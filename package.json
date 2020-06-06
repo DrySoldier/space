@@ -10,9 +10,16 @@
     "lint": "eslint ."
   },
   "dependencies": {
+    "@react-native-community/masked-view": "^0.1.10",
+    "@react-navigation/native": "^5.5.1",
+    "@react-navigation/stack": "^5.4.2",
     "react": "16.9.0",
     "react-game-kit": "^1.0.6",
     "react-native": "0.61.5",
+    "react-native-fast-image": "^8.1.5",
+    "react-native-gesture-handler": "^1.6.1",
+    "react-native-safe-area-context": "^3.0.2",
+    "react-native-screens": "^2.8.0",
     "rn-sprite-sheet": "^1.1.6"
   },
   "devDependencies": {

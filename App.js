@@ -1,26 +1,15 @@
-import React, {useState, useEffect} from 'react';
-import {
-  StyleSheet,
-  Text,
-  View,
-  SafeAreaView,
-  ActivityIndicator,
-} from 'react-native';
-import Game from './src/components/Game';
+import React from 'react';
+import { StyleSheet, View } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import RootStack from 'src/navigation/RootStack';
 
-export default function App() {
-  const [isLoadingComplete, setLoadingComplete] = useState(true);
-
-  if (isLoadingComplete) {
-    return (
-      <View style={styles.container}>
-        <Game />
-      </View>
-    );
-  } else {
-    return <ActivityIndicator />;
-  }
-}
+const App = () => (
+  <View style={styles.container}>
+    <NavigationContainer>
+      <RootStack />
+    </NavigationContainer>
+  </View>
+);
 
 const styles = StyleSheet.create({
   container: {
@@ -31,3 +20,5 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
 });
+
+export default App;

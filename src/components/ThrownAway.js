@@ -1,17 +1,17 @@
-import React, {useState, useEffect} from 'react';
-import {StyleSheet, Text, View, Animated, TouchableOpacity} from 'react-native';
-import {moderateScale as ms} from 'src/constants/scaling';
-import {images} from 'src/constants/images';
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, Text, View, Animated, TouchableOpacity } from 'react-native';
+import { moderateScale as ms } from 'src/constants/scaling';
+import { images } from 'src/constants/images';
 
 function randInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
-const ThrownAway = props => {
+const ThrownAway = (props) => {
   let opacity = new Animated.Value(0);
   let spinValue = new Animated.Value(0);
 
-  let currentImage = images.floor1;
+  let currentImage = require("../assets/newAssets/Elevator_tile.png");
   let currentHeight = ms(100);
 
   const spin = spinValue.interpolate({
