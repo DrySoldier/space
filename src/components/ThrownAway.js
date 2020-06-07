@@ -42,11 +42,13 @@ const ThrownAway = (props) => {
     ]).start();
   }, []);
 
+  // Render spaceguy falling
   if (props.spaceGuy) {
-    currentImage = images.astroLeft;
-    currentHeight = ms(200);
+    currentImage = require('../assets/newAssets/Astronaut-left-climb2.png');
+    currentHeight = ms(100);
   }
 
+  // If falling to left or right
   if (randInt(0, 1) === 0) {
     marginRight = 0;
   } else {

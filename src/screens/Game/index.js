@@ -1,16 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import {
-  Text,
-  View,
-  Animated,
-  TouchableOpacity,
-  Modal,
-  Alert,
-  Image,
-  ImageBackground,
-} from 'react-native';
+import { Text, View, Animated, TouchableOpacity, Image, ImageBackground } from 'react-native';
 import ThrownAway from 'src/components/ThrownAway';
 import HeightView from 'src/components/HeightView';
+import GameOverModal from 'src/components/GameOverModal';
 import { moderateScale as ms } from 'src/constants/scaling';
 import { images } from 'src/constants/images';
 
@@ -21,20 +13,33 @@ function randInt(min, max) {
 }
 
 const Game = () => {
-  const [currentSide, setSide] = useState('right');
+  // Current side player is on
+  const [currentSide, setSide] = useState('left');
   // 0 - no branch, 1 - left side branch, 2 - right side branch
   // The rantInts set up random branches on the top
-  const [branches, setNextBranch] = useState([randInt(0, 2), 0, randInt(0, 2), 0, 0, 0, 0]);
+  const defaultBranches = [randInt(0, 2), 0, randInt(0, 2), 0, 0, 0, 0];
+  const [branches, setNextBranch] = useState(defaultBranches);
+  // Used to space out branches
   const [lastBranch, setLastBranch] = useState(-1);
+  // All the branch views
   const [branchViews, setBranchViews] = useState([]);
+  // Array to store thrown away squares
   const [thrownAwayArr, setThrownAwayArr] = useState([]);
+  // A view set at the bottom, so to animate the entire stack of tiles going down
   const [heightArr, setHeightArr] = useState([
     <HeightView key={randInt(0, 99999)} callback={heightFinished} />,
   ]);
+  // Score
   const [score, setScore] = useState(-1);
+  // Game over modal
   const [modal, setModal] = useState(false);
+  // Variable for if next branch is on left or right. -1 is neither.
   const [branchLocation, setBranchLoc] = useState(-1);
-  const [playerModel, setPlayerModel] = useState(require('../assets/newAssets/Astronaut-right-climb2.png'));
+  // current player model TODO: Set up animated sprite
+  const [playerModel, setPlayerModel] = useState(
+    require('../../assets/newAssets/Astronaut-right-climb2.png'),
+  );
+  const [gameOver, setGameOver] = useState(false);
 
   let animatedValue = new Animated.Value(0);
   let nextBranch = -1;
@@ -43,8 +48,7 @@ const Game = () => {
 
   useEffect(() => {
     setBranchStatus();
-    setSide('right');
-    _handlePress('left');
+    _handlePress('right');
   }, []);
 
   useEffect(() => {
@@ -64,15 +68,28 @@ const Game = () => {
     }).start();
   }, [currentSide, setSide]);
 
-  useEffect(() => {}, [branches, setNextBranch]);
+  useEffect(() => {
+    if (gameOver) {
+      setNextBranch(defaultBranches);
+      setBranchLoc(-1);
+      setSide('right');
+      setModal(true);
+    } else if (!gameOver) {
+      setBranchStatus();
+      setPlayerModel(require('../../assets/newAssets/Astronaut-right-climb1.png'));
+      setModal(false);
+      _handlePress('right');
+      setScore(0);
+    }
+  }, [gameOver, setGameOver]);
 
   const setBranchStatus = () => {
-    let branchArr = branches.map((element, index) => {
+    const branchArr = branches.map((element, index) => {
       switch (element) {
         case 0:
           return (
             <ImageBackground
-              source={require('../assets/newAssets/Elevator_tile.png')}
+              source={require('../../assets/newAssets/Elevator_tile.png')}
               key={'nothing' + index + score}
               style={[styles.branch]}
             />
@@ -81,7 +98,7 @@ const Game = () => {
         case 1:
           return (
             <ImageBackground
-              source={require('../assets/newAssets/Elevator_tile.png')}
+              source={require('../../assets/newAssets/Elevator_tile.png')}
               key={'left' + index + score}
               style={[styles.branch, styles.branchLeft]}
             >
@@ -91,7 +108,7 @@ const Game = () => {
                   width: ms(100),
                   marginLeft: ms(-100),
                 }}
-                source={require('../assets/newAssets/Obstacle_tile.png')}
+                source={require('../../assets/newAssets/Obstacle_tile.png')}
               />
             </ImageBackground>
           );
@@ -99,13 +116,13 @@ const Game = () => {
         case 2:
           return (
             <ImageBackground
-              source={require('../assets/newAssets/Elevator_tile.png')}
+              source={require('../../assets/newAssets/Elevator_tile.png')}
               key={'right' + index + score}
               style={[styles.branch, styles.branchRight]}
             >
               <Image
                 style={{ height: ms(100), width: ms(100), marginLeft: ms(100) }}
-                source={require('../assets/newAssets/Obstacle_tile.png')}
+                source={require('../../assets/newAssets/Obstacle_tile.png')}
               />
             </ImageBackground>
           );
@@ -113,7 +130,7 @@ const Game = () => {
         default:
           return (
             <ImageBackground
-              source={require('../assets/newAssets/Elevator_tile.png')}
+              source={require('../../assets/newAssets/Elevator_tile.png')}
               key={'nothing' + index + score}
               style={[styles.branch]}
             />
@@ -126,24 +143,16 @@ const Game = () => {
   const _handlePress = (side) => {
     setSide(side);
     if (side === 'left') {
-      setPlayerModel(require('../assets/newAssets/Astronaut-right-climb1.png'));
+      setPlayerModel(require('../../assets/newAssets/Astronaut-right-climb1.png'));
     } else if (side === 'right') {
-      setPlayerModel(require('../assets/newAssets/Astronaut-left-climb2.png'));
-    }
-
-    // Check to see if player is chopping tree below branch
-    if ((side === 'left' && branches[6] === 1) || (side === 'right' && branches[6] === 2)) {
-      setModal(true);
-      spaceGuy = true;
-      setPlayerModel(images.nothing);
-    } else {
-      setScore(score + 1);
+      setPlayerModel(require('../../assets/newAssets/Astronaut-left-climb2.png'));
     }
 
     // Check to see if player is moving INTO a branch
     if ((side === 'left' && branchLocation === 1) || (side === 'right' && branchLocation === 2)) {
-      setModal(true);
+      setGameOver(true);
       spaceGuy = true;
+      setPlayerModel(images.nothing);
     } else {
       let copy = [...branches];
       copy.pop();
@@ -155,6 +164,15 @@ const Game = () => {
         <HeightView key={randInt(0, 99999)} callback={heightFinished} />,
       ]);
     }
+
+    // Check to see if player is chopping tree below branch
+    if ((side === 'left' && branches[6] === 1) || (side === 'right' && branches[6] === 2)) {
+      setGameOver(true);
+      spaceGuy = true;
+      setPlayerModel(images.nothing);
+    } else {
+      setScore(score + 1);
+    }
   };
 
   const _generateNewBranch = () => {
@@ -165,7 +183,7 @@ const Game = () => {
       nextBranch = randInt(0, 2);
     }
 
-    if (lastBranch != 0) {
+    if (lastBranch !== 0) {
       setLastBranch(0);
       return 0;
     } else {
@@ -219,41 +237,10 @@ const Game = () => {
         <View style={styles.ground} pointerEvents="none">
           {thrownAwayArr}
         </View>
-
-        <Modal
-          animationType="slide"
-          transparent={true}
-          visible={modal}
-          onRequestClose={() => Alert.alert('Modal has been closed.')}
-        >
-          <View style={styles.modalContainer}>
-            <ImageBackground
-              resizeMode={'stretch'}
-              source={require('../assets/newAssets/Spaceprobe.png')}
-              style={styles.modal}
-            >
-              <Text style={styles.white}>You Lost!</Text>
-              <Text style={styles.white}>{score}</Text>
-              <TouchableOpacity
-                onPress={() => {
-                  setNextBranch([0, 0, 0, 0, 0, 0, 0]);
-                  setScore(0);
-                  setBranchLoc(-1);
-                  setTimeout(() => {
-                    setBranchStatus();
-                    setModal(false);
-                    setPlayerModel(require('../assets/newAssets/Astronaut-left-climb1.png'));
-                  }, 50);
-                }}
-              >
-                <Text style={styles.white}>Restart</Text>
-              </TouchableOpacity>
-            </ImageBackground>
-          </View>
-        </Modal>
+        <GameOverModal visible={modal} score={score} resetGame={() => setGameOver(false)} />
       </ImageBackground>
     </View>
   );
-}
+};
 
 export default Game;

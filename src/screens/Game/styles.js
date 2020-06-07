@@ -1,4 +1,5 @@
 import { StyleSheet } from 'react-native';
+import { moderateScale as ms } from 'src/constants/scaling';
 
 const styles = StyleSheet.create({
     container: {
@@ -91,4 +92,3 @@ const styles = StyleSheet.create({
   });
 
   export default styles;
-  
