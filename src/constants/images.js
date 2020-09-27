@@ -1,6 +1,6 @@
 const images = {
-  astroLeft: require('src/assets/astro-left.png'),
-  astroRight: require('src/assets/astro-right.png'),
+  'astro-right': require('src/assets/newAssets/Astronaut-left-climb1.png'),
+  'astro-left': require('src/assets/newAssets/Astronaut-right-climb2.png'),
   sign: require('src/assets/sign.png'),
   space: require('src/assets/space.gif'),
   nothing: require('src/assets/nothing.png'),

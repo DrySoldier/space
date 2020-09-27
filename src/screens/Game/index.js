@@ -48,7 +48,6 @@ const Game = () => {
 
   useEffect(() => {
     setBranchStatus();
-    _handlePress('right');
   }, []);
 
   useEffect(() => {
@@ -142,11 +141,7 @@ const Game = () => {
 
   const _handlePress = (side) => {
     setSide(side);
-    if (side === 'left') {
-      setPlayerModel(require('../../assets/newAssets/Astronaut-right-climb1.png'));
-    } else if (side === 'right') {
-      setPlayerModel(require('../../assets/newAssets/Astronaut-left-climb2.png'));
-    }
+    setPlayerModel(images[`astro-${side}`]);
 
     // Check to see if player is moving INTO a branch
     if ((side === 'left' && branchLocation === 1) || (side === 'right' && branchLocation === 2)) {
