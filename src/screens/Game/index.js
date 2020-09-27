@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Text, View, Animated, TouchableOpacity, Image, ImageBackground } from 'react-native';
-import ThrownAway from 'src/components/ThrownAway';
-import HeightView from 'src/components/HeightView';
-import GameOverModal from 'src/components/GameOverModal';
+import { Text, View, Animated, TouchableOpacity } from 'react-native';
+import FastImage from 'react-native-fast-image';
 import { moderateScale as ms } from 'src/constants/scaling';
 import { images } from 'src/constants/images';
+import { ThrownAway, HeightView, GameOverModal, FastImageBackground } from '../../components';
 
 import styles from './styles';
 
@@ -44,7 +43,7 @@ const Game = () => {
   let animatedValue = new Animated.Value(0);
   let nextBranch = -1;
 
-  let spaceGuy = false;
+  let spaceGuySide;
 
   useEffect(() => {
     setBranchStatus();
@@ -69,6 +68,7 @@ const Game = () => {
 
   useEffect(() => {
     if (gameOver) {
+      setPlayerModel(images.nothing);
       setNextBranch(defaultBranches);
       setBranchLoc(-1);
       setSide('right');
@@ -87,7 +87,7 @@ const Game = () => {
       switch (element) {
         case 0:
           return (
-            <ImageBackground
+            <FastImageBackground
               source={require('../../assets/newAssets/Elevator_tile.png')}
               key={'nothing' + index + score}
               style={[styles.branch]}
@@ -96,12 +96,12 @@ const Game = () => {
 
         case 1:
           return (
-            <ImageBackground
+            <FastImageBackground
               source={require('../../assets/newAssets/Elevator_tile.png')}
               key={'left' + index + score}
               style={[styles.branch, styles.branchLeft]}
             >
-              <Image
+              <FastImage
                 style={{
                   height: ms(100),
                   width: ms(100),
@@ -109,26 +109,26 @@ const Game = () => {
                 }}
                 source={require('../../assets/newAssets/Obstacle_tile.png')}
               />
-            </ImageBackground>
+            </FastImageBackground>
           );
 
         case 2:
           return (
-            <ImageBackground
+            <FastImageBackground
               source={require('../../assets/newAssets/Elevator_tile.png')}
               key={'right' + index + score}
               style={[styles.branch, styles.branchRight]}
             >
-              <Image
+              <FastImage
                 style={{ height: ms(100), width: ms(100), marginLeft: ms(100) }}
                 source={require('../../assets/newAssets/Obstacle_tile.png')}
               />
-            </ImageBackground>
+            </FastImageBackground>
           );
 
         default:
           return (
-            <ImageBackground
+            <FastImageBackground
               source={require('../../assets/newAssets/Elevator_tile.png')}
               key={'nothing' + index + score}
               style={[styles.branch]}
@@ -146,8 +146,7 @@ const Game = () => {
     // Check to see if player is moving INTO a branch
     if ((side === 'left' && branchLocation === 1) || (side === 'right' && branchLocation === 2)) {
       setGameOver(true);
-      spaceGuy = true;
-      setPlayerModel(images.nothing);
+      spaceGuySide = side;
     } else {
       let copy = [...branches];
       copy.pop();
@@ -163,8 +162,7 @@ const Game = () => {
     // Check to see if player is chopping tree below branch
     if ((side === 'left' && branches[6] === 1) || (side === 'right' && branches[6] === 2)) {
       setGameOver(true);
-      spaceGuy = true;
-      setPlayerModel(images.nothing);
+      spaceGuySide = side;
     } else {
       setScore(score + 1);
     }
@@ -192,7 +190,7 @@ const Game = () => {
     copy.pop();
     setHeightArr(copy);
 
-    var newThrownAway = <ThrownAway spaceGuy={spaceGuy} key={randInt(0, 99999)} />;
+    var newThrownAway = <ThrownAway spaceGuySide={spaceGuySide} key={randInt(0, 99999)} />;
     setThrownAwayArr([...thrownAwayArr, newThrownAway]);
 
     setBranchStatus();
@@ -200,7 +198,7 @@ const Game = () => {
 
   return (
     <View style={styles.container}>
-      <ImageBackground source={images.space} style={styles.container}>
+      <FastImageBackground source={images.space} style={styles.container}>
         <TouchableOpacity style={styles.leftSide} onPress={() => _handlePress('left')}>
           <View style={styles.side} />
         </TouchableOpacity>
@@ -218,7 +216,7 @@ const Game = () => {
 
         <View style={styles.playerContainer} pointerEvents="none">
           <Animated.View style={{ marginLeft: animatedValue }}>
-            <Image style={styles.player} source={playerModel} />
+            <FastImage style={styles.player} source={playerModel} />
           </Animated.View>
         </View>
 
@@ -233,7 +231,7 @@ const Game = () => {
           {thrownAwayArr}
         </View>
         <GameOverModal visible={modal} score={score} resetGame={() => setGameOver(false)} />
-      </ImageBackground>
+      </FastImageBackground>
     </View>
   );
 };

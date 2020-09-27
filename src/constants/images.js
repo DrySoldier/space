@@ -1,8 +1,7 @@
 const images = {
   'astro-right': require('src/assets/newAssets/Astronaut-left-climb1.png'),
   'astro-left': require('src/assets/newAssets/Astronaut-right-climb2.png'),
-  sign: require('src/assets/sign.png'),
-  space: require('src/assets/space.gif'),
+  space: require('src/assets/newAssets/space-background.gif'),
   nothing: require('src/assets/nothing.png'),
 
   floorCorner: require('src/assets/future/Floor_1_Corner.png'),
@@ -21,4 +20,4 @@ const images = {
 
 let imageValues = Object.values(images);
 
-export {imageValues, images};
+export { imageValues, images };

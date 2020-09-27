@@ -1,17 +1,27 @@
-import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, Animated, TouchableOpacity } from 'react-native';
-import { moderateScale as ms } from 'src/constants/scaling';
-import { images } from 'src/constants/images';
+import React, { useEffect } from 'react';
+import { StyleSheet, View, Animated } from 'react-native';
+import FastImage from 'react-native-fast-image';
+import { moderateScale as ms } from '../constants/scaling';
+import { images } from '../constants/images';
 
-function randInt(min, max) {
-  return Math.floor(Math.random() * (max - min + 1) + min);
+const AnimatedFastImage = Animated.createAnimatedComponent(FastImage);
+
+const randInt = (min, max) => Math.floor(Math.random() * (max - min + 1) + min);
+
+enum spaceGuySideTypes {
+  LEFT = 'left',
+  RIGHT = 'right',
 }
 
-const ThrownAway = (props) => {
+interface ThrownAwayProps {
+  spaceGuySide: spaceGuySideTypes;
+}
+
+export const ThrownAway: React.FC<ThrownAwayProps> = ({ spaceGuySide }) => {
   let opacity = new Animated.Value(0);
   let spinValue = new Animated.Value(0);
 
-  let currentImage = require("../assets/newAssets/Elevator_tile.png");
+  let currentImage = require('../assets/newAssets/Elevator_tile.png');
   let currentHeight = ms(100);
 
   const spin = spinValue.interpolate({
@@ -29,35 +39,47 @@ const ThrownAway = (props) => {
     outputRange: [0, randInt(300, 500)],
   });
 
+  let marginTop = opacity.interpolate({
+    inputRange: [0, 0.5, 1],
+    outputRange: [0, randInt(50, 200), randInt(50, 150)],
+  });
+
   useEffect(() => {
     Animated.parallel([
       Animated.timing(opacity, {
         toValue: 1,
         duration: 1000,
+        useNativeDriver: false,
       }),
       Animated.timing(spinValue, {
         toValue: 1,
         duration: 1000,
+        useNativeDriver: false,
       }),
     ]).start();
   }, []);
 
   // Render spaceguy falling
-  if (props.spaceGuy) {
-    currentImage = require('../assets/newAssets/Astronaut-left-climb2.png');
+  if (spaceGuySide) {
+    currentImage = images[`astro-${spaceGuySide}`];
     currentHeight = ms(100);
-  }
 
-  // If falling to left or right
-  if (randInt(0, 1) === 0) {
-    marginRight = 0;
-  } else {
-    marginLeft = 0;
+    marginTop = opacity.interpolate({
+      inputRange: [0, 0.5, 1],
+      outputRange: [-100, randInt(50, 200), randInt(50, 150)],
+    });
+
+    // If falling to left or right
+    if (spaceGuySide === spaceGuySideTypes.RIGHT) {
+      marginRight = -100;
+    } else {
+      marginLeft = -100;
+    }
   }
 
   return (
     <View style={styles.thrownAwayContainer}>
-      <Animated.Image
+      <AnimatedFastImage
         source={currentImage}
         style={[
           styles.thrownAwayBranch,
@@ -77,16 +99,12 @@ const ThrownAway = (props) => {
                 rotate: spin,
               },
             ],
-            marginTop: opacity.interpolate({
-              inputRange: [0, 0.5, 1],
-              outputRange: [0, randInt(50, 200), randInt(50, 150)],
-            }),
-            marginLeft: marginLeft,
-            marginRight: marginRight,
+            marginTop,
+            marginLeft,
+            marginRight,
             height: currentHeight,
           },
         ]}
-        pointerEvents="none"
       />
     </View>
   );
@@ -104,5 +122,3 @@ const styles = StyleSheet.create({
     height: '100%',
   },
 });
-
-export default ThrownAway;

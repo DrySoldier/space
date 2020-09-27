@@ -16,21 +16,27 @@
     "react": "16.9.0",
     "react-game-kit": "^1.0.6",
     "react-native": "0.61.5",
-    "react-native-fast-image": "^8.1.5",
+    "react-native-fast-image": "^8.3.2",
     "react-native-gesture-handler": "^1.6.1",
     "react-native-safe-area-context": "^3.0.2",
     "react-native-screens": "^2.8.0",
-    "rn-sprite-sheet": "^1.1.6"
+    "rn-sprite-sheet": "^1.1.6",
+    "uuid": "^8.3.0"
   },
   "devDependencies": {
     "@babel/core": "^7.8.7",
     "@babel/runtime": "^7.8.7",
     "@react-native-community/eslint-config": "^0.0.7",
+    "@types/jest": "^26.0.14",
+    "@types/react": "^16.9.49",
+    "@types/react-native": "^0.63.22",
+    "@types/react-test-renderer": "^16.9.3",
     "babel-jest": "^25.1.0",
     "eslint": "^6.8.0",
     "jest": "^25.1.0",
     "metro-react-native-babel-preset": "^0.59.0",
-    "react-test-renderer": "16.9.0"
+    "react-test-renderer": "16.9.0",
+    "typescript": "^4.0.3"
   },
   "jest": {
     "preset": "react-native"
