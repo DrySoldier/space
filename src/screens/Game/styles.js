@@ -30,9 +30,9 @@ const styles = StyleSheet.create({
       width: '100%',
     },
     player: {
-      height: ms(100),
-      width: ms(50),
-      marginTop: ms(400),
+      height: ms(125),
+      width: ms(75),
+      marginTop: ms(350),
     },
     playerContainer: {
       width: '100%',
@@ -41,7 +41,7 @@ const styles = StyleSheet.create({
     },
     branchContainer: {
       flex: 1,
-      paddingBottom: ms(190),
+      paddingBottom: ms(350),
       width: '100%',
       position: 'absolute',
       alignItems: 'center',
@@ -64,7 +64,7 @@ const styles = StyleSheet.create({
     },
     ground: {
       width: '100%',
-      height: ms(160),
+      height: ms(185),
       alignSelf: 'flex-end',
       position: 'absolute',
     },

@@ -1,8 +1,8 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Animated } from 'react-native';
 
 export const HeightView = ({ callback }) => {
-  let heightValue = new Animated.Value(0);
+  let heightValue = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     Animated.timing(heightValue, {

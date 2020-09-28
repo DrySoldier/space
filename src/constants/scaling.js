@@ -1,4 +1,4 @@
-import { Dimensions, Platform } from 'react-native';
+import { Dimensions } from 'react-native';
 const { width, height } = Dimensions.get('window');
 
 //Guideline sizes are based on standard ~5" screen mobile device

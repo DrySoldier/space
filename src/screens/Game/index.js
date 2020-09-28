@@ -1,22 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Text, View, Animated, TouchableOpacity } from 'react-native';
 import FastImage from 'react-native-fast-image';
-import { moderateScale as ms } from 'src/constants/scaling';
-import { images } from 'src/constants/images';
+import ProgressBar from 'react-native-progress/Bar';
 import { ThrownAway, HeightView, GameOverModal, FastImageBackground } from '../../components';
+import { images, moderateScale as ms } from '../../constants';
+import { randInt, useInterval } from '../../utils';
 
 import styles from './styles';
 
-function randInt(min, max) {
-  return Math.floor(Math.random() * (max - min + 1) + min);
-}
+const AnimatedFastImage = Animated.createAnimatedComponent(FastImage);
 
-const Game = () => {
+const Game = ({ navigation }) => {
   // Current side player is on
   const [currentSide, setSide] = useState('left');
   // 0 - no branch, 1 - left side branch, 2 - right side branch
   // The rantInts set up random branches on the top
-  const defaultBranches = [randInt(0, 2), 0, randInt(0, 2), 0, 0, 0, 0];
+  const defaultBranches = [0, randInt(0, 2), 0, randInt(0, 2), 0, 0, 0, 0];
   const [branches, setNextBranch] = useState(defaultBranches);
   // Used to space out branches
   const [lastBranch, setLastBranch] = useState(-1);
@@ -35,61 +34,36 @@ const Game = () => {
   // Variable for if next branch is on left or right. -1 is neither.
   const [branchLocation, setBranchLoc] = useState(-1);
   // current player model TODO: Set up animated sprite
-  const [playerModel, setPlayerModel] = useState(
-    require('../../assets/newAssets/Astronaut-right-climb2.png'),
-  );
+  const defaultPosition = images['astro-left-2'];
+  const [playerModel, setPlayerModel] = useState(defaultPosition);
+  const [step, setStep] = useState(false);
   const [gameOver, setGameOver] = useState(false);
+  const [progressBarVal, setProgressBarVal] = useState(1);
+  const [progressBarPaused, setProgressBarPaused] = useState(false);
 
-  let animatedValue = new Animated.Value(0);
   let nextBranch = -1;
 
-  let spaceGuySide;
+  const astroSwapSideVal = useRef(new Animated.Value(0)).current;
+  const astroSpin = useRef(new Animated.Value(0)).current;
 
-  useEffect(() => {
-    setBranchStatus();
-  }, []);
+  const spin = astroSpin.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['0deg', `${randInt(5, 290)}deg`],
+  });
 
-  useEffect(() => {
-    let toValue = null;
-
-    if (currentSide === 'left') {
-      animatedValue.setValue(ms(125));
-      toValue = ms(-125);
-    } else if (currentSide === 'right') {
-      animatedValue.setValue(ms(-125));
-      toValue = ms(125);
-    }
-
-    Animated.timing(animatedValue, {
-      toValue: toValue,
-      duration: 25,
-    }).start();
-  }, [currentSide, setSide]);
-
-  useEffect(() => {
-    if (gameOver) {
-      setPlayerModel(images.nothing);
-      setNextBranch(defaultBranches);
-      setBranchLoc(-1);
-      setSide('right');
-      setModal(true);
-    } else if (!gameOver) {
-      setBranchStatus();
-      setPlayerModel(require('../../assets/newAssets/Astronaut-right-climb1.png'));
-      setModal(false);
-      _handlePress('right');
-      setScore(0);
-    }
-  }, [gameOver, setGameOver]);
+  const scale = astroSpin.interpolate({
+    inputRange: [0.2, 1],
+    outputRange: [0.78, 0],
+  });
 
   const setBranchStatus = () => {
-    const branchArr = branches.map((element, index) => {
+    const branchArr = branches.map((element) => {
       switch (element) {
         case 0:
           return (
             <FastImageBackground
-              source={require('../../assets/newAssets/Elevator_tile.png')}
-              key={'nothing' + index + score}
+              source={images.elevatorTile}
+              key={randInt(0, 99999)}
               style={[styles.branch]}
             />
           );
@@ -97,8 +71,8 @@ const Game = () => {
         case 1:
           return (
             <FastImageBackground
-              source={require('../../assets/newAssets/Elevator_tile.png')}
-              key={'left' + index + score}
+              source={images.elevatorTile}
+              key={randInt(0, 99999)}
               style={[styles.branch, styles.branchLeft]}
             >
               <FastImage
@@ -107,7 +81,7 @@ const Game = () => {
                   width: ms(100),
                   marginLeft: ms(-100),
                 }}
-                source={require('../../assets/newAssets/Obstacle_tile.png')}
+                source={images.obstacleTile}
               />
             </FastImageBackground>
           );
@@ -115,13 +89,18 @@ const Game = () => {
         case 2:
           return (
             <FastImageBackground
-              source={require('../../assets/newAssets/Elevator_tile.png')}
-              key={'right' + index + score}
+              source={images.elevatorTile}
+              key={randInt(0, 99999)}
               style={[styles.branch, styles.branchRight]}
             >
               <FastImage
-                style={{ height: ms(100), width: ms(100), marginLeft: ms(100) }}
-                source={require('../../assets/newAssets/Obstacle_tile.png')}
+                style={{
+                  height: ms(100),
+                  width: ms(100),
+                  marginLeft: ms(100),
+                  transform: [{ rotate: '180deg' }],
+                }}
+                source={images.obstacleTile}
               />
             </FastImageBackground>
           );
@@ -129,8 +108,8 @@ const Game = () => {
         default:
           return (
             <FastImageBackground
-              source={require('../../assets/newAssets/Elevator_tile.png')}
-              key={'nothing' + index + score}
+              source={images.elevatorTile}
+              key={randInt(0, 99999)}
               style={[styles.branch]}
             />
           );
@@ -139,20 +118,34 @@ const Game = () => {
     setBranchViews(branchArr);
   };
 
+  useInterval(() => {
+    const progressBarDecrease = progressBarVal - 0.025;
+    if (!progressBarPaused) {
+      setProgressBarVal(progressBarDecrease);
+    }
+  }, 100);
+
   const _handlePress = (side) => {
+    setStep(!step);
     setSide(side);
-    setPlayerModel(images[`astro-${side}`]);
+
+    const newProgressBarVal = progressBarVal + 0.065;
+    if (newProgressBarVal > 1) {
+      setProgressBarVal(1);
+    } else {
+      setProgressBarVal(newProgressBarVal);
+    }
 
     // Check to see if player is moving INTO a branch
     if ((side === 'left' && branchLocation === 1) || (side === 'right' && branchLocation === 2)) {
       setGameOver(true);
-      spaceGuySide = side;
+      return
     } else {
       let copy = [...branches];
       copy.pop();
       copy.unshift(_generateNewBranch());
       setNextBranch(copy);
-      setBranchLoc(branches[6]);
+      setBranchLoc(branches[branches.length - 1]);
       setHeightArr([
         ...heightArr,
         <HeightView key={randInt(0, 99999)} callback={heightFinished} />,
@@ -160,9 +153,11 @@ const Game = () => {
     }
 
     // Check to see if player is chopping tree below branch
-    if ((side === 'left' && branches[6] === 1) || (side === 'right' && branches[6] === 2)) {
+    if (
+      (side === 'left' && branches[branches.length - 1] === 1) ||
+      (side === 'right' && branches[branches.length - 1] === 2)
+    ) {
       setGameOver(true);
-      spaceGuySide = side;
     } else {
       setScore(score + 1);
     }
@@ -171,7 +166,7 @@ const Game = () => {
   const _generateNewBranch = () => {
     nextBranch = randInt(0, 2);
 
-    // make empty branches a little more rare
+    // Make empty branches a little more rare
     if (nextBranch === 0) {
       nextBranch = randInt(0, 2);
     }
@@ -190,11 +185,75 @@ const Game = () => {
     copy.pop();
     setHeightArr(copy);
 
-    var newThrownAway = <ThrownAway spaceGuySide={spaceGuySide} key={randInt(0, 99999)} />;
+    var newThrownAway = <ThrownAway key={randInt(0, 99999)} />;
     setThrownAwayArr([...thrownAwayArr, newThrownAway]);
 
     setBranchStatus();
   };
+
+  useEffect(() => {
+    setBranchStatus();
+  }, []);
+
+  useEffect(() => {
+    if (progressBarVal <= 0) {
+      setGameOver(true);
+    }
+  }, [progressBarVal]);
+
+  useEffect(() => {
+    let toValue = null;
+
+    if (currentSide === 'left') {
+      astroSwapSideVal.setValue(ms(125));
+      toValue = ms(-125);
+    } else if (currentSide === 'right') {
+      astroSwapSideVal.setValue(ms(-125));
+      toValue = ms(125);
+    }
+
+    Animated.timing(astroSwapSideVal, {
+      toValue: toValue,
+      duration: 25,
+    }).start();
+  }, [currentSide]);
+
+  useEffect(() => {
+    const stepNumber = step ? 1 : 2;
+
+    if (currentSide === 'left') {
+      setPlayerModel(images[`astro-right-${stepNumber}`]);
+    } else if (currentSide === 'right') {
+      setPlayerModel(images[`astro-left-${stepNumber}`]);
+    }
+  }, [step, currentSide]);
+
+  useEffect(() => {
+    if (gameOver) {
+      setNextBranch(defaultBranches);
+      setBranchLoc(-1);
+      setModal(true);
+      setProgressBarPaused(true);
+      setProgressBarVal(1);
+
+      Animated.timing(astroSpin, {
+        toValue: 1,
+        duration: 1000,
+      }).start();
+    } else if (!gameOver) {
+      setProgressBarPaused(false);
+      setBranchStatus();
+      setPlayerModel(defaultPosition);
+      setModal(false);
+      _handlePress('right');
+      setScore(0);
+
+      Animated.timing(astroSpin, {
+        toValue: 0,
+        duration: 0,
+      }).start();
+    }
+  }, [gameOver, setGameOver]);
 
   return (
     <View style={styles.container}>
@@ -215,22 +274,47 @@ const Game = () => {
         </View>
 
         <View style={styles.playerContainer} pointerEvents="none">
-          <Animated.View style={{ marginLeft: animatedValue }}>
-            <FastImage style={styles.player} source={playerModel} />
+          <Animated.View
+            style={{
+              marginLeft: astroSwapSideVal,
+              marginTop: astroSpin.interpolate({
+                inputRange: [0, 1],
+                outputRange: [0, 300],
+              }),
+            }}
+          >
+            <AnimatedFastImage
+              style={{
+                ...styles.player,
+                transform: [
+                  {
+                    scale
+                  },
+                  {
+                    rotate: spin,
+                  },
+                ],
+              }}
+              source={playerModel}
+            />
           </Animated.View>
         </View>
 
         <View style={styles.headerContainer} pointerEvents="none">
-          {
-            //<ProgressBarAnimated value={progress} maxValue={100} width={barWidth}></ProgressBarAnimated>
-          }
+          <View style={{ alignItems: 'center', marginBottom: ms(15) }}>
+            <ProgressBar
+              progress={progressBarVal}
+              width={200}
+              height={20}
+            />
+          </View>
           <Text style={styles.score}>{score}</Text>
         </View>
 
         <View style={styles.ground} pointerEvents="none">
           {thrownAwayArr}
         </View>
-        <GameOverModal visible={modal} score={score} resetGame={() => setGameOver(false)} />
+        <GameOverModal navigation={navigation} visible={modal} score={score} resetGame={() => setGameOver(false)} />
       </FastImageBackground>
     </View>
   );

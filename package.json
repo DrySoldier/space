@@ -18,6 +18,7 @@
     "react-native": "0.61.5",
     "react-native-fast-image": "^8.3.2",
     "react-native-gesture-handler": "^1.6.1",
+    "react-native-progress": "^4.1.2",
     "react-native-safe-area-context": "^3.0.2",
     "react-native-screens": "^2.8.0",
     "rn-sprite-sheet": "^1.1.6",
