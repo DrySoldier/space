@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { StyleSheet, View, Animated, Dimensions } from 'react-native';
+import { StyleSheet, View, Animated } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { moderateScale as ms } from '../constants/scaling';
 import { images } from '../constants/images';

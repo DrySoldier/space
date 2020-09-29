@@ -8,15 +8,16 @@ const styles = StyleSheet.create({
     fontFamily: 'GillSans-Bold',
   },
   button: {
-    height: 130,
-    width: 180,
+    height: ms(130),
+    width: ms(180),
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 50,
+    marginRight: ms(50),
   },
   buttonText: {
     color: 'white',
     fontFamily: 'GillSans-Bold',
+    textAlign: 'center'
   },
   buttonContainer: {
     flex: 3,
@@ -34,8 +35,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   astro: {
-    height: 100,
-    width: 100,
+    height: ms(100),
+    width: ms(100),
     position: 'absolute',
     top: ms(250),
   },

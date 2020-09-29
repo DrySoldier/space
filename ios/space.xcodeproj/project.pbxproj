@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		00E356F31AD99517003FC87E /* spaceTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* spaceTests.m */; };
 		13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.m */; };
-		13B07FBD1A68108700A75B9A /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB11A68108700A75B9A /* LaunchScreen.xib */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		2D02E4BC1E0B4A80006451C7 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.m */; };
@@ -17,6 +16,7 @@
 		2D02E4BF1E0B4AB3006451C7 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		2DCD954D1E0B4F2C00145EB5 /* spaceTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* spaceTests.m */; };
 		3827C1852B730D11A72E5014 /* libPods-space.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2A9466FAFC604CDD6EDD54F4 /* libPods-space.a */; };
+		835EFAE42522DECD00EF4F8B /* BootSplash.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 835EFAE32522DECD00EF4F8B /* BootSplash.storyboard */; };
 		AD92904C663AC078EAA8F21E /* libPods-space-tvOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5BCCC486A81BC7A209D47083 /* libPods-space-tvOS.a */; };
 		C5F30888F677FE32BFE68329 /* libPods-spaceTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3FF1A28789DFE4EFCCEB3D1E /* libPods-spaceTests.a */; };
 		CFB3ECC4DA91AC363B83D9BA /* libPods-space-tvOSTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FA34F0E517817E7F4BFE778E /* libPods-space-tvOSTests.a */; };
@@ -47,7 +47,6 @@
 		13B07F961A680F5B00A75B9A /* space.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = space.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = space/AppDelegate.h; sourceTree = "<group>"; };
 		13B07FB01A68108700A75B9A /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = space/AppDelegate.m; sourceTree = "<group>"; };
-		13B07FB21A68108700A75B9A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = space/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = space/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = space/main.m; sourceTree = "<group>"; };
@@ -60,6 +59,7 @@
 		3FF1A28789DFE4EFCCEB3D1E /* libPods-spaceTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-spaceTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		5BCCC486A81BC7A209D47083 /* libPods-space-tvOS.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-space-tvOS.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		75E3175BCED85F2509E34D1A /* Pods-space-tvOS.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-space-tvOS.debug.xcconfig"; path = "Target Support Files/Pods-space-tvOS/Pods-space-tvOS.debug.xcconfig"; sourceTree = "<group>"; };
+		835EFAE32522DECD00EF4F8B /* BootSplash.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = BootSplash.storyboard; path = space/BootSplash.storyboard; sourceTree = "<group>"; };
 		8985E4BE72E2A20107A87FCF /* Pods-space-tvOSTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-space-tvOSTests.release.xcconfig"; path = "Target Support Files/Pods-space-tvOSTests/Pods-space-tvOSTests.release.xcconfig"; sourceTree = "<group>"; };
 		8FA0D99F8844F9DC2B978658 /* Pods-spaceTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-spaceTests.debug.xcconfig"; path = "Target Support Files/Pods-spaceTests/Pods-spaceTests.debug.xcconfig"; sourceTree = "<group>"; };
 		A3F9C0A0AC2F6E794B044228 /* Pods-space.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-space.release.xcconfig"; path = "Target Support Files/Pods-space/Pods-space.release.xcconfig"; sourceTree = "<group>"; };
@@ -125,12 +125,12 @@
 		13B07FAE1A68108700A75B9A /* space */ = {
 			isa = PBXGroup;
 			children = (
+				835EFAE32522DECD00EF4F8B /* BootSplash.storyboard */,
 				008F07F21AC5B25A0029DE68 /* main.jsbundle */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.m */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
 				13B07FB61A68108700A75B9A /* Info.plist */,
-				13B07FB11A68108700A75B9A /* LaunchScreen.xib */,
 				13B07FB71A68108700A75B9A /* main.m */,
 			);
 			name = space;
@@ -337,7 +337,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
-				13B07FBD1A68108700A75B9A /* LaunchScreen.xib in Resources */,
+				835EFAE42522DECD00EF4F8B /* BootSplash.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -564,18 +564,6 @@
 			targetProxy = 2D02E4911E0B4A5D006451C7 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
-
-/* Begin PBXVariantGroup section */
-		13B07FB11A68108700A75B9A /* LaunchScreen.xib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				13B07FB21A68108700A75B9A /* Base */,
-			);
-			name = LaunchScreen.xib;
-			path = space;
-			sourceTree = "<group>";
-		};
-/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		00E356F61AD99517003FC87E /* Debug */ = {

@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { View, TouchableOpacity, Text, Animated, Easing } from 'react-native';
 import FastImage from 'react-native-fast-image';
+import RNBootSplash from 'react-native-bootsplash';
 import { FastImageBackground } from '../../components';
 import { images } from '../../constants/images';
 import styles from './styles';
@@ -43,11 +44,11 @@ const Home = ({ navigation }) => {
 
   const startAstroRotateAnimation = () => {
     astroDegree.setValue(0);
-  
+
     Animated.timing(astroDegree, {
       toValue: 1,
       duration: 10000,
-      easing: Easing.linear
+      easing: Easing.linear,
     }).start(() => startAstroRotateAnimation());
   };
 
@@ -57,7 +58,7 @@ const Home = ({ navigation }) => {
     Animated.timing(astroPosition, {
       toValue: 1,
       duration: 15000,
-      easing: Easing.ease
+      easing: Easing.ease,
     }).start(() => startAstroPositionAnimation());
   };
 
@@ -65,43 +66,46 @@ const Home = ({ navigation }) => {
     startButtonRotateAnimation();
     startAstroRotateAnimation();
     startAstroPositionAnimation();
+
+    RNBootSplash.hide({ duration: 250 });
   }, []);
 
   return (
-    <View style={{ flex: 1 }}>
-      <FastImageBackground source={images.space} style={{ flex: 1 }}>
-        <View style={styles.titleContainer}>
-          <Text style={styles.title}>SPACE CLIMB</Text>
-          <Text style={styles.subtitle}>(title pending)</Text>
-        </View>
-        <AnimatedFastImage style={{ ...styles.astro, left: xPosition, transform: [{ rotate: astro360 }] }} source={images["astro-right-2"]} />
-        <View style={styles.buttonContainer}>
-          <Animated.View style={{ transform: [{ rotate: spin }], paddingLeft: 125 }}>
-            <TouchableOpacity onPress={() => navigation.navigate('Game')}>
-              <FastImageBackground
-                style={styles.button}
-                resizeMode="stretch"
-                source={images.spaceProbe}
-              >
-                <Text style={styles.buttonText}>PLAY</Text>
-              </FastImageBackground>
-            </TouchableOpacity>
-          </Animated.View>
-          <Animated.View style={{ transform: [{ rotate: oppositeSpin }] }}>
-            <TouchableOpacity>
-              <FastImageBackground
-                style={styles.button}
-                resizeMode="stretch"
-                source={images.spaceProbe}
-              >
-                <Text style={styles.buttonText}>CREDITS</Text>
-              </FastImageBackground>
-            </TouchableOpacity>
-          </Animated.View>
-        </View>
-        <View style={{ flex: 1 }} />
-      </FastImageBackground>
-    </View>
+    <FastImageBackground source={images.space} style={{ flex: 1 }}>
+      <View style={styles.titleContainer}>
+        <Text style={styles.title}>SPACE CLIMB</Text>
+        <Text style={styles.subtitle}>(title pending)</Text>
+      </View>
+      <AnimatedFastImage
+        style={{ ...styles.astro, left: xPosition, transform: [{ rotate: astro360 }] }}
+        source={images['astro-right-2']}
+      />
+      <View style={styles.buttonContainer}>
+        <Animated.View style={{ transform: [{ rotate: spin }], paddingLeft: 125 }}>
+          <TouchableOpacity onPress={() => navigation.navigate('Game')}>
+            <FastImageBackground
+              style={styles.button}
+              resizeMode="stretch"
+              source={images.spaceProbe}
+            >
+              <Text style={styles.buttonText}>PLAY</Text>
+            </FastImageBackground>
+          </TouchableOpacity>
+        </Animated.View>
+        <Animated.View style={{ transform: [{ rotate: oppositeSpin }] }}>
+          <TouchableOpacity onPress={() => navigation.navigate('Settings')}>
+            <FastImageBackground
+              style={styles.button}
+              resizeMode="stretch"
+              source={images.spaceProbe}
+            >
+              <Text style={styles.buttonText}>SETTINGS</Text>
+            </FastImageBackground>
+          </TouchableOpacity>
+        </Animated.View>
+      </View>
+      <View style={{ flex: 1 }} />
+    </FastImageBackground>
   );
 };
 
