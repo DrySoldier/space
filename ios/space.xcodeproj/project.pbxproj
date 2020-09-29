@@ -194,7 +194,6 @@
 				8FA0D99F8844F9DC2B978658 /* Pods-spaceTests.debug.xcconfig */,
 				221DE88D3CA199069BC61176 /* Pods-spaceTests.release.xcconfig */,
 			);
-			name = Pods;
 			path = Pods;
 			sourceTree = "<group>";
 		};
@@ -308,6 +307,7 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 				Base,
 			);

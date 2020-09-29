@@ -1,11 +1,14 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { Text, View, TouchableOpacity, Modal, Alert, Animated } from 'react-native';
 import { FastImageBackground } from '../FastImageBackground';
 import styles from './styles';
 import { images } from '../../constants/images';
+import { retrieveData, storeData } from '../../utils/asyncData';
 
 export const GameOverModal = ({ visible, score, resetGame, navigation }) => {
   const buttonDegree = useRef(new Animated.Value(0)).current;
+
+  const [hiScore, setHiScore] = useState(null);
 
   const spin = buttonDegree.interpolate({
     inputRange: [0, 1],
@@ -25,10 +28,24 @@ export const GameOverModal = ({ visible, score, resetGame, navigation }) => {
       duration: 5000,
     }).start(() => startButtonRotateAnimation());
   };
+  const saveScore = async () => {
+    const hiScore = await retrieveData('HISCORE');
+
+    if (score > hiScore) {
+      storeData('HISCORE', score);
+      setHiScore(score);
+    } else {
+      setHiScore(hiScore);
+    }
+  };
 
   useEffect(() => {
     startButtonRotateAnimation();
   }, []);
+
+  useEffect(() => {
+    saveScore();
+  }, [score]);
 
   return (
     <Modal
@@ -43,19 +60,11 @@ export const GameOverModal = ({ visible, score, resetGame, navigation }) => {
           source={images.spaceProbe}
           style={styles.mainSpaceProbe}
         >
-          <View
-            style={{
-              flex: 1,
-              justifyContent: 'space-evenly',
-              alignItems: 'center',
-              paddingVertical: 75,
-              paddingHorizontal: 115,
-            }}
-          >
-            <Text style={styles.white}>Game Over</Text>
+          <View style={styles.gameOverContainer}>
+            <Text style={styles.headerText}>Game Over</Text>
             <View style={{ alignItems: 'center' }}>
-              <Text style={styles.white}>Your score</Text>
-              <Text style={styles.white}>{score}</Text>
+              <Text style={styles.headerText}>Your score</Text>
+              <Text style={styles.scoreText}>{score}</Text>
             </View>
           </View>
         </FastImageBackground>
@@ -64,22 +73,14 @@ export const GameOverModal = ({ visible, score, resetGame, navigation }) => {
           source={images.spaceProbe}
           style={styles.hiScoreSpaceProbe}
         >
-          <View
-            style={{
-              flex: 1,
-              justifyContent: 'space-evenly',
-              alignItems: 'center',
-              paddingVertical: 50,
-              paddingHorizontal: 50,
-            }}
-          >
+          <View style={styles.hiScoreContainer}>
             <View style={{ alignItems: 'center' }}>
-              <Text style={styles.white}>Hi-Score</Text>
-              <Text style={styles.white}>{score}</Text>
+              <Text style={styles.headerText}>Hi-Score</Text>
+              <Text style={styles.scoreText}>{hiScore}</Text>
             </View>
           </View>
         </FastImageBackground>
-        <View style={{ width: '100%', flexDirection: 'row', justifyContent: 'space-evenly' }}>
+        <View style={styles.buttonContainer}>
           <Animated.View style={{ transform: [{ rotate: spin }] }}>
             <TouchableOpacity onPress={() => navigation.navigate('Home')}>
               <FastImageBackground
@@ -87,16 +88,7 @@ export const GameOverModal = ({ visible, score, resetGame, navigation }) => {
                 source={images.spaceProbe}
                 style={styles.spaceProbe}
               >
-                <Text
-                  style={{
-                    color: 'white',
-                    paddingHorizontal: 25,
-                    textAlign: 'center',
-                    fontFamily: 'Gill Sans',
-                  }}
-                >
-                  Main Menu
-                </Text>
+                <Text style={styles.text}>Main Menu</Text>
               </FastImageBackground>
             </TouchableOpacity>
           </Animated.View>
@@ -107,16 +99,7 @@ export const GameOverModal = ({ visible, score, resetGame, navigation }) => {
                 source={images.spaceProbe}
                 style={styles.spaceProbe}
               >
-                <Text
-                  style={{
-                    color: 'white',
-                    paddingHorizontal: 25,
-                    textAlign: 'center',
-                    fontFamily: 'Gill Sans',
-                  }}
-                >
-                  Restart
-                </Text>
+                <Text style={styles.text}>Restart</Text>
               </FastImageBackground>
             </TouchableOpacity>
           </Animated.View>

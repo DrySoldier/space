@@ -1,18 +1,13 @@
 import React, { useEffect, useRef } from 'react';
-import { StyleSheet, View, Animated } from 'react-native';
+import { StyleSheet, View, Animated, Dimensions } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { moderateScale as ms } from '../constants/scaling';
 import { images } from '../constants/images';
+import { randInt } from '../utils';
 
 const AnimatedFastImage = Animated.createAnimatedComponent(FastImage);
 
-const randInt = (min, max) => Math.floor(Math.random() * (max - min + 1) + min);
-
-interface ThrownAwayProps {
-  spaceGuy: boolean;
-}
-
-export const ThrownAway: React.FC<ThrownAwayProps> = ({ spaceGuy }) => {
+export const ThrownAway = () => {
   const opacity = useRef(new Animated.Value(0)).current;
 
   const spin = opacity.interpolate({
@@ -22,7 +17,7 @@ export const ThrownAway: React.FC<ThrownAwayProps> = ({ spaceGuy }) => {
 
   const marginTop = opacity.interpolate({
     inputRange: [0, 0.5, 1],
-    outputRange: [0, randInt(50, 200), randInt(50, 150)],
+    outputRange: [50, randInt(100, 200), randInt(50, 150)],
   });
 
   const marginLeft = opacity.interpolate({
@@ -36,7 +31,7 @@ export const ThrownAway: React.FC<ThrownAwayProps> = ({ spaceGuy }) => {
   });
 
   const scale = opacity.interpolate({
-    inputRange: [0.2, 1],
+    inputRange: [0.1, 1],
     outputRange: [0.78, 0],
   });
 
@@ -86,7 +81,6 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
   thrownAwayContainer: {
-    marginTop: ms(0),
     position: 'absolute',
     width: '100%',
     height: '100%',

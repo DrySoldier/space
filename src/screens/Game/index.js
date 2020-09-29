@@ -41,8 +41,6 @@ const Game = ({ navigation }) => {
   const [progressBarVal, setProgressBarVal] = useState(1);
   const [progressBarPaused, setProgressBarPaused] = useState(false);
 
-  let nextBranch = -1;
-
   const astroSwapSideVal = useRef(new Animated.Value(0)).current;
   const astroSpin = useRef(new Animated.Value(0)).current;
 
@@ -54,6 +52,11 @@ const Game = ({ navigation }) => {
   const scale = astroSpin.interpolate({
     inputRange: [0.2, 1],
     outputRange: [0.78, 0],
+  });
+
+  const astroFall = astroSpin.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, 300],
   });
 
   const setBranchStatus = () => {
@@ -73,7 +76,7 @@ const Game = ({ navigation }) => {
             <FastImageBackground
               source={images.elevatorTile}
               key={randInt(0, 99999)}
-              style={[styles.branch, styles.branchLeft]}
+              style={styles.branch}
             >
               <FastImage
                 style={{
@@ -91,7 +94,7 @@ const Game = ({ navigation }) => {
             <FastImageBackground
               source={images.elevatorTile}
               key={randInt(0, 99999)}
-              style={[styles.branch, styles.branchRight]}
+              style={styles.branch}
             >
               <FastImage
                 style={{
@@ -139,7 +142,7 @@ const Game = ({ navigation }) => {
     // Check to see if player is moving INTO a branch
     if ((side === 'left' && branchLocation === 1) || (side === 'right' && branchLocation === 2)) {
       setGameOver(true);
-      return
+      return;
     } else {
       let copy = [...branches];
       copy.pop();
@@ -164,7 +167,7 @@ const Game = ({ navigation }) => {
   };
 
   const _generateNewBranch = () => {
-    nextBranch = randInt(0, 2);
+    let nextBranch = randInt(0, 2);
 
     // Make empty branches a little more rare
     if (nextBranch === 0) {
@@ -277,10 +280,7 @@ const Game = ({ navigation }) => {
           <Animated.View
             style={{
               marginLeft: astroSwapSideVal,
-              marginTop: astroSpin.interpolate({
-                inputRange: [0, 1],
-                outputRange: [0, 300],
-              }),
+              marginTop: astroFall,
             }}
           >
             <AnimatedFastImage
@@ -288,7 +288,7 @@ const Game = ({ navigation }) => {
                 ...styles.player,
                 transform: [
                   {
-                    scale
+                    scale,
                   },
                   {
                     rotate: spin,
@@ -301,12 +301,8 @@ const Game = ({ navigation }) => {
         </View>
 
         <View style={styles.headerContainer} pointerEvents="none">
-          <View style={{ alignItems: 'center', marginBottom: ms(15) }}>
-            <ProgressBar
-              progress={progressBarVal}
-              width={200}
-              height={20}
-            />
+          <View style={styles.progressBarContainer}>
+            <ProgressBar progress={progressBarVal} width={200} height={20} />
           </View>
           <Text style={styles.score}>{score}</Text>
         </View>
@@ -314,7 +310,12 @@ const Game = ({ navigation }) => {
         <View style={styles.ground} pointerEvents="none">
           {thrownAwayArr}
         </View>
-        <GameOverModal navigation={navigation} visible={modal} score={score} resetGame={() => setGameOver(false)} />
+        <GameOverModal
+          navigation={navigation}
+          visible={modal}
+          score={score}
+          resetGame={() => setGameOver(false)}
+        />
       </FastImageBackground>
     </View>
   );

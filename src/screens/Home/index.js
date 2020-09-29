@@ -1,9 +1,9 @@
 import React, { useEffect, useRef } from 'react';
 import { View, TouchableOpacity, Text, Animated, Easing } from 'react-native';
 import FastImage from 'react-native-fast-image';
-import { moderateScale as ms } from 'src/constants/scaling';
 import { FastImageBackground } from '../../components';
 import { images } from '../../constants/images';
+import styles from './styles';
 
 const AnimatedFastImage = Animated.createAnimatedComponent(FastImage);
 
@@ -70,43 +70,31 @@ const Home = ({ navigation }) => {
   return (
     <View style={{ flex: 1 }}>
       <FastImageBackground source={images.space} style={{ flex: 1 }}>
-        <View style={{ flex: 3, justifyContent: 'center', alignItems: 'center' }}>
-          <Text style={{ color: 'white', fontSize: 36, fontFamily: 'GillSans-Bold' }}>SPACE GAME</Text>
-          <Text style={{ color: 'white', fontSize: 12, fontFamily: 'GillSans-Bold' }}>(title pending)</Text>
+        <View style={styles.titleContainer}>
+          <Text style={styles.title}>SPACE CLIMB</Text>
+          <Text style={styles.subtitle}>(title pending)</Text>
         </View>
-        <AnimatedFastImage style={{ height: 100, width: 100, position: 'absolute', top: ms(250), left: xPosition, transform: [{ rotate: astro360 }] }} source={images["astro-right-2"]} />
-        <View style={{ flex: 3, alignItems: 'center', justifyContent: 'space-evenly' }}>
-          <Animated.View style={{ transform: [{ rotate: spin }] }}>
+        <AnimatedFastImage style={{ ...styles.astro, left: xPosition, transform: [{ rotate: astro360 }] }} source={images["astro-right-2"]} />
+        <View style={styles.buttonContainer}>
+          <Animated.View style={{ transform: [{ rotate: spin }], paddingLeft: 125 }}>
             <TouchableOpacity onPress={() => navigation.navigate('Game')}>
               <FastImageBackground
-                style={{
-                  height: 130,
-                  width: 180,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  marginLeft: 50,
-                }}
+                style={styles.button}
                 resizeMode="stretch"
                 source={images.spaceProbe}
               >
-                <Text style={{ color: 'white', fontFamily: 'GillSans-Bold' }}>PLAY</Text>
+                <Text style={styles.buttonText}>PLAY</Text>
               </FastImageBackground>
             </TouchableOpacity>
           </Animated.View>
           <Animated.View style={{ transform: [{ rotate: oppositeSpin }] }}>
             <TouchableOpacity>
               <FastImageBackground
-                style={{
-                  height: 130,
-                  width: 180,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  marginRight: 50,
-                }}
+                style={styles.button}
                 resizeMode="stretch"
                 source={images.spaceProbe}
               >
-                <Text style={{ color: 'white', fontFamily: 'GillSans-Bold' }}>LEADERBOAD</Text>
+                <Text style={styles.buttonText}>CREDITS</Text>
               </FastImageBackground>
             </TouchableOpacity>
           </Animated.View>
