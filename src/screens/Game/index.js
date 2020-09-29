@@ -32,7 +32,7 @@ const Game = ({ navigation }) => {
   // Game over modal
   const [modal, setModal] = useState(false);
   // Variable for if next branch is on left or right. -1 is neither.
-  const [branchLocation, setBranchLoc] = useState(-1);
+  let branchLocation = -1;
   // current player model TODO: Set up animated sprite
   const defaultPosition = images['astro-left-2'];
   const [playerModel, setPlayerModel] = useState(defaultPosition);
@@ -122,7 +122,7 @@ const Game = ({ navigation }) => {
   };
 
   useInterval(() => {
-    const progressBarDecrease = progressBarVal - 0.025;
+    const progressBarDecrease = progressBarVal - 0.035;
     if (!progressBarPaused) {
       setProgressBarVal(progressBarDecrease);
     }
@@ -131,6 +131,9 @@ const Game = ({ navigation }) => {
   const _handlePress = (side) => {
     setStep(!step);
     setSide(side);
+
+    const newThrownAway = <ThrownAway key={randInt(0, 99999)} />;
+    setThrownAwayArr([newThrownAway, ...thrownAwayArr]);
 
     const newProgressBarVal = progressBarVal + 0.065;
     if (newProgressBarVal > 1) {
@@ -148,7 +151,7 @@ const Game = ({ navigation }) => {
       copy.pop();
       copy.unshift(_generateNewBranch());
       setNextBranch(copy);
-      setBranchLoc(branches[branches.length - 1]);
+      branchLocation = branches[branches.length - 1];
       setHeightArr([
         ...heightArr,
         <HeightView key={randInt(0, 99999)} callback={heightFinished} />,
@@ -184,12 +187,9 @@ const Game = ({ navigation }) => {
   };
 
   const heightFinished = () => {
-    let copy = [...heightArr];
-    copy.pop();
-    setHeightArr(copy);
-
-    var newThrownAway = <ThrownAway key={randInt(0, 99999)} />;
-    setThrownAwayArr([...thrownAwayArr, newThrownAway]);
+    const heightArrCopy = [...heightArr];
+    heightArrCopy.pop();
+    setHeightArr(heightArrCopy);
 
     setBranchStatus();
   };
@@ -208,16 +208,17 @@ const Game = ({ navigation }) => {
     let toValue = null;
 
     if (currentSide === 'left') {
-      astroSwapSideVal.setValue(ms(125));
-      toValue = ms(-125);
+      astroSwapSideVal.setValue(ms(70));
+      toValue = ms(-70);
     } else if (currentSide === 'right') {
-      astroSwapSideVal.setValue(ms(-125));
-      toValue = ms(125);
+      astroSwapSideVal.setValue(ms(-70));
+      toValue = ms(70);
     }
 
     Animated.timing(astroSwapSideVal, {
       toValue: toValue,
       duration: 25,
+      useNativeDriver: true,
     }).start();
   }, [currentSide]);
 
@@ -233,8 +234,9 @@ const Game = ({ navigation }) => {
 
   useEffect(() => {
     if (gameOver) {
+      setThrownAwayArr([]);
       setNextBranch(defaultBranches);
-      setBranchLoc(-1);
+      branchLocation = -1;
       setModal(true);
       setProgressBarPaused(true);
       setProgressBarVal(1);
@@ -242,6 +244,7 @@ const Game = ({ navigation }) => {
       Animated.timing(astroSpin, {
         toValue: 1,
         duration: 1000,
+        useNativeDriver: true,
       }).start();
     } else if (!gameOver) {
       setProgressBarPaused(false);
@@ -254,6 +257,7 @@ const Game = ({ navigation }) => {
       Animated.timing(astroSpin, {
         toValue: 0,
         duration: 0,
+        useNativeDriver: true,
       }).start();
     }
   }, [gameOver, setGameOver]);
@@ -277,27 +281,26 @@ const Game = ({ navigation }) => {
         </View>
 
         <View style={styles.playerContainer} pointerEvents="none">
-          <Animated.View
+          <AnimatedFastImage
             style={{
-              marginLeft: astroSwapSideVal,
-              marginTop: astroFall,
+              ...styles.player,
+              transform: [
+                {
+                  translateX: astroSwapSideVal,
+                },
+                {
+                  translateY: astroFall,
+                },
+                {
+                  scale,
+                },
+                {
+                  rotate: spin,
+                },
+              ],
             }}
-          >
-            <AnimatedFastImage
-              style={{
-                ...styles.player,
-                transform: [
-                  {
-                    scale,
-                  },
-                  {
-                    rotate: spin,
-                  },
-                ],
-              }}
-              source={playerModel}
-            />
-          </Animated.View>
+            source={playerModel}
+          />
         </View>
 
         <View style={styles.headerContainer} pointerEvents="none">

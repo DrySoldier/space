@@ -31,8 +31,8 @@ export const ThrownAway = () => {
   });
 
   const scale = opacity.interpolate({
-    inputRange: [0.1, 1],
-    outputRange: [0.78, 0],
+    inputRange: [0, 1],
+    outputRange: [1, 0],
   });
 
   const opacityInterpolate = opacity.interpolate({
@@ -43,7 +43,7 @@ export const ThrownAway = () => {
   useEffect(() => {
     Animated.timing(opacity, {
       toValue: 1,
-      duration: 1000,
+      duration: 750,
       useNativeDriver: false,
     }).start();
   }, []);
