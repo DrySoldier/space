@@ -32,7 +32,7 @@ const Game = ({ navigation }) => {
   // Game over modal
   const [modal, setModal] = useState(false);
   // Variable for if next branch is on left or right. -1 is neither.
-  let branchLocation = -1;
+  const [branchLocation, setBranchLocation] = useState(-1);
   // current player model TODO: Set up animated sprite
   const defaultPosition = images['astro-left-2'];
   const [playerModel, setPlayerModel] = useState(defaultPosition);
@@ -151,7 +151,7 @@ const Game = ({ navigation }) => {
       copy.pop();
       copy.unshift(_generateNewBranch());
       setNextBranch(copy);
-      branchLocation = branches[branches.length - 1];
+      setBranchLocation(branches[branches.length - 1]);
       setHeightArr([
         ...heightArr,
         <HeightView key={randInt(0, 99999)} callback={heightFinished} />,
@@ -164,6 +164,7 @@ const Game = ({ navigation }) => {
       (side === 'right' && branches[branches.length - 1] === 2)
     ) {
       setGameOver(true);
+      return;
     } else {
       setScore(score + 1);
     }
@@ -236,7 +237,7 @@ const Game = ({ navigation }) => {
     if (gameOver) {
       setThrownAwayArr([]);
       setNextBranch(defaultBranches);
-      branchLocation = -1;
+      setBranchLocation(-1);
       setModal(true);
       setProgressBarPaused(true);
       setProgressBarVal(1);
