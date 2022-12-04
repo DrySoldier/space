@@ -39,6 +39,7 @@ const Home = ({ navigation }) => {
     Animated.timing(buttonDegree, {
       toValue: randomDegree,
       duration: 5000,
+      useNativeDriver: true
     }).start(() => startButtonRotateAnimation());
   };
 
@@ -49,6 +50,7 @@ const Home = ({ navigation }) => {
       toValue: 1,
       duration: 10000,
       easing: Easing.linear,
+      useNativeDriver: true
     }).start(() => startAstroRotateAnimation());
   };
 
@@ -58,7 +60,8 @@ const Home = ({ navigation }) => {
     Animated.timing(astroPosition, {
       toValue: 1,
       duration: 15000,
-      easing: Easing.ease,
+      easing: Easing.linear,
+      useNativeDriver: true
     }).start(() => startAstroPositionAnimation());
   };
 
@@ -77,7 +80,7 @@ const Home = ({ navigation }) => {
         <Text style={styles.subtitle}>(title pending)</Text>
       </View>
       <AnimatedFastImage
-        style={{ ...styles.astro, left: xPosition, transform: [{ rotate: astro360 }] }}
+        style={{ ...styles.astro, transform: [{ rotate: astro360 }, { translateX: xPosition }] }}
         source={images['astro-right-2']}
       />
       <View style={styles.buttonContainer}>

@@ -1,8 +1,9 @@
 module.exports = {
+  root: true,
   env: {
     es6: true,
   },
-  extends: ['plugin:react/recommended', 'prettier', 'airbnb'],
+  extends: ['plugin:react/recommended', 'prettier', 'airbnb', '@react-native-community'],
   plugins: ['prettier', 'react', 'react-native', 'jsx-a11y'],
   globals: {
     Atomics: 'readonly',
