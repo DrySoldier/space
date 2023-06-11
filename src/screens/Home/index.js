@@ -1,12 +1,8 @@
 import React, { useEffect, useRef } from 'react';
-import { View, TouchableOpacity, Text, Animated, Easing } from 'react-native';
-import FastImage from 'react-native-fast-image';
+import { View, TouchableOpacity, Text, Animated, Easing, ImageBackground } from 'react-native';
 import RNBootSplash from 'react-native-bootsplash';
-import { FastImageBackground } from '../../components';
 import { images } from '../../constants/images';
 import styles from './styles';
-
-const AnimatedFastImage = Animated.createAnimatedComponent(FastImage);
 
 const Home = ({ navigation }) => {
   const buttonDegree = useRef(new Animated.Value(0)).current;
@@ -39,7 +35,7 @@ const Home = ({ navigation }) => {
     Animated.timing(buttonDegree, {
       toValue: randomDegree,
       duration: 5000,
-      useNativeDriver: true
+      useNativeDriver: true,
     }).start(() => startButtonRotateAnimation());
   };
 
@@ -74,41 +70,41 @@ const Home = ({ navigation }) => {
   }, []);
 
   return (
-    <FastImageBackground source={images.space} style={{ flex: 1 }}>
+    <ImageBackground source={images.space} style={{ flex: 1 }}>
       <View style={styles.titleContainer}>
         <Text style={styles.title}>SPACE CLIMB</Text>
         <Text style={styles.subtitle}>(title pending)</Text>
       </View>
-      <AnimatedFastImage
+      <Animated.Image
         style={{ ...styles.astro, transform: [{ rotate: astro360 }, { translateX: xPosition }] }}
         source={images['astro-right-2']}
       />
       <View style={styles.buttonContainer}>
         <Animated.View style={{ transform: [{ rotate: spin }], paddingLeft: 125 }}>
           <TouchableOpacity onPress={() => navigation.navigate('Game')}>
-            <FastImageBackground
+            <ImageBackground
               style={styles.button}
               resizeMode="stretch"
               source={images.spaceProbe}
             >
               <Text style={styles.buttonText}>PLAY</Text>
-            </FastImageBackground>
+            </ImageBackground>
           </TouchableOpacity>
         </Animated.View>
         <Animated.View style={{ transform: [{ rotate: oppositeSpin }] }}>
           <TouchableOpacity onPress={() => navigation.navigate('Settings')}>
-            <FastImageBackground
+            <ImageBackground
               style={styles.button}
               resizeMode="stretch"
               source={images.spaceProbe}
             >
               <Text style={styles.buttonText}>SETTINGS</Text>
-            </FastImageBackground>
+            </ImageBackground>
           </TouchableOpacity>
         </Animated.View>
       </View>
       <View style={{ flex: 1 }} />
-    </FastImageBackground>
+    </ImageBackground>
   );
 };
 

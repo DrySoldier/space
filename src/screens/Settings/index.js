@@ -1,13 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, TouchableOpacity, Text, Animated, Easing, Alert, StyleSheet } from 'react-native';
-import FastImage from 'react-native-fast-image';
+import { View, TouchableOpacity, Text, Animated, Easing, Alert, StyleSheet, ImageBackground, Image } from 'react-native';
 import RNBootSplash from 'react-native-bootsplash';
 import { moderateScale as ms } from 'src/constants/scaling';
-import { FastImageBackground } from '../../components';
 import { images } from '../../constants/images';
 import { removeData } from '../../utils/asyncData';
-
-const AnimatedFastImage = Animated.createAnimatedComponent(FastImage);
 
 const Settings = ({ navigation }) => {
   const buttonDegree = useRef(new Animated.Value(0)).current;
@@ -42,6 +38,7 @@ const Settings = ({ navigation }) => {
     Animated.timing(buttonDegree, {
       toValue: randomDegree,
       duration: 5000,
+      useNativeDriver: true
     }).start(() => startButtonRotateAnimation());
   };
 
@@ -52,6 +49,7 @@ const Settings = ({ navigation }) => {
       toValue: 1,
       duration: 10000,
       easing: Easing.linear,
+      useNativeDriver: true
     }).start(() => startAstroRotateAnimation());
   };
 
@@ -62,6 +60,7 @@ const Settings = ({ navigation }) => {
       toValue: 1,
       duration: 15000,
       easing: Easing.ease,
+      useNativeDriver: true
     }).start(() => startAstroPositionAnimation());
   };
 
@@ -74,12 +73,11 @@ const Settings = ({ navigation }) => {
   }, []);
 
   return (
-    <FastImageBackground source={images.space} style={{ flex: 1 }}>
-      <AnimatedFastImage
+    <ImageBackground source={images.space} style={{ flex: 1 }}>
+      <Animated.Image
         style={{
           ...styles.astro,
-          left: xPosition,
-          transform: [{ rotate: astro360 }],
+          transform: [{ rotate: astro360 }, { translateX: xPosition }],
           top: ms(500),
         }}
         source={images['astro-right-2']}
@@ -87,25 +85,25 @@ const Settings = ({ navigation }) => {
       <View style={styles.buttonContainer}>
         <Animated.View style={{ transform: [{ rotate: spin }], paddingLeft: 125 }}>
           <TouchableOpacity onPress={() => navigation.navigate('Home')}>
-            <FastImageBackground
+            <ImageBackground
               style={styles.button}
               resizeMode="stretch"
               source={images.spaceProbe}
             >
               <Text style={styles.buttonText}>BACK</Text>
-            </FastImageBackground>
+            </ImageBackground>
           </TouchableOpacity>
         </Animated.View>
         <View style={{ flexDirection: 'row' }}>
           <Animated.View style={{ transform: [{ rotate: spin }] }}>
             <TouchableOpacity onPress={() => setMusicMuted(!musicMuted)}>
-              <FastImageBackground
+              <ImageBackground
                 style={styles.button}
                 resizeMode="stretch"
                 source={images.spaceProbe}
               >
                 <Text style={styles.buttonText}>{musicMuted ? 'UNMUTE' : 'MUTE'}</Text>
-              </FastImageBackground>
+              </ImageBackground>
             </TouchableOpacity>
           </Animated.View>
           <Animated.View style={{ transform: [{ rotate: oppositeSpin }] }}>
@@ -126,42 +124,42 @@ const Settings = ({ navigation }) => {
                 )
               }
             >
-              <FastImageBackground
+              <ImageBackground
                 style={styles.button}
                 resizeMode="stretch"
                 source={images.spaceProbe}
               >
                 <Text style={styles.buttonText}>CLEAR DATA</Text>
-              </FastImageBackground>
+              </ImageBackground>
             </TouchableOpacity>
           </Animated.View>
         </View>
-        <FastImageBackground
+        <ImageBackground
           style={styles.creditDisplay}
           resizeMode="stretch"
           source={images.spaceProbe}
         >
           <Text style={styles.buttonText}>Programming:</Text>
           <Text style={styles.buttonText}>Christian Cotham</Text>
-        </FastImageBackground>
-        <FastImageBackground
+        </ImageBackground>
+        <ImageBackground
           style={{ ...styles.creditDisplay, marginLeft: ms(150) }}
           resizeMode="stretch"
           source={images.spaceProbe}
         >
           <Text style={styles.buttonText}>Art:</Text>
           <Text style={styles.buttonText}>Carrill Munnings</Text>
-        </FastImageBackground>
-        <FastImageBackground
+        </ImageBackground>
+        <ImageBackground
           style={styles.creditDisplay}
           resizeMode="stretch"
           source={images.spaceProbe}
         >
           <Text style={styles.buttonText}>Music:</Text>
           <Text style={styles.buttonText}>Tyler Sawyer</Text>
-        </FastImageBackground>
+        </ImageBackground>
       </View>
-    </FastImageBackground>
+    </ImageBackground>
   );
 };
 

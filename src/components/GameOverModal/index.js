@@ -1,6 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { Text, View, TouchableOpacity, Modal, Alert, Animated } from 'react-native';
-import { FastImageBackground } from '../FastImageBackground';
+import { Text, View, TouchableOpacity, Modal, Alert, Animated, ImageBackground } from 'react-native';
 import styles from './styles';
 import { images } from '../../constants/images';
 import { retrieveData, storeData } from '../../utils/asyncData';
@@ -26,6 +25,7 @@ export const GameOverModal = ({ visible, score, resetGame, navigation }) => {
     Animated.timing(buttonDegree, {
       toValue: randomDegree,
       duration: 5000,
+      useNativeDriver: true
     }).start(() => startButtonRotateAnimation());
   };
   const saveScore = async () => {
@@ -55,7 +55,7 @@ export const GameOverModal = ({ visible, score, resetGame, navigation }) => {
       onRequestClose={() => Alert.alert('Modal has been closed.')}
     >
       <View style={styles.modalContainer}>
-        <FastImageBackground
+        <ImageBackground
           resizeMode={'stretch'}
           source={images.spaceProbe}
           style={styles.mainSpaceProbe}
@@ -67,8 +67,8 @@ export const GameOverModal = ({ visible, score, resetGame, navigation }) => {
               <Text style={styles.scoreText}>{score}</Text>
             </View>
           </View>
-        </FastImageBackground>
-        <FastImageBackground
+        </ImageBackground>
+        <ImageBackground
           resizeMode={'stretch'}
           source={images.spaceProbe}
           style={styles.hiScoreSpaceProbe}
@@ -79,28 +79,28 @@ export const GameOverModal = ({ visible, score, resetGame, navigation }) => {
               <Text style={styles.scoreText}>{hiScore}</Text>
             </View>
           </View>
-        </FastImageBackground>
+        </ImageBackground>
         <View style={styles.buttonContainer}>
           <Animated.View style={{ transform: [{ rotate: spin }] }}>
             <TouchableOpacity onPress={() => navigation.navigate('Home')}>
-              <FastImageBackground
+              <ImageBackground
                 resizeMode={'stretch'}
                 source={images.spaceProbe}
                 style={styles.spaceProbe}
               >
                 <Text style={styles.text}>Main Menu</Text>
-              </FastImageBackground>
+              </ImageBackground>
             </TouchableOpacity>
           </Animated.View>
           <Animated.View style={{ transform: [{ rotate: oppositeSpin }] }}>
             <TouchableOpacity onPress={resetGame}>
-              <FastImageBackground
+              <ImageBackground
                 resizeMode={'stretch'}
                 source={images.spaceProbe}
                 style={styles.spaceProbe}
               >
                 <Text style={styles.text}>Restart</Text>
-              </FastImageBackground>
+              </ImageBackground>
             </TouchableOpacity>
           </Animated.View>
         </View>

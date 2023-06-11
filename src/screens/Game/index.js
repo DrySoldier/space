@@ -1,14 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Text, View, Animated, TouchableOpacity } from 'react-native';
-import FastImage from 'react-native-fast-image';
+import { Text, View, Animated, TouchableOpacity, ImageBackground, Image } from 'react-native';
 import ProgressBar from 'react-native-progress/Bar';
-import { ThrownAway, HeightView, GameOverModal, FastImageBackground } from '../../components';
+import { ThrownAway, HeightView, GameOverModal } from '../../components';
 import { images, moderateScale as ms } from '../../constants';
 import { randInt, useInterval } from '../../utils';
 
 import styles from './styles';
-
-const AnimatedFastImage = Animated.createAnimatedComponent(FastImage);
 
 const Game = ({ navigation }) => {
   // Current side player is on
@@ -64,7 +61,7 @@ const Game = ({ navigation }) => {
       switch (element) {
         case 0:
           return (
-            <FastImageBackground
+            <ImageBackground
               source={images.elevatorTile}
               key={randInt(0, 99999)}
               style={[styles.branch]}
@@ -73,12 +70,12 @@ const Game = ({ navigation }) => {
 
         case 1:
           return (
-            <FastImageBackground
+            <ImageBackground
               source={images.elevatorTile}
               key={randInt(0, 99999)}
               style={styles.branch}
             >
-              <FastImage
+              <Image
                 style={{
                   height: ms(100),
                   width: ms(100),
@@ -86,17 +83,17 @@ const Game = ({ navigation }) => {
                 }}
                 source={images.obstacleTile}
               />
-            </FastImageBackground>
+            </ImageBackground>
           );
 
         case 2:
           return (
-            <FastImageBackground
+            <ImageBackground
               source={images.elevatorTile}
               key={randInt(0, 99999)}
               style={styles.branch}
             >
-              <FastImage
+              <Image
                 style={{
                   height: ms(100),
                   width: ms(100),
@@ -105,12 +102,12 @@ const Game = ({ navigation }) => {
                 }}
                 source={images.obstacleTile}
               />
-            </FastImageBackground>
+            </ImageBackground>
           );
 
         default:
           return (
-            <FastImageBackground
+            <ImageBackground
               source={images.elevatorTile}
               key={randInt(0, 99999)}
               style={[styles.branch]}
@@ -265,7 +262,7 @@ const Game = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <FastImageBackground source={images.space} style={styles.container}>
+      <ImageBackground source={images.space} style={styles.container}>
         <TouchableOpacity style={styles.leftSide} onPress={() => _handlePress('left')}>
           <View style={styles.side} />
         </TouchableOpacity>
@@ -282,7 +279,7 @@ const Game = ({ navigation }) => {
         </View>
 
         <View style={styles.playerContainer} pointerEvents="none">
-          <AnimatedFastImage
+          <Animated.Image
             style={{
               ...styles.player,
               transform: [
@@ -320,7 +317,7 @@ const Game = ({ navigation }) => {
           score={score}
           resetGame={() => setGameOver(false)}
         />
-      </FastImageBackground>
+      </ImageBackground>
     </View>
   );
 };

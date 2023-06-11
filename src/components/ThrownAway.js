@@ -1,11 +1,8 @@
 import React, { useEffect, useRef } from 'react';
 import { StyleSheet, View, Animated } from 'react-native';
-import FastImage from 'react-native-fast-image';
 import { moderateScale as ms } from '../constants/scaling';
 import { images } from '../constants/images';
 import { randInt } from '../utils';
-
-const AnimatedFastImage = Animated.createAnimatedComponent(FastImage);
 
 export const ThrownAway = () => {
   const opacity = useRef(new Animated.Value(0)).current;
@@ -25,11 +22,6 @@ export const ThrownAway = () => {
     outputRange: [0, randInt(300, 500)],
   });
 
-  const marginRight = opacity.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0, randInt(300, 500)],
-  });
-
   const scale = opacity.interpolate({
     inputRange: [0, 1],
     outputRange: [1, 0],
@@ -44,13 +36,13 @@ export const ThrownAway = () => {
     Animated.timing(opacity, {
       toValue: 1,
       duration: 750,
-      useNativeDriver: false,
+      useNativeDriver: true,
     }).start();
   }, []);
 
   return (
     <View style={styles.thrownAwayContainer}>
-      <AnimatedFastImage
+      <Animated.Image
         source={images.elevatorTile}
         style={[
           styles.thrownAwayBranch,
@@ -63,10 +55,13 @@ export const ThrownAway = () => {
               {
                 rotate: spin,
               },
+              {
+                translateY: marginTop,
+              },
+              {
+                translateX: marginLeft,
+              }
             ],
-            marginTop,
-            marginLeft,
-            marginRight,
           },
         ]}
       />
