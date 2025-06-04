@@ -6,10 +6,22 @@ const { height } = Dimensions.get('window');
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
     flexDirection: 'row',
+  },
+  imageContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexDirection: 'column',
+    position: "absolute",
+    width: '100%',
+  },
+  image: {
+    width: '100%',
+    height: 800,
+    marginTop: -1
   },
   leftSide: {
     flex: 4,
@@ -49,7 +61,7 @@ const styles = StyleSheet.create({
   },
   branchContainer: {
     flex: 1,
-    paddingBottom: ms(550),
+    paddingBottom: ms(350),
     width: '100%',
     position: 'absolute',
   },
