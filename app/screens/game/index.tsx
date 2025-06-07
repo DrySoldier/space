@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useRef} from 'react';
+import React, {useState, useEffect, useRef, createRef} from 'react';
 import {
   Text,
   View,
@@ -17,31 +17,43 @@ import GameOverModal from '../../../components/GameOverModal';
 
 type TSide = 'left' | 'right';
 
-const defaultBranches = [0, randInt(0, 2), 0, 0, 0, 0, 0, 0];
+const defaultBranches = [
+  {type: 0, id: 7, ref: createRef()},
+  {type: randInt(0, 2), id: 6, ref: createRef()},
+  {type: 0, id: 5, ref: createRef()},
+  {type: 0, id: 4, ref: createRef()},
+  {type: 0, id: 3, ref: createRef()},
+  {type: 0, id: 2, ref: createRef()},
+  {type: 0, id: 1, ref: createRef()},
+  {type: 0, id: 0, ref: createRef()},
+];
 
 const backgroundSize = 1600;
+
+const defaultPosition = images['astro-right-2'];
 
 const Game = () => {
   // Current side player is on
   const [currentSide, setCurrentSide] = useState('left');
   // 0 - no branch, 1 - left side branch, 2 - right side branch
   // The rantInts set up random branches on the top
-  const [branches, setBranches] = useState<Number[]>(defaultBranches);
+  const [branches, setBranches] =
+    useState<{type: number; id: number; ref: React.RefObject<any>}[]>(
+      defaultBranches,
+    );
   // Used to space out branches
   const [lastBranch, setLastBranch] = useState(-1);
   // All the branch views
   // Array to store thrown away squares
   const [thrownAwayArr, setThrownAwayArr] = useState<React.JSX.Element[]>([]);
 
-  const [branchesElevated, setBranchesElevated] = useState(0);
-
   const [disablePress, setDisablePress] = useState(false);
 
   const [score, setScore] = useState(-1);
-  // current player model TODO: Set up animated sprite
-  const defaultPosition = images['astro-right-2'];
 
+  // current player model TODO: Set up animated sprite
   const [playerModel, setPlayerModel] = useState(defaultPosition);
+
   // animation for the astronaut
   const [step, setStep] = useState(false);
   const [gameOver, setGameOver] = useState(false);
@@ -124,23 +136,36 @@ const Game = () => {
       useNativeDriver: true,
     }).start();
 
+    const lastBranch = branches[7];
+    const nextBranch = branches[6];
+
+    branches.forEach((b) => {
+      b.ref?.current.animateOut(() => {
+        if (b.id === lastBranch.id) {
+          setBranches(prevState => {
+            const copy = [...prevState];
+            copy.pop();
+            copy.unshift({
+              type: generateNewBranch(),
+              id: prevState[0].id + 1,
+              ref: createRef(),
+            });
+
+            return copy;
+          });
+        }
+      });
+    });
+
     setThrownAwayArr([
       ...thrownAwayArr,
-      <ThrownAway
-        side={branches[branches.length - 1]}
-        key={randInt(0, 9999999)}
-      />,
+      <ThrownAway side={lastBranch.type} key={randInt(0, 999999)} />,
     ]);
-
-    let copy = [...branches];
-    copy.pop();
-    copy.unshift(generateNewBranch());
-    setBranches(copy);
 
     // Check to see if player is chopping tree below branch
     if (
-      (side === 'left' && branches[branches.length - 2] === 1) ||
-      (side === 'right' && branches[branches.length - 2] === 2)
+      (side === 'left' && nextBranch.type === 1) ||
+      (side === 'right' && nextBranch.type === 2)
     ) {
       setGameOver(true);
       return;
@@ -268,7 +293,10 @@ const Game = () => {
           alignItems: 'center',
         }}
         data={branches}
-        renderItem={({item}) => <Branch side={item} />}
+        renderItem={({item}) => {
+          return <Branch side={item.type} ref={item.ref} />;
+        }}
+        keyExtractor={item => item.id.toString()}
       />
 
       <View style={styles.playerContainer} pointerEvents="none">

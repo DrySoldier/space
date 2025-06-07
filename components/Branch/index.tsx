@@ -1,48 +1,91 @@
-import { Image, ImageBackground } from "react-native";
-import { images, moderateScale as ms } from "../../constants";
+import {Animated, Easing, Image, ImageBackground, View} from 'react-native';
+import {images, moderateScale as ms} from '../../constants';
 import styles from './styles';
+import {
+  ForwardedRef,
+  forwardRef,
+  useImperativeHandle,
+  useRef,
+} from 'react';
 
-const Branch = ({ side }: { side: Number }) => {
+type TBranchRef = {
+  animateOut: (callback: () => void) => void;
+};
+
+interface IBranch {
+  side: number;
+}
+
+const Branch = ({side}: IBranch, ref: ForwardedRef<TBranchRef>) => {
+  const translateY = useRef(new Animated.Value(ms(0))).current;
+
+  const animateOut = (callback: () => void) => {
+    Animated.timing(translateY, {
+      toValue: ms(100),
+      duration: 50,
+      easing: Easing.linear,
+      useNativeDriver: true,
+    }).start(() => {
+      translateY.resetAnimation();
+
+      callback();
+    });
+  };
+
+  useImperativeHandle(ref, () => ({
+    animateOut,
+  }));
+
   switch (side) {
     case 0:
       return (
-        <ImageBackground source={images.elevatorTile} style={[styles.branch]} />
+        <Animated.Image
+          source={images.elevatorTile}
+          style={[styles.branch, {transform: [{translateY}]}]}
+        />
       );
 
     case 1:
       return (
-        <ImageBackground source={images.elevatorTile} style={styles.branch}>
+        <Animated.View style={[styles.branch, {transform: [{translateY}]}]}>
+          <Image source={images.elevatorTile} style={[styles.branch]} />
           <Image
             style={{
-              height: ms(100),
               width: ms(100),
+              height: ms(100),
               marginLeft: ms(-100),
+              marginTop: ms(-100),
             }}
             source={images.obstacleTile}
           />
-        </ImageBackground>
+        </Animated.View>
       );
 
     case 2:
       return (
-        <ImageBackground source={images.elevatorTile} style={styles.branch}>
+        <Animated.View style={[styles.branch, {transform: [{translateY}]}]}>
+          <Image source={images.elevatorTile} style={[styles.branch]} />
           <Image
             style={{
-              height: ms(100),
               width: ms(100),
+              height: ms(100),
               marginLeft: ms(100),
-              transform: [{ rotate: "180deg" }],
+              transform: [{rotate: '180deg'}],
+              position: 'absolute',
             }}
             source={images.obstacleTile}
           />
-        </ImageBackground>
+        </Animated.View>
       );
 
     default:
       return (
-        <ImageBackground source={images.elevatorTile} style={[styles.branch]} />
+        <Animated.Image
+          source={images.elevatorTile}
+          style={[styles.branch, {transform: [{translateY}]}]}
+        />
       );
   }
 };
 
-export default Branch;
+export default forwardRef<TBranchRef, IBranch>(Branch);
