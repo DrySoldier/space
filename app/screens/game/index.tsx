@@ -7,15 +7,18 @@ import {
   FlatList,
   Image,
   Easing,
+  Pressable,
 } from 'react-native';
-import {ThrownAway, Branch} from '../../../components';
-import {images, moderateScale as ms} from '../../../constants';
-import {randInt} from '../../../utils';
+import {ThrownAway, Branch, GameOverModal, OxygenMeter} from '@/components';
+import {images} from '@/constants';
+import {randInt} from '@/utils';
 
 import styles from './styles';
-import GameOverModal from '../../../components/GameOverModal';
+import {useOxygen} from '@/app/hooks/useOxygen';
+import Player from '@/components/Player';
 
 type TSide = 'left' | 'right';
+type TBranch = {type: number; id: number; ref: React.RefObject<any>};
 
 const defaultBranches = [
   {type: 0, id: 7, ref: createRef()},
@@ -30,79 +33,61 @@ const defaultBranches = [
 
 const backgroundSize = 1600;
 
-const defaultPosition = images['astro-right-2'];
+let timerInterval: any;
 
 const Game = () => {
   // Current side player is on
-  const [currentSide, setCurrentSide] = useState('left');
+  const [currentSide, setCurrentSide] = useState<TSide>('left');
   // 0 - no branch, 1 - left side branch, 2 - right side branch
   // The rantInts set up random branches on the top
-  const [branches, setBranches] =
-    useState<{type: number; id: number; ref: React.RefObject<any>}[]>(
-      defaultBranches,
-    );
-  // Used to space out branches
-  const [lastBranch, setLastBranch] = useState(-1);
+  const [branches, setBranches] = useState<TBranch[]>(defaultBranches);
   // All the branch views
   // Array to store thrown away squares
   const [thrownAwayArr, setThrownAwayArr] = useState<React.JSX.Element[]>([]);
+  const [paused, setPaused] = useState(false);
 
   const [disablePress, setDisablePress] = useState(false);
 
   const [score, setScore] = useState(-1);
-
-  // current player model TODO: Set up animated sprite
-  const [playerModel, setPlayerModel] = useState(defaultPosition);
+  const [gameOver, setGameOver] = useState(false);
+  const [isMoving, setIsMoving] = useState(false);
 
   // animation for the astronaut
   const [step, setStep] = useState(false);
-  const [gameOver, setGameOver] = useState(false);
 
-  const astroSwapSideVal = useRef(new Animated.Value(0)).current;
-  const astroSpin = useRef(new Animated.Value(0)).current;
+  const {refill, o2} = useOxygen(isMoving, paused, gameOver);
+
   const offsetY = useRef(new Animated.Value(0)).current;
 
-  const spin = astroSpin.interpolate({
-    inputRange: [0, 1],
-    outputRange: ['0deg', `${randInt(5, 290)}deg`],
-  });
+  const generateNewBranch = (lastBranch: TBranch) => {
+    let nextBranch = randInt(0, 2);
 
-  const scale = astroSpin.interpolate({
-    inputRange: [0.2, 1],
-    outputRange: [0.78, 0],
-  });
+    // Make empty branches a little more rare
+    if (nextBranch === 0) {
+      nextBranch = randInt(0, 2);
+    }
 
-  const astroFall = astroSpin.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0, 300],
-  });
+    if (nextBranch === 0) {
+      // 1 out of 15 chance to generate an oxygen tank in an empty branch
+      const hasOxygenTank = randInt(0, 100) >= 7;
 
-  const animateAstronautIn = () => {
-    setDisablePress(true);
+      const side = randInt(0, 1);
+      if (hasOxygenTank) {
+        nextBranch = 3 + side;
+      }
+    }
 
-    astroSwapSideVal.setValue(-300);
-    astroSpin.setValue(1);
-
-    Animated.parallel([
-      Animated.timing(astroSwapSideVal, {
-        toValue: ms(-70),
-        duration: 750,
-        useNativeDriver: true,
-      }),
-      Animated.timing(astroSpin, {
-        toValue: 0,
-        duration: 750,
-        useNativeDriver: true,
-      }),
-    ]).start(() => {
-      setCurrentSide('left');
-      setDisablePress(false);
-    });
+    if (lastBranch.type !== 0) {
+      return 0;
+    } else {
+      return nextBranch;
+    }
   };
 
   const handlePress = (side: TSide) => {
     if (disablePress) return;
 
+    // Handle background shift
     offsetY.stopAnimation(current => {
       const target = current + 20;
 
@@ -119,40 +104,30 @@ const Game = () => {
       }
     });
 
-    setStep(!step);
     setCurrentSide(side);
+    setStep(prevState => !prevState);
 
-    let toValue = 0;
-
-    if (side === 'left') {
-      toValue = ms(-70);
-    } else if (side === 'right') {
-      toValue = ms(70);
-    }
-
-    Animated.timing(astroSwapSideVal, {
-      toValue: toValue,
-      duration: 100,
-      useNativeDriver: true,
-    }).start();
-
+    // Handle branch animations & logic
     const lastBranch = branches[7];
     const nextBranch = branches[6];
+    const lastGeneratedBranch = branches[0];
 
-    branches.forEach((b) => {
-      b.ref?.current.animateOut(() => {
+    setIsMoving(true);
+
+    branches.forEach(b => {
+      b.ref?.current.animateDown(() => {
         if (b.id === lastBranch.id) {
           setBranches(prevState => {
             const copy = [...prevState];
             copy.pop();
             copy.unshift({
-              type: generateNewBranch(),
+              type: generateNewBranch(lastGeneratedBranch),
               id: prevState[0].id + 1,
               ref: createRef(),
             });
-
             return copy;
           });
+          setIsMoving(false);
         }
       });
     });
@@ -167,65 +142,61 @@ const Game = () => {
       (side === 'left' && nextBranch.type === 1) ||
       (side === 'right' && nextBranch.type === 2)
     ) {
+      setDisablePress(true);
       setGameOver(true);
       return;
     } else {
+      if (side === 'left' && nextBranch.type === 3) {
+        refill(8);
+      } else if (side === 'right' && nextBranch.type === 4) {
+        refill(8);
+      }
+
       setScore(prevState => prevState + 100);
     }
   };
 
-  const generateNewBranch = () => {
-    let nextBranch = randInt(0, 2);
-
-    // Make empty branches a little more rare
-    if (nextBranch === 0) {
-      nextBranch = randInt(0, 2);
-    }
-
-    if (lastBranch !== 0) {
-      setLastBranch(0);
-      return 0;
-    } else {
-      setLastBranch(nextBranch);
-      return nextBranch;
-    }
-  };
-
   useEffect(() => {
-    const stepNumber = step ? 1 : 2;
-
-    if (currentSide === 'left') {
-      setPlayerModel(images[`astro-right-${stepNumber}`]);
-    } else if (currentSide === 'right') {
-      setPlayerModel(images[`astro-left-${stepNumber}`]);
-    }
-  }, [step]);
-
-  useEffect(() => {
-    let timerInterval: any;
-
     if (gameOver) {
       clearInterval(timerInterval);
-
-      Animated.timing(astroSpin, {
-        toValue: 1,
-        duration: 1000,
-        useNativeDriver: true,
-      }).start();
+      timerInterval = undefined;
+      setDisablePress(true);
     } else if (!gameOver) {
       timerInterval = setInterval(() => {
         setScore(prevState => prevState - 20);
       }, 1000);
 
-      animateAstronautIn();
+      refill(31);
       setThrownAwayArr([]);
       setBranches(defaultBranches);
-      setPlayerModel(defaultPosition);
       setScore(0);
     }
 
     return () => clearInterval(timerInterval);
   }, [gameOver]);
+
+  useEffect(() => {
+    if (paused) {
+      clearInterval(timerInterval);
+      timerInterval = undefined;
+      setDisablePress(true);
+    } else {
+      console.log(timerInterval);
+      if (!timerInterval) {
+        timerInterval = setInterval(() => {
+          setScore(prevState => prevState - 20);
+        }, 1000);
+      }
+
+      setDisablePress(false);
+    }
+  }, [paused]);
+
+  useEffect(() => {
+    if (o2 <= 0) {
+      setGameOver(true);
+    }
+  }, [o2]);
 
   return (
     <View style={styles.container}>
@@ -272,6 +243,7 @@ const Game = () => {
           style={[styles.image]}
         />
       </Animated.View>
+
       <TouchableOpacity
         style={styles.leftSide}
         onPress={() => handlePress('left')}>
@@ -289,46 +261,79 @@ const Game = () => {
       <FlatList
         pointerEvents="none"
         style={styles.branchContainer}
-        contentContainerStyle={{
-          alignItems: 'center',
-        }}
+        contentContainerStyle={{}}
         data={branches}
-        renderItem={({item}) => {
-          return <Branch side={item.type} ref={item.ref} />;
-        }}
+        renderItem={({item, index}) => (
+          <Branch side={item.type} index={index} ref={item.ref} />
+        )}
         keyExtractor={item => item.id.toString()}
       />
 
-      <View style={styles.playerContainer} pointerEvents="none">
-        <Animated.Image
+      <Player
+        gameOver={gameOver}
+        setCurrentSide={setCurrentSide}
+        currentSide={currentSide}
+        setDisablePress={setDisablePress}
+        step={step}
+      />
+
+      <View style={styles.headerContainer}>
+        <Text style={styles.score}>{score}</Text>
+
+        <Pressable
+          onPress={() => setPaused(true)}
           style={{
-            ...styles.player,
-            transform: [
-              {
-                translateX: astroSwapSideVal,
-              },
-              {
-                translateY: astroFall,
-              },
-              {
-                scale,
-              },
-              {
-                rotate: spin,
-              },
-            ],
-          }}
-          source={playerModel}
-        />
+            position: 'absolute',
+            right: 25,
+            paddingHorizontal: 12,
+            paddingBottom: 12,
+          }}>
+          {!paused && !gameOver && (
+            <Text style={{fontSize: 32, color: 'white'}}>{'⏸︎'}</Text>
+          )}
+        </Pressable>
       </View>
 
-      <View style={styles.headerContainer} pointerEvents="none">
-        <Text style={styles.score}>{score}</Text>
-      </View>
+      <OxygenMeter o2={o2} />
 
       <View style={styles.ground} pointerEvents="none">
         {thrownAwayArr}
       </View>
+
+      {paused && (
+        <View
+          style={{
+            position: 'absolute',
+            backgroundColor: 'rgba(0,0,0,.3)',
+            height: '100%',
+            width: '100%',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}>
+          {paused && (
+            <Pressable
+              style={{
+                position: 'absolute',
+                right: 25,
+                top: '8%',
+                paddingHorizontal: 12,
+                paddingBottom: 12,
+              }}
+              onPress={() => setPaused(false)}>
+              <Text
+                style={{
+                  fontSize: 32,
+                  color: 'white',
+                }}>
+                {'⏵︎'}
+              </Text>
+            </Pressable>
+          )}
+
+          <Text style={{fontSize: 26, color: 'white'}}>PAUSED</Text>
+        </View>
+      )}
+
       <GameOverModal
         visible={gameOver}
         score={score}

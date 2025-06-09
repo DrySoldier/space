@@ -1,7 +1,5 @@
-import { StyleSheet, Dimensions } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { moderateScale as ms } from '../../../constants/scaling';
-
-const { height } = Dimensions.get('window');
 
 const styles = StyleSheet.create({
   container: {
@@ -63,8 +61,10 @@ const styles = StyleSheet.create({
     flex: 1,
     width: '100%',
     position: 'absolute',
-    bottom: ms(200),
-    overflow: 'visible'
+    overflow: 'visible',
+    backgroundColor: 'red',
+    top: 20,
+    left: 150
   },
   ground: {
     width: '100%',
@@ -88,7 +88,7 @@ const styles = StyleSheet.create({
   headerContainer: {
     width: '100%',
     position: 'absolute',
-    height: '75%',
+    height: '85%',
   },
   white: {
     color: 'white',

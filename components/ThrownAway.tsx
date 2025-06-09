@@ -4,7 +4,7 @@ import { moderateScale as ms } from '../constants';
 import { randInt } from '../utils';
 import Branch from './Branch';
 
-const ThrownAway = ({ side }: { side: Number }) => {
+const ThrownAway = ({ side }: { side: number }) => {
   const opacity = useRef(new Animated.Value(0)).current;
 
   const spin = opacity.interpolate({

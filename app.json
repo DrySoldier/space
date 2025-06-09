@@ -9,13 +9,15 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.cassio.space"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/bootsplash_logo.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.cassio.space"
     },
     "web": {
       "bundler": "metro",

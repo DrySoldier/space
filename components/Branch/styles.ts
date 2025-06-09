@@ -5,6 +5,7 @@ const styles = StyleSheet.create({
     branch: {
         width: ms(100),
         height: ms(100),
+        position: 'absolute'
     },
 });
 

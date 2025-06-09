@@ -1,79 +1,136 @@
-import {Animated, Easing, Image, ImageBackground, View} from 'react-native';
-import {images, moderateScale as ms} from '../../constants';
+import {ForwardedRef, forwardRef, useImperativeHandle, useRef} from 'react';
+import {Animated, Easing, Image} from 'react-native';
+import {images, moderateScale as ms} from '@/constants';
 import styles from './styles';
-import {
-  ForwardedRef,
-  forwardRef,
-  useImperativeHandle,
-  useRef,
-} from 'react';
 
-type TBranchRef = {
-  animateOut: (callback: () => void) => void;
+export type TBranchRef = {
+  animateDown: (callback: () => void) => void;
 };
 
 interface IBranch {
   side: number;
+  index: number;
 }
 
-const Branch = ({side}: IBranch, ref: ForwardedRef<TBranchRef>) => {
-  const translateY = useRef(new Animated.Value(ms(0))).current;
+const Branch = ({side, index}: IBranch, ref: ForwardedRef<TBranchRef>) => {
+  const translateY = useRef(
+    new Animated.Value(ms((index - 2) * ms(93))),
+  ).current;
 
-  const animateOut = (callback: () => void) => {
+  const animateDown = (callback: () => void) => {
     Animated.timing(translateY, {
-      toValue: ms(100),
+      toValue: (index - 1) * ms(100),
       duration: 50,
       easing: Easing.linear,
       useNativeDriver: true,
     }).start(() => {
-      translateY.resetAnimation();
-
       callback();
     });
   };
 
   useImperativeHandle(ref, () => ({
-    animateOut,
+    animateDown,
   }));
 
   switch (side) {
     case 0:
       return (
         <Animated.Image
+          resizeMode="stretch"
           source={images.elevatorTile}
-          style={[styles.branch, {transform: [{translateY}]}]}
+          style={[styles.branch, {marginTop: -0.2, transform: [{translateY}]}]}
         />
       );
 
     case 1:
       return (
-        <Animated.View style={[styles.branch, {transform: [{translateY}]}]}>
-          <Image source={images.elevatorTile} style={[styles.branch]} />
+        <Animated.View
+          style={[styles.branch, {marginTop: -0.2, transform: [{translateY}]}]}>
           <Image
             style={{
               width: ms(100),
               height: ms(100),
-              marginLeft: ms(-100),
-              marginTop: ms(-100),
+              marginLeft: ms(-94),
+              position: 'absolute',
             }}
+            resizeMode="cover"
             source={images.obstacleTile}
+          />
+          <Image
+            resizeMode="stretch"
+            source={images.elevatorTile}
+            style={[styles.branch]}
           />
         </Animated.View>
       );
 
     case 2:
       return (
-        <Animated.View style={[styles.branch, {transform: [{translateY}]}]}>
-          <Image source={images.elevatorTile} style={[styles.branch]} />
+        <Animated.View
+          style={[styles.branch, {marginTop: -0.2, transform: [{translateY}]}]}>
           <Image
             style={{
               width: ms(100),
               height: ms(100),
-              marginLeft: ms(100),
+              marginLeft: ms(94),
               transform: [{rotate: '180deg'}],
               position: 'absolute',
             }}
+            resizeMode="cover"
             source={images.obstacleTile}
+          />
+          <Image
+            resizeMode="stretch"
+            source={images.elevatorTile}
+            style={[styles.branch]}
+          />
+        </Animated.View>
+      );
+
+    case 3:
+      return (
+        <Animated.View style={[styles.branch, {transform: [{translateY}]}]}>
+          <Image
+            source={images.pitstop}
+            resizeMode="stretch"
+            style={[
+              styles.branch,
+              {marginTop: -0.2, transform: [{rotateY: '180deg'}]},
+            ]}
+          />
+          <Image
+            style={{
+              width: ms(50),
+              height: ms(65),
+              marginLeft: ms(-32),
+              marginTop: ms(8),
+              position: 'absolute',
+              transform: [{rotateY: '180deg'}],
+            }}
+            resizeMode="stretch"
+            source={images.oxygenTank}
+          />
+        </Animated.View>
+      );
+
+    case 4:
+      return (
+        <Animated.View style={[styles.branch, {transform: [{translateY}]}]}>
+          <Image
+            source={images.pitstop}
+            resizeMode="stretch"
+            style={[styles.branch, {marginTop: -0.2}]}
+          />
+          <Image
+            style={{
+              width: ms(50),
+              height: ms(65),
+              marginLeft: ms(82),
+              marginTop: ms(8),
+              position: 'absolute',
+            }}
+            resizeMode="stretch"
+            source={images.oxygenTank}
           />
         </Animated.View>
       );
@@ -81,6 +138,7 @@ const Branch = ({side}: IBranch, ref: ForwardedRef<TBranchRef>) => {
     default:
       return (
         <Animated.Image
+          resizeMode="stretch"
           source={images.elevatorTile}
           style={[styles.branch, {transform: [{translateY}]}]}
         />
