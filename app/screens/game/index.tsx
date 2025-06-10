@@ -34,6 +34,7 @@ const defaultBranches = [
 const backgroundSize = 1600;
 
 let timerInterval: any;
+let oxygenChance = 0;
 
 const Game = () => {
   // Current side player is on
@@ -69,19 +70,23 @@ const Game = () => {
 
     if (nextBranch === 0) {
       // 1 out of 15 chance to generate an oxygen tank in an empty branch
-      const hasOxygenTank = randInt(0, 100) >= 7;
+      const hasOxygenTank = randInt(oxygenChance, 100) >= 80;
 
       const side = randInt(0, 1);
       if (hasOxygenTank) {
         nextBranch = 3 + side;
+        oxygenChance = 0;
+        return nextBranch;
       }
+
+      oxygenChance += 10;
     }
 
     if (lastBranch.type !== 0) {
-      return 0;
-    } else {
-      return nextBranch;
+      nextBranch = 0;
     }
+
+    return nextBranch;
   };
 
   const handlePress = (side: TSide) => {
@@ -107,7 +112,7 @@ const Game = () => {
     setCurrentSide(side);
     setStep(prevState => !prevState);
 
-    // Handle branch animations & logic
+    // Handle branch animations
     const lastBranch = branches[7];
     const nextBranch = branches[6];
     const lastGeneratedBranch = branches[0];
@@ -181,7 +186,6 @@ const Game = () => {
       timerInterval = undefined;
       setDisablePress(true);
     } else {
-      console.log(timerInterval);
       if (!timerInterval) {
         timerInterval = setInterval(() => {
           setScore(prevState => prevState - 20);
