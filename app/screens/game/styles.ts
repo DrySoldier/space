@@ -1,5 +1,7 @@
-import { StyleSheet } from 'react-native';
+import { Dimensions, StyleSheet } from 'react-native';
 import { moderateScale as ms } from '../../../constants/scaling';
+
+const { height, width } = Dimensions.get('screen');
 
 const styles = StyleSheet.create({
   container: {
@@ -60,12 +62,11 @@ const styles = StyleSheet.create({
   },
   branchContainer: {
     flex: 1,
-    width: '100%',
-    position: 'absolute',
     overflow: 'visible',
-    backgroundColor: 'red',
-    top: 20,
-    left: 150
+    position: 'absolute',
+    width: '100%',
+    bottom: height * 1.05,
+    backgroundColor: 'red'
   },
   ground: {
     width: '100%',

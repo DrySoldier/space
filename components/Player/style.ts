@@ -1,11 +1,13 @@
-import { StyleSheet } from 'react-native';
+import { Dimensions, StyleSheet } from 'react-native';
 import { moderateScale as ms } from '../../constants/scaling';
+
+const {height, width} = Dimensions.get('screen');
 
 const styles = StyleSheet.create({
   player: {
-    height: ms(125),
-    width: ms(75),
-    marginTop: ms(325),
+    height: height * .16,
+    width: width * .30,
+    marginTop: height * .48,
   },
   playerContainer: {
     width: '100%',

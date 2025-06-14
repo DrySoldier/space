@@ -4,7 +4,7 @@ import {LinearGradient} from 'expo-linear-gradient';
 import {images, moderateScale as ms} from '@/constants';
 
 const HEIGHT = ms(70);
-const TICK = ms(4.49);
+const TICK = ms(4.3);
 
 const OxygenMeter = ({o2}: {o2: number}) => {
   const colors =
@@ -17,7 +17,7 @@ const OxygenMeter = ({o2}: {o2: number}) => {
       style={{
         position: 'absolute',
         top: ms(100),
-        left: ms(112),
+        left: ms(100),
         flex: 1,
         justifyContent: 'center',
         alignItems: 'flex-start',

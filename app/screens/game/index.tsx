@@ -168,7 +168,12 @@ const Game = () => {
       setDisablePress(true);
     } else if (!gameOver) {
       timerInterval = setInterval(() => {
-        setScore(prevState => prevState - 20);
+        setScore(prevState => {
+          if (prevState > 0) {
+            return prevState - 20;
+          }
+          return 0;
+        });
       }, 1000);
 
       refill(31);
@@ -265,7 +270,11 @@ const Game = () => {
       <FlatList
         pointerEvents="none"
         style={styles.branchContainer}
-        contentContainerStyle={{}}
+        contentContainerStyle={{
+          justifyContent: 'center',
+          alignItems: 'center',
+          width: '75%',
+        }}
         data={branches}
         renderItem={({item, index}) => (
           <Branch side={item.type} index={index} ref={item.ref} />
@@ -314,26 +323,23 @@ const Game = () => {
             justifyContent: 'center',
             alignItems: 'center',
           }}>
-          {paused && (
-            <Pressable
+          <Pressable
+            style={{
+              position: 'absolute',
+              right: 25,
+              top: '8%',
+              paddingHorizontal: 12,
+              paddingBottom: 12,
+            }}
+            onPress={() => setPaused(false)}>
+            <Text
               style={{
-                position: 'absolute',
-                right: 25,
-                top: '8%',
-                paddingHorizontal: 12,
-                paddingBottom: 12,
-              }}
-              onPress={() => setPaused(false)}>
-              <Text
-                style={{
-                  fontSize: 32,
-                  color: 'white',
-                }}>
-                {'⏵︎'}
-              </Text>
-            </Pressable>
-          )}
-
+                fontSize: 32,
+                color: 'white',
+              }}>
+              {'⏵︎'}
+            </Text>
+          </Pressable>
           <Text style={{fontSize: 26, color: 'white'}}>PAUSED</Text>
         </View>
       )}
@@ -341,7 +347,7 @@ const Game = () => {
       <GameOverModal
         visible={gameOver}
         score={score}
-        resetGame={() => setGameOver(false)}
+        resetGame={() => disablePress && setGameOver(false)}
       />
     </View>
   );
