@@ -1,7 +1,7 @@
 import {ForwardedRef, forwardRef, useImperativeHandle, useRef} from 'react';
-import {Animated, Dimensions, Easing, Image} from 'react-native';
-import {images, moderateScale as ms} from '@/constants';
-import styles from './styles';
+import {Animated, Easing, Image} from 'react-native';
+import {images} from '@/constants';
+import styles, {BRANCH_HW, OBSTACLE_MARGIN} from './styles';
 
 export type TBranchRef = {
   animateDown: (callback: () => void) => void;
@@ -12,18 +12,14 @@ interface IBranch {
   index: number;
 }
 
-const branchHW = 100;
-const initBranchHW = 100;
-
 const Branch = ({side, index}: IBranch, ref: ForwardedRef<TBranchRef>) => {
-  console.log("TRIGGERED2")
   const translateY = useRef(
-    new Animated.Value(ms((index - 2) * initBranchHW)),
+    new Animated.Value((index - 2) * BRANCH_HW),
   ).current;
 
   const animateDown = (callback: () => void) => {
     Animated.timing(translateY, {
-      toValue: (index - 1) * branchHW,
+      toValue: (index - 1) * BRANCH_HW,
       duration: 50,
       easing: Easing.linear,
       useNativeDriver: true,
@@ -50,7 +46,7 @@ const Branch = ({side, index}: IBranch, ref: ForwardedRef<TBranchRef>) => {
       return (
         <Animated.View style={[styles.branch, {transform: [{translateY}]}]}>
           <Image
-            style={[styles.branch, {marginLeft: ms(-94)}]}
+            style={[styles.branch, {marginLeft: -OBSTACLE_MARGIN}]}
             resizeMode="cover"
             source={images.obstacleTile}
           />
@@ -69,7 +65,7 @@ const Branch = ({side, index}: IBranch, ref: ForwardedRef<TBranchRef>) => {
             style={[
               styles.branch,
               {
-                marginLeft: ms(94),
+                marginLeft: OBSTACLE_MARGIN,
                 transform: [{rotate: '180deg'}],
               },
             ]}
@@ -93,14 +89,14 @@ const Branch = ({side, index}: IBranch, ref: ForwardedRef<TBranchRef>) => {
             style={[styles.branch, {transform: [{rotateY: '180deg'}]}]}
           />
           <Image
-            style={{
-              width: ms(50),
-              height: ms(65),
-              marginLeft: ms(-32),
-              marginTop: ms(8),
-              position: 'absolute',
-              transform: [{rotateY: '180deg'}],
-            }}
+            style={[
+              styles.oxygen,
+              {
+                right: BRANCH_HW * 0.87,
+                position: 'absolute',
+                transform: [{rotateY: '180deg'}],
+              },
+            ]}
             resizeMode="stretch"
             source={images.oxygenTank}
           />
@@ -116,13 +112,12 @@ const Branch = ({side, index}: IBranch, ref: ForwardedRef<TBranchRef>) => {
             style={[styles.branch]}
           />
           <Image
-            style={{
-              width: ms(50),
-              height: ms(65),
-              marginLeft: ms(82),
-              marginTop: ms(8),
-              position: 'absolute',
-            }}
+            style={[
+              styles.oxygen,
+              {
+                left: BRANCH_HW * 0.87,
+              },
+            ]}
             resizeMode="stretch"
             source={images.oxygenTank}
           />

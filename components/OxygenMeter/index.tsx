@@ -1,7 +1,7 @@
 import {View, Image} from 'react-native';
 import React from 'react';
 import {LinearGradient} from 'expo-linear-gradient';
-import {images, moderateScale as ms} from '@/constants';
+import {images, moderateScale as ms, width} from '@/constants';
 
 const HEIGHT = ms(70);
 const TICK = ms(4.3);
@@ -17,7 +17,7 @@ const OxygenMeter = ({o2}: {o2: number}) => {
       style={{
         position: 'absolute',
         top: ms(100),
-        left: ms(100),
+        left: width * .27,
         flex: 1,
         justifyContent: 'center',
         alignItems: 'flex-start',

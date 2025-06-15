@@ -1,10 +1,11 @@
-import React, { useEffect, useRef } from 'react';
-import { StyleSheet, View, Animated } from 'react-native';
-import { moderateScale as ms } from '../constants';
-import { randInt } from '../utils';
+import React, {useEffect, useRef} from 'react';
+import {StyleSheet, View, Animated} from 'react-native';
+import {moderateScale as ms} from '../constants';
+import {randInt} from '../utils';
 import Branch from './Branch';
+import { BRANCH_HW } from './Branch/styles';
 
-const ThrownAway = ({ side }: { side: number }) => {
+const ThrownAway = ({side}: {side: number}) => {
   const opacity = useRef(new Animated.Value(0)).current;
 
   const spin = opacity.interpolate({
@@ -14,7 +15,7 @@ const ThrownAway = ({ side }: { side: number }) => {
 
   const marginTop = opacity.interpolate({
     inputRange: [0, 0.5, 1],
-    outputRange: [50, 500, 1000],
+    outputRange: [25, 500, 1000],
   });
 
   const marginLeft = opacity.interpolate({
@@ -59,12 +60,11 @@ const ThrownAway = ({ side }: { side: number }) => {
               },
               {
                 translateX: marginLeft,
-              }
+              },
             ],
           },
-        ]}
-      >
-        <Branch side={side} />
+        ]}>
+        <Branch side={side} index={2} />
       </Animated.View>
     </View>
   );
@@ -74,8 +74,8 @@ export default ThrownAway;
 
 const styles = StyleSheet.create({
   thrownAwayBranch: {
-    height: ms(100),
-    width: ms(100),
+    height: BRANCH_HW,
+    width: BRANCH_HW,
     alignSelf: 'center',
   },
   thrownAwayContainer: {

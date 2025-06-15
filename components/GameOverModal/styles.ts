@@ -37,7 +37,7 @@ const styles = StyleSheet.create({
     color: 'white',
     fontFamily: 'GillSans-Bold',
     textAlign: 'center',
-    fontSize: 24,
+    fontSize: ms(20),
   },
   scoreText: {
     color: 'white',

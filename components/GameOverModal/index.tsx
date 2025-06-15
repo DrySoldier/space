@@ -62,7 +62,7 @@ const GameOverModal = ({ visible, score, resetGame }: IGameOverModal) => {
   }, []);
 
   useEffect(() => {
-    if (visible) {
+    if (visible && score > displayScore) {
       saveScore();
     }
   }, [visible]);
@@ -83,7 +83,7 @@ const GameOverModal = ({ visible, score, resetGame }: IGameOverModal) => {
           <View style={styles.gameOverContainer}>
             <Text style={styles.headerText}>Game Over</Text>
             <View style={{ alignItems: "center" }}>
-              <Text style={styles.headerText}>Your score</Text>
+              <Text style={styles.headerText}>Your Score</Text>
               <Text style={styles.scoreText}>{score}</Text>
             </View>
           </View>

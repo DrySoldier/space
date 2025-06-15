@@ -1,11 +1,11 @@
 import {View, Animated} from 'react-native';
 import React, {SetStateAction, useEffect, useRef, useState} from 'react';
-import {images, moderateScale as ms} from '@/constants';
+import {images, moderateScale as ms, width} from '@/constants';
 import styles from './style';
 import {randInt} from '@/utils';
+import { BRANCH_HW } from '../Branch/styles';
 
 const defaultPosition = images['astro-right-2'];
-
 type TSide = 'left' | 'right';
 
 interface IPlayer {
@@ -14,7 +14,10 @@ interface IPlayer {
   setDisablePress: React.Dispatch<SetStateAction<boolean>>;
   gameOver: boolean;
   step: boolean;
-}
+};
+
+const PLAYER_RIGHT_X = BRANCH_HW - width * .07;
+const PLAYER_LEFT_X = -(width * .16);
 
 const Player = ({
   currentSide,
@@ -48,9 +51,9 @@ const Player = ({
     let toValue = 0;
 
     if (currentSide === 'left') {
-      toValue = ms(-65);
+      toValue = PLAYER_LEFT_X;
     } else if (currentSide === 'right') {
-      toValue = ms(65);
+      toValue = PLAYER_RIGHT_X;
     }
 
     Animated.timing(astroSwapSideVal, {
@@ -89,7 +92,7 @@ const Player = ({
 
     Animated.parallel([
       Animated.timing(astroSwapSideVal, {
-        toValue: ms(-70),
+        toValue: PLAYER_LEFT_X,
         duration: 750,
         useNativeDriver: true,
       }),

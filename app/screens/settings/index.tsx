@@ -174,7 +174,8 @@ const styles = StyleSheet.create({
   buttonText: {
     color: 'white',
     fontFamily: 'GillSans-Bold',
-    textAlign: 'center'
+    textAlign: 'center',
+    fontSize: ms(12),
   },
   astro: {
     height: ms(100),

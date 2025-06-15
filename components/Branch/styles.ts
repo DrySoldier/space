@@ -1,12 +1,21 @@
-import { Dimensions, StyleSheet } from 'react-native';
-import { moderateScale as ms } from '../../constants/scaling';
+import { StyleSheet } from 'react-native';
+import { height, moderateScale as ms } from '../../constants/scaling';
+
+export const BRANCH_HW = height * 0.13;
+export const OBSTACLE_MARGIN = height * 0.12;
 
 const styles = StyleSheet.create({
     branch: {
-        width: ms(100),
-        height: 100,
+        width: BRANCH_HW,
+        height: BRANCH_HW,
         position: 'absolute'
     },
+    oxygen: {
+        marginTop: 12,
+        position: 'absolute',
+        width: BRANCH_HW * 0.5,
+        height: BRANCH_HW * 0.65,
+    }
 });
 
 export default styles;

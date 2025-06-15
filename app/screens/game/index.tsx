@@ -22,7 +22,7 @@ type TBranch = {type: number; id: number; ref: React.RefObject<any>};
 
 const defaultBranches = [
   {type: 0, id: 7, ref: createRef()},
-  {type: randInt(0, 2), id: 6, ref: createRef()},
+  {type: 0, id: 6, ref: createRef()},
   {type: 0, id: 5, ref: createRef()},
   {type: 0, id: 4, ref: createRef()},
   {type: 0, id: 3, ref: createRef()},
@@ -69,8 +69,7 @@ const Game = () => {
     }
 
     if (nextBranch === 0) {
-      // 1 out of 15 chance to generate an oxygen tank in an empty branch
-      const hasOxygenTank = randInt(oxygenChance, 100) >= 80;
+      const hasOxygenTank = oxygenChance >= 7;
 
       const side = randInt(0, 1);
       if (hasOxygenTank) {
@@ -78,11 +77,10 @@ const Game = () => {
         oxygenChance = 0;
         return nextBranch;
       }
-
-      oxygenChance += 10;
     }
 
     if (lastBranch.type !== 0) {
+      oxygenChance++;
       nextBranch = 0;
     }
 
@@ -271,7 +269,6 @@ const Game = () => {
         pointerEvents="none"
         style={styles.branchContainer}
         contentContainerStyle={{
-          justifyContent: 'center',
           alignItems: 'center',
           width: '75%',
         }}
