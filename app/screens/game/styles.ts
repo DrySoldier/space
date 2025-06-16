@@ -20,7 +20,7 @@ const styles = StyleSheet.create({
   image: {
     width: '100%',
     height: 800,
-    marginTop: -1
+    marginTop: -1,
   },
   leftSide: {
     flex: 4,
@@ -131,6 +131,17 @@ const styles = StyleSheet.create({
   pauseImage: {
     height: ms(32),
     width: ms(32),
+  },
+  levelNameBackground: {
+    height: 75,
+    width: 125,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  levelNameText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: ms(16),
   }
 });
 

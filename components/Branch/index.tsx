@@ -47,8 +47,8 @@ const Branch = ({side, index}: IBranch, ref: ForwardedRef<TBranchRef>) => {
       return (
         <Animated.View style={[styles.branch, {transform: [{translateY}]}]}>
           <Image
-            style={[styles.branch, {marginLeft: -OBSTACLE_MARGIN}]}
-            resizeMode="cover"
+            style={[styles.obstacle, {marginLeft: -OBSTACLE_MARGIN * 3.1}]}
+            resizeMode="contain"
             source={images.obstacleTile}
           />
           <Image
@@ -64,13 +64,13 @@ const Branch = ({side, index}: IBranch, ref: ForwardedRef<TBranchRef>) => {
         <Animated.View style={[styles.branch, {transform: [{translateY}]}]}>
           <Image
             style={[
-              styles.branch,
+              styles.obstacle,
               {
                 marginLeft: OBSTACLE_MARGIN,
                 transform: [{rotate: '180deg'}],
               },
             ]}
-            resizeMode="cover"
+            resizeMode="contain"
             source={images.obstacleTile}
           />
           <Image

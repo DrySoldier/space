@@ -9,7 +9,7 @@ import {
   Pressable,
   Platform,
 } from 'react-native';
-import {Image} from 'expo-image';
+import {Image, ImageBackground} from 'expo-image';
 import {ThrownAway, Branch, GameOverModal, OxygenMeter} from '@/components';
 import {images} from '@/constants';
 import {randInt} from '@/utils';
@@ -37,6 +37,10 @@ const backgroundSize = 1600;
 let timerInterval: any;
 let oxygenChance = 0;
 
+// Bump up the chance by 1 for every 5000, defaulting to 6 at 0
+const getOxygenChance = (score: number) =>
+  Math.min(6 + Math.floor(score / 5000), 12);
+
 const Game = () => {
   // Current side player is on
   const [currentSide, setCurrentSide] = useState<TSide>('left');
@@ -51,8 +55,16 @@ const Game = () => {
   const [animatingIn, setAnimatingIn] = useState(false);
 
   const [score, setScore] = useState(-1);
+  const [level, setLevel] = useState(1);
   const [gameOver, setGameOver] = useState(false);
+
   const [isMoving, setIsMoving] = useState(false);
+
+  const levelOpacity = useRef(new Animated.Value(0)).current;
+  const levelOpacityInterpolate = levelOpacity.interpolate({
+    inputRange: [0, 35000],
+    outputRange: [0, 0.12],
+  });
 
   // animation for the astronaut
   const [step, setStep] = useState(false);
@@ -60,6 +72,24 @@ const Game = () => {
   const {refill, o2} = useOxygen(isMoving, paused, gameOver);
 
   const offsetY = useRef(new Animated.Value(0)).current;
+  const levelNameY = useRef(new Animated.Value(-200)).current;
+
+  const buttonDegree = useRef(new Animated.Value(0)).current;
+
+  const spin = buttonDegree.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['-10deg', '10deg'],
+  });
+
+  const startButtonRotateAnimation = () => {
+    const randomDegree = Math.random();
+
+    Animated.timing(buttonDegree, {
+      toValue: randomDegree,
+      duration: 5000,
+      useNativeDriver: true,
+    }).start(() => startButtonRotateAnimation());
+  };
 
   const generateNewBranch = (lastBranch: TBranch) => {
     let nextBranch = randInt(0, 2);
@@ -70,7 +100,7 @@ const Game = () => {
     }
 
     if (nextBranch === 0) {
-      const hasOxygenTank = oxygenChance >= 7;
+      const hasOxygenTank = oxygenChance >= getOxygenChance(score);
 
       const side = randInt(0, 1);
       if (hasOxygenTank) {
@@ -80,7 +110,13 @@ const Game = () => {
       }
     }
 
-    if (lastBranch.type !== 0) {
+    if (level === 2 && lastBranch.type === nextBranch) {
+      if (nextBranch === 1) {
+        nextBranch++;
+      } else if (nextBranch === 2) {
+        nextBranch--;
+      }
+    } else if (lastBranch.type !== 0) {
       oxygenChance++;
       nextBranch = 0;
     }
@@ -105,6 +141,17 @@ const Game = () => {
       const wrapped = target % backgroundSize;
       if (wrapped > backgroundSize - 10) {
         offsetY.setValue(0);
+      }
+    });
+
+    levelNameY.stopAnimation(current => {
+      if (level === 2) {
+        Animated.timing(levelNameY, {
+          toValue: current + 100,
+          duration: 5000,
+          easing: Easing.bezier(0, 0.55, 0.45, 1),
+          useNativeDriver: true,
+        }).start();
       }
     });
 
@@ -173,10 +220,11 @@ const Game = () => {
         });
       }, 1000);
 
+      setLevel(1);
       refill(31);
       setThrownAwayArr([]);
       setBranches(defaultBranches);
-      setScore(0);
+      setScore(30000);
     }
 
     return () => clearInterval(timerInterval);
@@ -194,6 +242,22 @@ const Game = () => {
       }
     }
   }, [paused]);
+
+  useEffect(() => {
+    levelOpacity.stopAnimation();
+    Animated.timing(levelOpacity, {
+      toValue: score,
+      duration: 750,
+      easing: Easing.linear,
+      useNativeDriver: true,
+    }).start();
+
+    if (level !== 2 && score >= 35000) {
+      startButtonRotateAnimation();
+      levelNameY.setValue(-200);
+      setLevel(2);
+    }
+  }, [score]);
 
   useEffect(() => {
     if (o2 <= 0) {
@@ -245,7 +309,34 @@ const Game = () => {
           source={images.space}
           style={[styles.image]}
         />
+        <Animated.View
+          style={{
+            width: '100%',
+            height: '100%',
+            backgroundColor: '#ff9900',
+            position: 'absolute',
+            opacity: levelOpacityInterpolate,
+          }}
+        />
       </Animated.View>
+
+      {level === 2 && (
+        <Animated.View
+          style={{
+            position: 'absolute',
+            left: 25,
+            top: 0,
+            transform: [{rotate: spin}, {translateY: levelNameY}],
+          }}>
+          <ImageBackground
+            source={images.spaceProbe}
+            resizeMode="stretch"
+            style={styles.levelNameBackground}>
+            <Text
+              style={styles.levelNameText}>{`Solaris`}</Text>
+          </ImageBackground>
+        </Animated.View>
+      )}
 
       <FlatList
         pointerEvents="none"
