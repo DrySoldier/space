@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from "react";
+import React, {useRef, useEffect, useState} from 'react';
 import {
   Text,
   View,
@@ -6,12 +6,12 @@ import {
   Modal,
   Alert,
   Animated,
-  ImageBackground,
-} from "react-native";
-import styles from "./styles";
-import { images } from "../../constants/images";
-import { retrieveData, storeData } from "../../utils/asyncData";
-import { Link } from "expo-router";
+} from 'react-native';
+import {ImageBackground} from 'expo-image';
+import styles from './styles';
+import {images} from '../../constants/images';
+import {retrieveData, storeData} from '../../utils/asyncData';
+import {Link} from 'expo-router';
 
 interface IGameOverModal {
   visible: boolean;
@@ -19,19 +19,19 @@ interface IGameOverModal {
   resetGame: () => void;
 }
 
-const GameOverModal = ({ visible, score, resetGame }: IGameOverModal) => {
+const GameOverModal = ({visible, score, resetGame}: IGameOverModal) => {
   const buttonDegree = useRef(new Animated.Value(0)).current;
 
   const [displayScore, setDisplayScore] = useState(0);
 
   const spin = buttonDegree.interpolate({
     inputRange: [0, 1],
-    outputRange: ["-10deg", "10deg"],
+    outputRange: ['-10deg', '10deg'],
   });
 
   const oppositeSpin = buttonDegree.interpolate({
     inputRange: [0, 1],
-    outputRange: ["10deg", "-10deg"],
+    outputRange: ['10deg', '-10deg'],
   });
 
   const startButtonRotateAnimation = () => {
@@ -45,12 +45,12 @@ const GameOverModal = ({ visible, score, resetGame }: IGameOverModal) => {
   };
 
   const saveScore = async () => {
-    const hiScore = await retrieveData("HISCORE");
+    const hiScore = await retrieveData('HISCORE');
 
     const parsedHiScore = Number(hiScore);
 
     if (score > parsedHiScore) {
-      storeData("HISCORE", score);
+      storeData('HISCORE', score);
       setDisplayScore(score);
     } else {
       setDisplayScore(parsedHiScore);
@@ -72,53 +72,48 @@ const GameOverModal = ({ visible, score, resetGame }: IGameOverModal) => {
       animationType="slide"
       transparent={true}
       visible={visible}
-      onRequestClose={() => Alert.alert("Modal has been closed.")}
-    >
+      onRequestClose={() => Alert.alert('Modal has been closed.')}>
       <View style={styles.modalContainer}>
         <ImageBackground
-          resizeMode={"stretch"}
+          resizeMode={'stretch'}
           source={images.spaceProbe}
-          style={styles.mainSpaceProbe}
-        >
+          style={styles.mainSpaceProbe}>
           <View style={styles.gameOverContainer}>
             <Text style={styles.headerText}>Game Over</Text>
-            <View style={{ alignItems: "center" }}>
+            <View style={{alignItems: 'center'}}>
               <Text style={styles.headerText}>Your Score</Text>
               <Text style={styles.scoreText}>{score}</Text>
             </View>
           </View>
         </ImageBackground>
         <ImageBackground
-          resizeMode={"stretch"}
+          resizeMode={'stretch'}
           source={images.spaceProbe}
-          style={styles.hiScoreSpaceProbe}
-        >
+          style={styles.hiScoreSpaceProbe}>
           <View style={styles.hiScoreContainer}>
-            <View style={{ alignItems: "center" }}>
+            <View style={{alignItems: 'center'}}>
               <Text style={styles.headerText}>Hi-Score</Text>
               <Text style={styles.scoreText}>{displayScore}</Text>
             </View>
           </View>
         </ImageBackground>
         <View style={styles.buttonContainer}>
-          <Animated.View style={{ transform: [{ rotate: spin }] }}>
+          <Animated.View style={{transform: [{rotate: spin}]}}>
             <Link href="..">
               <ImageBackground
-                resizeMode={"stretch"}
+                resizeMode={'stretch'}
                 source={images.spaceProbe}
-                style={styles.spaceProbe}
-              >
+                style={styles.spaceProbe}>
                 <Text style={styles.text}>Main Menu</Text>
               </ImageBackground>
             </Link>
           </Animated.View>
-          <Animated.View style={{ transform: [{ rotate: oppositeSpin }] }}>
+          <Animated.View style={{transform: [{rotate: oppositeSpin}]}}>
             <TouchableOpacity onPress={resetGame}>
               <ImageBackground
-                resizeMode={"stretch"}
+                resizeMode={'stretch'}
                 source={images.spaceProbe}
-                style={styles.spaceProbe}
-              >
+                style={styles.spaceProbe}>
                 <Text style={styles.text}>Restart</Text>
               </ImageBackground>
             </TouchableOpacity>

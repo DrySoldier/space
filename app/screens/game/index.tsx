@@ -1,22 +1,26 @@
-import React, {useState, useEffect, useRef, createRef} from 'react';
+import React, {useState, useEffect, createRef, useRef} from 'react';
 import {
   Text,
   View,
-  Animated,
   TouchableOpacity,
   FlatList,
-  Easing,
   Pressable,
   Platform,
 } from 'react-native';
-import {Image, ImageBackground} from 'expo-image';
-import {ThrownAway, Branch, GameOverModal, OxygenMeter} from '@/components';
+import {Image} from 'expo-image';
+import {
+  ThrownAway,
+  Branch,
+  GameOverModal,
+  OxygenMeter,
+  Background,
+} from '@/components';
 import {images} from '@/constants';
 import {randInt} from '@/utils';
 
 import styles from './styles';
-import {useOxygen} from '@/app/hooks/useOxygen';
 import Player from '@/components/Player';
+import {useOxygen} from '@/hooks/useOxygen';
 
 type TSide = 'left' | 'right';
 type TBranch = {type: number; id: number; ref: React.RefObject<any>};
@@ -32,8 +36,6 @@ const defaultBranches = [
   {type: 0, id: 0, ref: createRef()},
 ];
 
-const backgroundSize = 1600;
-
 let timerInterval: any;
 let oxygenChance = 0;
 
@@ -44,10 +46,10 @@ const getOxygenChance = (score: number) =>
 const Game = () => {
   // Current side player is on
   const [currentSide, setCurrentSide] = useState<TSide>('left');
-  // 0 - no branch, 1 - left side branch, 2 - right side branch
-  // The rantInts set up random branches on the top
-  const [branches, setBranches] = useState<TBranch[]>(defaultBranches);
   // All the branch views
+  // 0 - no branch, 1 - left side branch, 2 - right side branch
+  // 3 - left side oxygen tank, 4 - right side oxygen tank
+  const [branches, setBranches] = useState<TBranch[]>(defaultBranches);
   // Array to store thrown away squares
   const [thrownAwayArr, setThrownAwayArr] = useState<React.JSX.Element[]>([]);
   const [paused, setPaused] = useState(false);
@@ -57,39 +59,12 @@ const Game = () => {
   const [score, setScore] = useState(-1);
   const [level, setLevel] = useState(1);
   const [gameOver, setGameOver] = useState(false);
-
-  const [isMoving, setIsMoving] = useState(false);
-
-  const levelOpacity = useRef(new Animated.Value(0)).current;
-  const levelOpacityInterpolate = levelOpacity.interpolate({
-    inputRange: [0, 35000],
-    outputRange: [0, 0.12],
-  });
-
   // animation for the astronaut
   const [step, setStep] = useState(false);
 
+  let isMoving = useRef(false).current;
+
   const {refill, o2} = useOxygen(isMoving, paused, gameOver);
-
-  const offsetY = useRef(new Animated.Value(0)).current;
-  const levelNameY = useRef(new Animated.Value(-200)).current;
-
-  const buttonDegree = useRef(new Animated.Value(0)).current;
-
-  const spin = buttonDegree.interpolate({
-    inputRange: [0, 1],
-    outputRange: ['-10deg', '10deg'],
-  });
-
-  const startButtonRotateAnimation = () => {
-    const randomDegree = Math.random();
-
-    Animated.timing(buttonDegree, {
-      toValue: randomDegree,
-      duration: 5000,
-      useNativeDriver: true,
-    }).start(() => startButtonRotateAnimation());
-  };
 
   const generateNewBranch = (lastBranch: TBranch) => {
     let nextBranch = randInt(0, 2);
@@ -127,34 +102,6 @@ const Game = () => {
   const handlePress = (side: TSide) => {
     if (animatingIn || paused || gameOver) return;
 
-    // Handle background shift
-    offsetY.stopAnimation(current => {
-      const target = current + 20;
-
-      Animated.timing(offsetY, {
-        toValue: target,
-        duration: 5000,
-        easing: Easing.bezier(0, 0.55, 0.45, 1),
-        useNativeDriver: true,
-      }).start();
-
-      const wrapped = target % backgroundSize;
-      if (wrapped > backgroundSize - 10) {
-        offsetY.setValue(0);
-      }
-    });
-
-    levelNameY.stopAnimation(current => {
-      if (level === 2) {
-        Animated.timing(levelNameY, {
-          toValue: current + 100,
-          duration: 5000,
-          easing: Easing.bezier(0, 0.55, 0.45, 1),
-          useNativeDriver: true,
-        }).start();
-      }
-    });
-
     setCurrentSide(side);
     setStep(prevState => !prevState);
 
@@ -163,7 +110,7 @@ const Game = () => {
     const nextBranch = branches[6];
     const lastGeneratedBranch = branches[0];
 
-    setIsMoving(true);
+    isMoving = true;
 
     branches.forEach(b => {
       b.ref?.current.animateDown(() => {
@@ -178,7 +125,7 @@ const Game = () => {
             });
             return copy;
           });
-          setIsMoving(false);
+          isMoving = false;
         }
       });
     });
@@ -244,22 +191,6 @@ const Game = () => {
   }, [paused]);
 
   useEffect(() => {
-    levelOpacity.stopAnimation();
-    Animated.timing(levelOpacity, {
-      toValue: score,
-      duration: 750,
-      easing: Easing.linear,
-      useNativeDriver: true,
-    }).start();
-
-    if (level !== 2 && score >= 35000) {
-      startButtonRotateAnimation();
-      levelNameY.setValue(-200);
-      setLevel(2);
-    }
-  }, [score]);
-
-  useEffect(() => {
     if (o2 <= 0) {
       setGameOver(true);
     }
@@ -267,77 +198,7 @@ const Game = () => {
 
   return (
     <View style={styles.container}>
-      <Animated.View
-        style={[
-          styles.imageContainer,
-          {
-            transform: [
-              {translateY: offsetY},
-              {
-                skewY: '2deg',
-              },
-            ],
-          },
-        ]}>
-        <Image
-          resizeMode="stretch"
-          source={images.space}
-          style={[styles.image]}
-        />
-        <Image
-          resizeMode="stretch"
-          source={images.space}
-          style={[styles.image]}
-        />
-        <Image
-          resizeMode="stretch"
-          source={images.space}
-          style={[styles.image]}
-        />
-        <Image
-          resizeMode="stretch"
-          source={images.space}
-          style={[styles.image]}
-        />
-        <Image
-          resizeMode="stretch"
-          source={images.space}
-          style={[styles.image]}
-        />
-        <Image
-          resizeMode="stretch"
-          source={images.space}
-          style={[styles.image]}
-        />
-        <Animated.View
-          style={{
-            width: '100%',
-            height: '100%',
-            backgroundColor: '#ff9900',
-            position: 'absolute',
-            opacity: levelOpacityInterpolate,
-          }}
-        />
-      </Animated.View>
-
-      {level === 2 && (
-        <Animated.View
-          style={{
-            position: 'absolute',
-            left: 25,
-            top: 0,
-            transform: [{rotate: spin}, {translateY: levelNameY}],
-          }}>
-          <ImageBackground
-            source={images.spaceProbe}
-            resizeMode="stretch"
-            style={styles.levelNameBackground}>
-            <Text
-              style={styles.levelNameText}>{`Solaris`}</Text>
-          </ImageBackground>
-        </Animated.View>
-      )}
-
+      <Background setLevel={setLevel} level={level} score={score} step={step} />
       <FlatList
         pointerEvents="none"
         style={styles.branchContainer}

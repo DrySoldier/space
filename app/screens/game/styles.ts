@@ -9,19 +9,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     backgroundColor: 'black'
   },
-  imageContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexDirection: 'column',
-    position: "absolute",
-    width: '100%',
-  },
-  image: {
-    width: '100%',
-    height: 800,
-    marginTop: -1,
-  },
   leftSide: {
     flex: 4,
   },
@@ -132,17 +119,6 @@ const styles = StyleSheet.create({
     height: ms(32),
     width: ms(32),
   },
-  levelNameBackground: {
-    height: 75,
-    width: 125,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  levelNameText: {
-    color: 'white',
-    fontWeight: 'bold',
-    fontSize: ms(16),
-  }
 });
 
 export default styles;

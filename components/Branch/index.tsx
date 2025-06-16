@@ -93,8 +93,8 @@ const Branch = ({side, index}: IBranch, ref: ForwardedRef<TBranchRef>) => {
             style={[
               styles.oxygen,
               {
-                right: BRANCH_HW * 0.87,
                 position: 'absolute',
+                right: BRANCH_HW * 0.87,
                 transform: [{rotateY: '180deg'}],
               },
             ]}
