@@ -1,5 +1,6 @@
 import {ForwardedRef, forwardRef, useImperativeHandle, useRef} from 'react';
-import {Animated, Easing, Image} from 'react-native';
+import {Animated, Easing} from 'react-native';
+import {Image} from 'expo-image';
 import {images} from '@/constants';
 import styles, {BRANCH_HW, OBSTACLE_MARGIN} from './styles';
 

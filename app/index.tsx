@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from "react";
-import { View, Text, Animated, Easing, ImageBackground } from "react-native";
+import { View, Text, Animated, Easing } from "react-native";
+import { ImageBackground } from 'expo-image';
 import { images } from "../constants/images";
 import styles from "./styles";
 import { Link } from "expo-router";

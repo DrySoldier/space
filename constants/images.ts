@@ -10,7 +10,9 @@ const images = {
   obstacleTile: require('../assets/newAssets/obstacle-tile.png'),
   oxygenMeter: require('../assets/newAssets/meter.png'),
   oxygenTank: require('../assets/newAssets/oxygen-tank.png'),
-  pitstop: require('../assets/newAssets/pitstop.png')
+  pitstop: require('../assets/newAssets/pitstop.png'),
+  pause: require('../assets/newAssets/pause.png'),
+  play: require('../assets/newAssets/play.png')
 };
 
 let imageValues = Object.values(images);

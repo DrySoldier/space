@@ -1,9 +1,9 @@
 import {View, Image} from 'react-native';
 import React from 'react';
 import {LinearGradient} from 'expo-linear-gradient';
-import {images, moderateScale as ms, width} from '@/constants';
+import {images, moderateScale as ms} from '@/constants';
+import styles, {OXYGEN_HEIGHT} from './styles';
 
-const HEIGHT = ms(70);
 const TICK = ms(4.3);
 
 const OxygenMeter = ({o2}: {o2: number}) => {
@@ -13,32 +13,23 @@ const OxygenMeter = ({o2}: {o2: number}) => {
       : (['#ffae42', '#d21e2b'] as const);
 
   return (
-    <View
-      style={{
-        position: 'absolute',
-        top: ms(100),
-        left: width * .27,
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'flex-start',
-      }}>
+    <View style={styles.oxygenContainer}>
       <LinearGradient
         colors={colors}
         start={{x: 0, y: 0}}
         end={{x: 1, y: 0}}
-        style={{
-          position: 'absolute',
-          backgroundColor: 'red',
-          width: TICK * Math.floor(o2),
-          height: HEIGHT,
-          marginLeft: ms(18.7),
-        }}
+        style={[
+          styles.oxygenGradient,
+          {
+            width: TICK * Math.floor(o2),
+          },
+        ]}
       />
       <View />
       <Image
         source={images.oxygenMeter}
         resizeMode="stretch"
-        style={{height: HEIGHT, width: ms(180)}}
+        style={{height: OXYGEN_HEIGHT, width: ms(180)}}
       />
     </View>
   );

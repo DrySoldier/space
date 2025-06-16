@@ -5,10 +5,11 @@ import {
   Animated,
   TouchableOpacity,
   FlatList,
-  Image,
   Easing,
   Pressable,
+  Platform,
 } from 'react-native';
+import {Image} from 'expo-image';
 import {ThrownAway, Branch, GameOverModal, OxygenMeter} from '@/components';
 import {images} from '@/constants';
 import {randInt} from '@/utils';
@@ -47,7 +48,7 @@ const Game = () => {
   const [thrownAwayArr, setThrownAwayArr] = useState<React.JSX.Element[]>([]);
   const [paused, setPaused] = useState(false);
 
-  const [disablePress, setDisablePress] = useState(false);
+  const [animatingIn, setAnimatingIn] = useState(false);
 
   const [score, setScore] = useState(-1);
   const [gameOver, setGameOver] = useState(false);
@@ -88,7 +89,7 @@ const Game = () => {
   };
 
   const handlePress = (side: TSide) => {
-    if (disablePress) return;
+    if (animatingIn || paused || gameOver) return;
 
     // Handle background shift
     offsetY.stopAnimation(current => {
@@ -145,7 +146,6 @@ const Game = () => {
       (side === 'left' && nextBranch.type === 1) ||
       (side === 'right' && nextBranch.type === 2)
     ) {
-      setDisablePress(true);
       setGameOver(true);
       return;
     } else {
@@ -163,7 +163,6 @@ const Game = () => {
     if (gameOver) {
       clearInterval(timerInterval);
       timerInterval = undefined;
-      setDisablePress(true);
     } else if (!gameOver) {
       timerInterval = setInterval(() => {
         setScore(prevState => {
@@ -187,15 +186,12 @@ const Game = () => {
     if (paused) {
       clearInterval(timerInterval);
       timerInterval = undefined;
-      setDisablePress(true);
     } else {
       if (!timerInterval) {
         timerInterval = setInterval(() => {
           setScore(prevState => prevState - 20);
         }, 1000);
       }
-
-      setDisablePress(false);
     }
   }, [paused]);
 
@@ -251,6 +247,18 @@ const Game = () => {
         />
       </Animated.View>
 
+      <FlatList
+        pointerEvents="none"
+        style={styles.branchContainer}
+        contentContainerStyle={styles.branchContentContainer}
+        data={branches}
+        renderItem={({item, index}) => (
+          <Branch side={item.type} index={index} ref={item.ref} />
+        )}
+        removeClippedSubviews={Platform.OS === 'android'}
+        keyExtractor={item => item.id.toString()}
+      />
+
       <TouchableOpacity
         style={styles.leftSide}
         onPress={() => handlePress('left')}>
@@ -265,43 +273,22 @@ const Game = () => {
         <View style={styles.side} />
       </TouchableOpacity>
 
-      <FlatList
-        pointerEvents="none"
-        style={styles.branchContainer}
-        contentContainerStyle={{
-          alignItems: 'center',
-          width: '75%',
-        }}
-        data={branches}
-        renderItem={({item, index}) => (
-          <Branch side={item.type} index={index} ref={item.ref} />
-        )}
-        keyExtractor={item => item.id.toString()}
-      />
-
       <Player
         gameOver={gameOver}
         setCurrentSide={setCurrentSide}
         currentSide={currentSide}
-        setDisablePress={setDisablePress}
+        setDisablePress={setAnimatingIn}
         step={step}
       />
 
       <View style={styles.headerContainer}>
         <Text style={styles.score}>{score}</Text>
 
-        <Pressable
-          onPress={() => setPaused(true)}
-          style={{
-            position: 'absolute',
-            right: 25,
-            paddingHorizontal: 12,
-            paddingBottom: 12,
-          }}>
-          {!paused && !gameOver && (
-            <Text style={{fontSize: 32, color: 'white'}}>{'⏸︎'}</Text>
-          )}
-        </Pressable>
+        {!paused && !gameOver && (
+          <Pressable onPress={() => setPaused(true)} style={styles.pauseButton}>
+            <Image source={images.pause} style={styles.pauseImage} />
+          </Pressable>
+        )}
       </View>
 
       <OxygenMeter o2={o2} />
@@ -311,40 +298,20 @@ const Game = () => {
       </View>
 
       {paused && (
-        <View
-          style={{
-            position: 'absolute',
-            backgroundColor: 'rgba(0,0,0,.3)',
-            height: '100%',
-            width: '100%',
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}>
+        <View style={styles.pauseContainer}>
           <Pressable
-            style={{
-              position: 'absolute',
-              right: 25,
-              top: '8%',
-              paddingHorizontal: 12,
-              paddingBottom: 12,
-            }}
+            style={styles.continueButton}
             onPress={() => setPaused(false)}>
-            <Text
-              style={{
-                fontSize: 32,
-                color: 'white',
-              }}>
-              {'⏵︎'}
-            </Text>
+            <Image source={images.play} style={styles.pauseImage} />
           </Pressable>
-          <Text style={{fontSize: 26, color: 'white'}}>PAUSED</Text>
+          <Text style={styles.pauseText}>PAUSED</Text>
         </View>
       )}
 
       <GameOverModal
         visible={gameOver}
         score={score}
-        resetGame={() => disablePress && setGameOver(false)}
+        resetGame={() => setGameOver(false)}
       />
     </View>
   );

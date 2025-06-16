@@ -3,29 +3,23 @@ import React, {SetStateAction, useEffect, useRef, useState} from 'react';
 import {images, moderateScale as ms, width} from '@/constants';
 import styles from './style';
 import {randInt} from '@/utils';
-import { BRANCH_HW } from '../Branch/styles';
+import {BRANCH_HW} from '../Branch/styles';
 
 const defaultPosition = images['astro-right-2'];
 type TSide = 'left' | 'right';
 
 interface IPlayer {
-  currentSide: TSide
+  currentSide: TSide;
   setCurrentSide: React.Dispatch<SetStateAction<TSide>>;
   setDisablePress: React.Dispatch<SetStateAction<boolean>>;
   gameOver: boolean;
   step: boolean;
-};
+}
 
-const PLAYER_RIGHT_X = BRANCH_HW - width * .07;
-const PLAYER_LEFT_X = -(width * .16);
+const PLAYER_RIGHT_X = BRANCH_HW - width * 0.1;
+const PLAYER_LEFT_X = -(width * 0.16);
 
-const Player = ({
-  currentSide,
-  setCurrentSide,
-  setDisablePress,
-  gameOver,
-  step,
-}: IPlayer) => {
+const Player = ({currentSide, setCurrentSide, setDisablePress, gameOver, step}: IPlayer) => {
   // current player model TODO: Set up animated sprite
   const [playerModel, setPlayerModel] = useState(defaultPosition);
 
@@ -87,6 +81,7 @@ const Player = ({
   }, [gameOver]);
 
   const animateAstronautIn = () => {
+    setDisablePress(true);
     astroSwapSideVal.setValue(-300);
     astroSpin.setValue(1);
 

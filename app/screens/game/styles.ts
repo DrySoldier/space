@@ -1,7 +1,5 @@
-import { Dimensions, StyleSheet } from 'react-native';
-import { moderateScale as ms } from '../../../constants/scaling';
-
-const { height, width } = Dimensions.get('screen');
+import { Platform, StyleSheet } from 'react-native';
+import { height, moderateScale as ms } from '../../../constants/scaling';
 
 const styles = StyleSheet.create({
   container: {
@@ -61,11 +59,17 @@ const styles = StyleSheet.create({
     fontFamily: 'GillSans-Bold',
   },
   branchContainer: {
-    flex: 1,
     overflow: 'visible',
     position: 'absolute',
     width: '100%',
-    bottom: height * 1.05,
+    height: '100%',
+    bottom: Platform.OS === 'ios' ? height * .06 : height * .03
+  },
+  branchContentContainer: {
+    alignItems: 'center',
+    width: '75%',
+    height: '100%',
+    overflow: 'visible',
   },
   ground: {
     width: '100%',
@@ -98,6 +102,36 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: ms(15),
   },
+  pauseContainer: {
+    position: 'absolute',
+    backgroundColor: 'rgba(0,0,0,.3)',
+    height: '100%',
+    width: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  pauseButton: {
+    position: 'absolute',
+    right: 25,
+    paddingHorizontal: 12,
+    paddingBottom: 12,
+  },
+  continueButton: {
+    position: 'absolute',
+    right: 25,
+    top: '8%',
+    paddingHorizontal: 12,
+    paddingBottom: 12,
+  },
+  pauseText: {
+    fontSize: ms(32),
+    color: 'white',
+    marginLeft: ms(12)
+  },
+  pauseImage: {
+    height: ms(32),
+    width: ms(32),
+  }
 });
 
 export default styles;
