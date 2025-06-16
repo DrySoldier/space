@@ -10,14 +10,14 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.cassio.space"
+      "bundleIdentifier": "com.imisshtml.spaceclimb"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/bootsplash_logo.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.cassio.space"
+      "package": "com.imisshtml.spaceclimb"
     },
     "web": {
       "bundler": "metro",
@@ -38,6 +38,14 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "c13eed24-e36e-45a6-a491-c44549c34266"
+      }
     }
   }
 }
