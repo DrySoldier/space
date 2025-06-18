@@ -8,10 +8,11 @@ import {
   Animated,
 } from 'react-native';
 import {ImageBackground} from 'expo-image';
+import {Link} from 'expo-router';
 import styles from './styles';
 import {images} from '../../constants/images';
 import {retrieveData, storeData} from '../../utils/asyncData';
-import {Link} from 'expo-router';
+import {useScoreboard} from '@/hooks/useScoreboard';
 
 interface IGameOverModal {
   visible: boolean;
@@ -20,10 +21,10 @@ interface IGameOverModal {
 }
 
 const GameOverModal = ({visible, score, resetGame}: IGameOverModal) => {
-  const buttonDegree = useRef(new Animated.Value(0)).current;
-
+  const {scores} = useScoreboard(visible);
   const [displayScore, setDisplayScore] = useState(0);
 
+  const buttonDegree = useRef(new Animated.Value(0)).current;
   const spin = buttonDegree.interpolate({
     inputRange: [0, 1],
     outputRange: ['-10deg', '10deg'],
@@ -66,6 +67,10 @@ const GameOverModal = ({visible, score, resetGame}: IGameOverModal) => {
       saveScore();
     }
   }, [visible]);
+
+  useEffect(() => {
+    console.log(scores);
+  }, [scores]);
 
   return (
     <Modal

@@ -41,9 +41,9 @@ const styles = StyleSheet.create({
   },
   score: {
     color: 'white',
-    fontSize: ms(25),
+    fontSize: ms(28),
     alignSelf: 'center',
-    fontFamily: 'GillSans-Bold',
+    fontFamily: 'Pixellari',
   },
   branchContainer: {
     overflow: 'visible',
@@ -113,6 +113,7 @@ const styles = StyleSheet.create({
   pauseText: {
     fontSize: ms(32),
     color: 'white',
+    fontFamily: 'Pixellari',
     marginLeft: ms(12)
   },
   pauseImage: {

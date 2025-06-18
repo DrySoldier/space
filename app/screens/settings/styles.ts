@@ -1,9 +1,38 @@
+import { moderateScale as ms } from "@/constants";
 import { StyleSheet } from "react-native"
 
-const useStyles = () => {
-    const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+    button: {
+        height: ms(130),
+        width: ms(180),
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingHorizontal: ms(50)
+    },
+    creditDisplay: {
+        height: ms(150),
+        width: ms(250),
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: ms(75),
+    },
+    buttonContainer: {
+        flex: 3,
+        alignItems: 'center',
+        justifyContent: 'space-evenly',
+    },
+    buttonText: {
+        color: 'white',
+        fontFamily: 'Pixellari',
+        textAlign: 'center',
+        fontSize: ms(16),
+    },
+    astro: {
+        height: ms(100),
+        width: ms(100),
+        position: 'absolute',
+        top: ms(250),
+    },
+})
 
-    return styles;
-}
-
-export default useStyles;
+export default styles;

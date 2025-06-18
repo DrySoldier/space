@@ -1,9 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, TouchableOpacity, Text, Animated, Easing, Alert, StyleSheet, ImageBackground } from 'react-native';
-import { images, moderateScale as ms } from '../../../constants';
+import { View, TouchableOpacity, Text, Animated, Easing, Alert, ImageBackground } from 'react-native';
+import { images } from '../../../constants';
 import { removeData } from '../../../utils/asyncData';
 import { Link } from 'expo-router';
 import { randInt } from '../../../utils';
+import styles from './styles';
 
 const Settings = () => {
   const buttonDegree = useRef(new Animated.Value(0)).current;
@@ -150,37 +151,3 @@ const Settings = () => {
 };
 
 export default Settings;
-
-const styles = StyleSheet.create({
-  button: {
-    height: ms(130),
-    width: ms(180),
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: ms(50)
-  },
-  creditDisplay: {
-    height: ms(150),
-    width: ms(250),
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: ms(75),
-  },
-  buttonContainer: {
-    flex: 3,
-    alignItems: 'center',
-    justifyContent: 'space-evenly',
-  },
-  buttonText: {
-    color: 'white',
-    fontFamily: 'GillSans-Bold',
-    textAlign: 'center',
-    fontSize: ms(12),
-  },
-  astro: {
-    height: ms(100),
-    width: ms(100),
-    position: 'absolute',
-    top: ms(250),
-  },
-});

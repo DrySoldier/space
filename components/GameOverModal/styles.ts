@@ -30,20 +30,21 @@ const styles = StyleSheet.create({
   },
   text: {
     color: 'white',
-    fontFamily: 'GillSans-Bold',
+    fontFamily: 'Pixellari',
+    fontSize: ms(16),
     textAlign: 'center',
   },
   headerText: {
     color: 'white',
-    fontFamily: 'GillSans-Bold',
+    fontFamily: 'Pixellari',
     textAlign: 'center',
-    fontSize: ms(20),
+    fontSize: ms(24),
   },
   scoreText: {
     color: 'white',
-    fontFamily: 'GillSans-Bold',
+    fontFamily: 'Pixellari',
     textAlign: 'center',
-    fontSize: 28,
+    fontSize: ms(32),
   },
   buttonContainer: {
     width: '100%',

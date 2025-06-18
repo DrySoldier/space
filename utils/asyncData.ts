@@ -1,30 +1,31 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import log from './logger';
 
-export const storeData = async (type, val) => {
+type TStorageKeys = 'HISCORE' | 'UUID';
+
+export const storeData = async (type: TStorageKeys, val: unknown) => {
   try {
     await AsyncStorage.setItem(`@SPACE:${type}`, String(val));
   } catch (error) {
-    log(' ::: AsyncStorage Error - StoreData failed for ', type, val);
+    console.log(' ::: AsyncStorage Error - StoreData failed for ', type, val);
   }
 };
 
-export const retrieveData = async type => {
+export const retrieveData = async (type: TStorageKeys) => {
   try {
     const value = await AsyncStorage.getItem(`@SPACE:${type}`);
-    log(`::: AsyncStorage retrieved for ${type} with value: ${value}`);
+    console.log(`::: AsyncStorage retrieved for ${type} with value: ${value}`);
     return value;
   } catch (error) {
-    log(' ::: AsyncStorage Error - Retriev/eData failed for ', type);
+    console.log(' ::: AsyncStorage Error - Retriev/eData failed for ', type);
   }
 };
 
-export const removeData = async type => {
+export const removeData = async (type: TStorageKeys) => {
   try {
     const value = await AsyncStorage.removeItem(`@SPACE:${type}`);
-    log(`::: AsyncStorage removed for ${type} with value: ${value}`);
+    console.log(`::: AsyncStorage removed for ${type} with value: ${value}`);
     return value;
   } catch (error) {
-    log(' ::: AsyncStorage Error - Remove data failed for ', type);
+    console.log(' ::: AsyncStorage Error - Remove data failed for ', type);
   }
 };

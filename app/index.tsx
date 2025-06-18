@@ -1,121 +1,59 @@
-import React, { useEffect, useRef } from "react";
-import { View, Text, Animated, Easing } from "react-native";
-import { ImageBackground } from 'expo-image';
-import { images } from "../constants/images";
-import styles from "./styles";
-import { Link } from "expo-router";
-import { randInt } from "../utils";
+import {useEffect, useState} from 'react';
+import {View} from 'react-native';
+import {useFonts} from 'expo-font';
+import * as SplashScreen from 'expo-splash-screen';
+import {Image} from 'expo-image';
+import {images} from '@/constants';
+import {useRouter} from 'expo-router';
+import {retrieveData, storeData} from '@/utils/asyncData';
+import * as Crypto from 'expo-crypto';
 
-const Home = () => {
-  const buttonDegree = useRef(new Animated.Value(0)).current;
-  const astroPosition = useRef(new Animated.Value(0)).current;
-  const astroRotate = useRef(new Animated.Value(0)).current;
+SplashScreen.preventAutoHideAsync();
 
-  const spin = buttonDegree.interpolate({
-    inputRange: [0, 1],
-    outputRange: ["-10deg", "10deg"],
+export default function App() {
+  const [loaded, error] = useFonts({
+    Pixellari: require('../assets/fonts/Pixellari.ttf'),
   });
+  const [uuidLoaded, setUUIDLoaded] = useState(false);
 
-  const oppositeSpin = buttonDegree.interpolate({
-    inputRange: [0, 1],
-    outputRange: ["10deg", "-10deg"],
-  });
-
-  const astro360 = astroRotate.interpolate({
-    inputRange: [0, 1],
-    outputRange: [`0deg`, `360deg`],
-  });
-
-  const xPosition = astroPosition.interpolate({
-    inputRange: [0, 1],
-    outputRange: [-100, 650],
-  });
-
-  const startButtonRotateAnimation = () => {
-    const randomDegree = Math.random();
-
-    Animated.timing(buttonDegree, {
-      toValue: randomDegree,
-      duration: 5000,
-      useNativeDriver: true,
-    }).start(() => startButtonRotateAnimation());
-  };
-
-  const startAstroAnimation = () => {
-    const newDuration = randInt(6000, 18000);
-    const newRotate = Math.random();
-    astroPosition.setValue(0);
-
-    Animated.parallel([
-      Animated.timing(astroPosition, {
-        toValue: 1,
-        duration: newDuration,
-        easing: Easing.linear,
-        useNativeDriver: true,
-      }),
-      Animated.timing(astroRotate, {
-        toValue: newRotate,
-        duration: newDuration,
-        easing: Easing.linear,
-        useNativeDriver: true,
-      }),
-    ]).start(() => startAstroAnimation());
-  };
+  const router = useRouter();
 
   useEffect(() => {
-    startButtonRotateAnimation();
-    startAstroAnimation();
+    if (uuidLoaded && (loaded || error)) {
+      SplashScreen.hideAsync();
+      router.navigate('/screens/home');
+    }
+  }, [loaded, error, uuidLoaded]);
+
+  useEffect(() => {
+    (async function () {
+      const deviceId = await retrieveData('UUID');
+
+      if (!deviceId) {
+        const uuid = Crypto.randomUUID();
+
+        await storeData('UUID', uuid);
+      }
+      setUUIDLoaded(true);
+    })();
   }, []);
 
-  return (
-    <ImageBackground source={images.space} style={{ flex: 1 }}>
-      <View style={styles.titleContainer}>
-        <Text style={styles.title}>SPACE CLIMB</Text>
-        <Text style={styles.subtitle}>(title pending)</Text>
-      </View>
-      <Animated.View
-        style={{
-          ...styles.astro,
-          transform: [{ translateX: xPosition }],
-        }}
-      >
-        <Animated.Image
-          style={{
-            ...styles.astro,
-            transform: [{ rotateZ: astro360 }],
-          }}
-          source={images["astro-left-2"]}
-        />
-      </Animated.View>
-      <View style={styles.buttonContainer}>
-        <Animated.View
-          style={{ transform: [{ rotate: spin }], paddingLeft: 125 }}
-        >
-          <Link href="/screens/game">
-            <ImageBackground
-              style={styles.button}
-              resizeMode="stretch"
-              source={images.spaceProbe}
-            >
-              <Text style={styles.buttonText}>PLAY</Text>
-            </ImageBackground>
-          </Link>
-        </Animated.View>
-        <Animated.View style={{ transform: [{ rotate: oppositeSpin }] }}>
-          <Link href="/screens/settings">
-            <ImageBackground
-              style={styles.button}
-              resizeMode="stretch"
-              source={images.spaceProbe}
-            >
-              <Text style={styles.buttonText}>SETTINGS</Text>
-            </ImageBackground>
-          </Link>
-        </Animated.View>
-      </View>
-      <View style={{ flex: 1 }} />
-    </ImageBackground>
-  );
-};
+  if (!loaded && !error) {
+    return null;
+  }
 
-export default Home;
+  return (
+    <View
+      style={{
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'white',
+      }}>
+      <Image
+        source={images['astro-left-2']}
+        style={{height: 200, width: 200}}
+      />
+    </View>
+  );
+}

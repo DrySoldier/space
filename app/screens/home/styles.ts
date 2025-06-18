@@ -1,11 +1,11 @@
+import { moderateScale as ms } from '@/constants';
 import { StyleSheet } from 'react-native';
-import { moderateScale as ms } from '../constants/scaling';
 
 const styles = StyleSheet.create({
   title: {
     color: 'white',
-    fontSize: 36,
-    fontFamily: 'GillSans-Bold',
+    fontSize: ms(34),
+    fontFamily: 'Pixellari',
   },
   button: {
     height: ms(130),
@@ -16,7 +16,8 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: 'white',
-    fontFamily: 'GillSans-Bold',
+    fontFamily: 'Pixellari',
+    fontSize: ms(16),
     textAlign: 'center'
   },
   buttonContainer: {
