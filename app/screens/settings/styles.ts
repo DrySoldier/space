@@ -27,11 +27,23 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         fontSize: ms(16),
     },
+    changeNameText: {
+        color: 'white',
+        fontFamily: 'Pixellari',
+        textAlign: 'center',
+        fontSize: ms(22),
+    },
     astro: {
         height: ms(100),
         width: ms(100),
         position: 'absolute',
         top: ms(250),
+    },
+    nameChange: {
+        height: ms(150),
+        width: ms(450),
+        justifyContent: 'center',
+        alignItems: 'center',
     },
 })
 

@@ -1,12 +1,30 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { View, TouchableOpacity, Text, Animated, Easing, Alert, ImageBackground } from 'react-native';
-import { images } from '../../../constants';
-import { removeData } from '../../../utils/asyncData';
-import { Link } from 'expo-router';
-import { randInt } from '../../../utils';
+import React, {useEffect, useRef, useState} from 'react';
+import {
+  View,
+  TouchableOpacity,
+  Text,
+  Animated,
+  Easing,
+  Alert,
+  ImageBackground,
+  TextInput,
+  KeyboardAvoidingView,
+  ActivityIndicator,
+} from 'react-native';
+import {images, moderateScale} from '../../../constants';
+import {removeData, storeData} from '../../../utils/asyncData';
+import {Link, useRouter} from 'expo-router';
+import {randInt} from '../../../utils';
 import styles from './styles';
+import * as Crypto from 'expo-crypto';
+import {useScoreboard} from '../../../hooks/useScoreboard';
 
 const Settings = () => {
+  const router = useRouter();
+  const {getScoreByUUID, updateName, userScore} = useScoreboard();
+
+  const [name, setName] = useState(userScore?.name || '');
+
   const buttonDegree = useRef(new Animated.Value(0)).current;
   const astroPosition = useRef(new Animated.Value(0)).current;
   const astroRotate = useRef(new Animated.Value(0)).current;
@@ -39,7 +57,7 @@ const Settings = () => {
     Animated.timing(buttonDegree, {
       toValue: randomDegree,
       duration: 5000,
-      useNativeDriver: true
+      useNativeDriver: true,
     }).start(() => startButtonRotateAnimation());
   };
 
@@ -64,52 +82,69 @@ const Settings = () => {
     ]).start(() => startAstroAnimation());
   };
 
+  const clearAllData = async () => {
+    await removeData('HISCORE');
+    await removeData('UUID');
+
+    const uuid = Crypto.randomUUID();
+
+    await storeData('UUID', uuid);
+    router.dismissAll();
+    router.replace('/');
+  };
+
   useEffect(() => {
     startButtonRotateAnimation();
     startAstroAnimation();
+    getScoreByUUID();
   }, []);
 
+  useEffect(() => {
+    if (userScore?.name) {
+      setName(userScore.name);
+    }
+  }, [userScore]);
+
   return (
-    <ImageBackground source={images.space} style={{ flex: 1 }}>
+    <ImageBackground source={images.space} style={{flex: 1}}>
       <Animated.View
         style={{
           ...styles.astro,
-          transform: [{ translateX: xPosition }],
-        }}
-      >
+          transform: [{translateX: xPosition}],
+        }}>
         <Animated.Image
           style={{
             ...styles.astro,
-            transform: [{ rotateZ: astro360 }],
+            transform: [{rotateZ: astro360}],
           }}
-          source={images["astro-right-2"]}
+          source={images['astro-right-2']}
         />
       </Animated.View>
       <View style={styles.buttonContainer}>
-        <Animated.View style={{ transform: [{ rotate: spin }], paddingLeft: 125 }}>
+        <Animated.View style={{transform: [{rotate: spin}], paddingLeft: 125}}>
           <Link href="..">
             <ImageBackground
               style={styles.button}
               resizeMode="stretch"
-              source={images.spaceProbe}
-            >
+              source={images.spaceProbe}>
               <Text style={styles.buttonText}>BACK</Text>
             </ImageBackground>
           </Link>
         </Animated.View>
-        <View style={{ flexDirection: 'row' }}>
-          <Animated.View style={{ transform: [{ rotate: spin }] }}>
+        <View style={{flexDirection: 'row'}}>
+          <Animated.View style={{transform: [{rotate: spin}]}}>
             <TouchableOpacity onPress={() => setMusicMuted(!musicMuted)}>
               <ImageBackground
                 style={styles.button}
                 resizeMode="stretch"
-                source={images.spaceProbe}
-              >
-                <Text style={styles.buttonText}>{musicMuted ? 'UNMUTE' : 'MUTE'}</Text>
+                source={images.spaceProbe}>
+                <Text style={styles.buttonText}>
+                  {musicMuted ? 'UNMUTE' : 'MUTE'}
+                </Text>
               </ImageBackground>
             </TouchableOpacity>
           </Animated.View>
-          <Animated.View style={{ transform: [{ rotate: oppositeSpin }] }}>
+          <Animated.View style={{transform: [{rotate: oppositeSpin}]}}>
             <TouchableOpacity
               onPress={() =>
                 Alert.alert(
@@ -121,27 +156,51 @@ const Settings = () => {
                       onPress: () => console.log('Cancel Pressed'),
                       style: 'cancel',
                     },
-                    { text: 'OK', onPress: () => removeData('HISCORE') },
+                    {text: 'OK', onPress: clearAllData},
                   ],
-                  { cancelable: false },
+                  {cancelable: false},
                 )
-              }
-            >
+              }>
               <ImageBackground
                 style={styles.button}
                 resizeMode="stretch"
-                source={images.spaceProbe}
-              >
+                source={images.spaceProbe}>
                 <Text style={styles.buttonText}>CLEAR DATA</Text>
               </ImageBackground>
             </TouchableOpacity>
           </Animated.View>
         </View>
+        <KeyboardAvoidingView behavior='position'>
+          <ImageBackground
+            style={styles.nameChange}
+            resizeMode="stretch"
+            source={images.spaceScreen}>
+            <Text style={styles.changeNameText}>Change Name</Text>
+            {userScore?.name ? <TextInput
+              style={{
+                backgroundColor: 'gray',
+                width: '35%',
+                height: moderateScale(32),
+                paddingHorizontal: 12,
+                paddingVertical: 6,
+                marginTop: moderateScale(24),
+                borderRadius: 6,
+                color: 'white',
+                fontFamily: 'Pixellari',
+                fontSize: 18,
+              }}
+              defaultValue={userScore?.name || ''}
+              onChangeText={setName}
+              onEndEditing={() => updateName(name)}
+              maxLength={12}
+              value={name}
+            /> : <ActivityIndicator style={{ paddingTop: moderateScale(36), paddingBottom: moderateScale(8) }} />}
+          </ImageBackground>
+        </KeyboardAvoidingView>
         <ImageBackground
           style={styles.creditDisplay}
           resizeMode="stretch"
-          source={images.spaceProbe}
-        >
+          source={images.spaceProbe}>
           <Text style={styles.buttonText}>Programming:</Text>
           <Text style={styles.buttonText}>Christian Cotham</Text>
         </ImageBackground>

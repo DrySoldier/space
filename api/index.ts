@@ -29,8 +29,30 @@ const fetchData = async (herokuEndpoint = '', method: 'GET' | 'PUT' | 'POST', ob
     return null;
 };
 
-export const getAllScores = async () =>
+export const getScoreRange = async (from: number, to: number) =>
     fetchData(
-        'scoreboard/all',
+        `scoreboard/get?from=${from}&to=${to}`,
         'GET'
     );
+
+export const getScoreRelativeRangeByUUID = async (uuid: string) =>
+    fetchData(
+        `scoreboard/uuid/${uuid}`,
+        'GET'
+    );
+
+export const getScoreByUUID = async (uuid: string) =>
+    fetchData(
+        `scoreboard/uuid/${uuid}`,
+        'GET'
+    );
+
+export const postScore = async (score: number, uuid: string) =>
+    fetchData(`scoreboard/add`, 'POST', { score, device_uuid: uuid });
+
+export const putName = async (uuid: string, name: string) =>
+    fetchData(`scoreboard/uuid/${uuid}/name/${name}`, 'PUT');
+
+export const getAbove = async (rank: number) => fetchData(`scoreboard/above?rank=${rank}`, 'GET');
+
+export const getBelow = async (rank: number) => fetchData(`scoreboard/below?rank=${rank}`, 'GET');

@@ -42,7 +42,6 @@ const styles = StyleSheet.create({
   score: {
     color: 'white',
     fontSize: ms(28),
-    alignSelf: 'center',
     fontFamily: 'Pixellari',
   },
   branchContainer: {
@@ -81,6 +80,7 @@ const styles = StyleSheet.create({
     width: '100%',
     position: 'absolute',
     height: '85%',
+    alignItems: 'center',
   },
   white: {
     color: 'white',

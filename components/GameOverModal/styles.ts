@@ -1,32 +1,35 @@
 import { StyleSheet } from 'react-native';
-import { moderateScale as ms } from '../../constants/scaling';
+import { height, moderateScale as ms, width } from '../../constants/scaling';
 
 const styles = StyleSheet.create({
   mainSpaceProbe: {
-    height: ms(250),
-    width: ms(350),
+    height: ms(120),
+    width: ms(220),
     justifyContent: 'center',
     alignItems: 'center',
+    paddingHorizontal: ms(12)
   },
   spaceProbe: {
     height: ms(100),
     width: ms(150),
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 50,
+    paddingHorizontal: ms(40),
   },
   hiScoreSpaceProbe: {
-    height: ms(150),
-    width: ms(250),
-    justifyContent: 'center',
+    height: height * .4,
+    width: width * 1.4,
+    justifyContent: 'flex-start',
     alignItems: 'center',
-    margin: ms(50),
+    paddingTop: ms(26),
+    paddingBottom: height * .065
   },
   modalContainer: {
-    justifyContent: 'center',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    height: '100%',
+    height: '80%',
     width: '100%',
+    marginTop: ms(80)
   },
   text: {
     color: 'white',
@@ -38,13 +41,19 @@ const styles = StyleSheet.create({
     color: 'white',
     fontFamily: 'Pixellari',
     textAlign: 'center',
-    fontSize: ms(24),
+    fontSize: ms(42),
+  },
+  hiscoreText: {
+    color: 'white',
+    fontFamily: 'Pixellari',
+    textAlign: 'center',
+    fontSize: ms(42),
   },
   scoreText: {
     color: 'white',
     fontFamily: 'Pixellari',
     textAlign: 'center',
-    fontSize: ms(32),
+    fontSize: ms(64),
   },
   buttonContainer: {
     width: '100%',
@@ -53,18 +62,11 @@ const styles = StyleSheet.create({
   },
   hiScoreContainer: {
     flex: 1,
-    justifyContent: 'space-evenly',
+    height: height * .3,
+    justifyContent: 'center',
     alignItems: 'center',
-    paddingVertical: 50,
-    paddingHorizontal: 50,
+    paddingHorizontal: ms(50),
   },
-  gameOverContainer: {
-    flex: 1,
-    justifyContent: 'space-evenly',
-    alignItems: 'center',
-    paddingVertical: 75,
-    paddingHorizontal: 115,
-  }
 });
 
 export default styles;

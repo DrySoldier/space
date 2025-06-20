@@ -30,15 +30,15 @@
         "expo-splash-screen",
         {
           "image": "./assets/bootsplash_logo.png",
-          "imageWidth": 200,
           "resizeMode": "contain",
+          "imageWidth": 200,
           "backgroundColor": "#ffffff"
         }
       ],
       [
         "expo-font",
         {
-          "fonts": ["./assets/font/Pixellari.ttf"]
+          "fonts": ["./assets/fonts/Pixellari.ttf"]
         }
       ]
     ],

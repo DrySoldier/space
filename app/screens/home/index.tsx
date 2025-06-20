@@ -5,6 +5,7 @@ import {Link} from 'expo-router';
 import {images} from '../../../constants/images';
 import styles from './styles';
 import {randInt} from '../../../utils';
+import { moderateScale } from '@/constants';
 
 const Home = () => {
   const buttonDegree = useRef(new Animated.Value(0)).current;
@@ -87,7 +88,7 @@ const Home = () => {
         />
       </Animated.View>
       <View style={styles.buttonContainer}>
-        <Animated.View style={{transform: [{rotate: spin}], paddingLeft: 125}}>
+        <Animated.View style={{transform: [{rotate: spin}], paddingLeft: moderateScale(125)}}>
           <Link href="/screens/game">
             <ImageBackground
               style={styles.button}

@@ -12,7 +12,7 @@ const styles = StyleSheet.create({
     width: ms(180),
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: ms(50),
+    marginLeft: ms(50),
   },
   buttonText: {
     color: 'white',

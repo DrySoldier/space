@@ -14,7 +14,6 @@ const styles = StyleSheet.create({
     },
     oxygenGradient: {
         position: 'absolute',
-        backgroundColor: 'red',
         height: OXYGEN_HEIGHT,
         marginLeft: ms(18.7),
     }

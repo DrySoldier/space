@@ -1,5 +1,4 @@
 import {useEffect, useState} from 'react';
-import {View} from 'react-native';
 import {useFonts} from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import {Image} from 'expo-image';
@@ -43,17 +42,6 @@ export default function App() {
   }
 
   return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: 'white',
-      }}>
-      <Image
-        source={images['astro-left-2']}
-        style={{height: 200, width: 200}}
-      />
-    </View>
+    <Image source={images.space} style={{height: '100%', width: '100%'}} />
   );
 }

@@ -12,7 +12,8 @@ const images = {
   oxygenTank: require('../assets/newAssets/oxygen-tank.png'),
   pitstop: require('../assets/newAssets/pitstop.png'),
   pause: require('../assets/newAssets/pause.png'),
-  play: require('../assets/newAssets/play.png')
+  play: require('../assets/newAssets/play.png'),
+  spaceScreen: require('../assets/newAssets/space-screen.png'),
 };
 
 let imageValues = Object.values(images);
