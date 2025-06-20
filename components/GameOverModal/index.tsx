@@ -4,7 +4,6 @@ import {
   View,
   TouchableOpacity,
   Modal,
-  Alert,
   Animated,
   FlatList,
 } from 'react-native';
@@ -55,18 +54,15 @@ const GameOverModal = ({visible, score, resetGame}: IGameOverModal) => {
 
   const saveScore = async () => {
     const hiScore = await retrieveData('HISCORE');
-
     const parsedHiScore = Number(hiScore);
 
     if (score > parsedHiScore) {
       storeData('HISCORE', score);
       setHiScore(score);
-
-      addNewScore(score);
     } else {
       setHiScore(parsedHiScore);
-      addNewScore(parsedHiScore);
     }
+    addNewScore(score);
   };
 
   useEffect(() => {
@@ -106,10 +102,12 @@ const GameOverModal = ({visible, score, resetGame}: IGameOverModal) => {
         const playerScoreIndex = scores.findIndex(e => !!e.player);
 
         if (playerScoreIndex > 8) {
-          scoreboardRef?.current?.scrollToOffset({
-            animated: true,
-            offset: playerScoreIndex * 12,
-          });
+          setTimeout(() => {
+            scoreboardRef?.current?.scrollToOffset({
+              animated: true,
+              offset: playerScoreIndex * 12,
+            });
+          }, 100);
         }
       }
     })();
