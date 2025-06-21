@@ -7,7 +7,6 @@ const styles = StyleSheet.create({
     oxygenContainer: {
         position: 'absolute',
         top: ms(100),
-        left: width * .29,
         flex: 1,
         justifyContent: 'center',
         alignItems: 'flex-start',

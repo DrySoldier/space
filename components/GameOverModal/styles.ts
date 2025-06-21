@@ -67,6 +67,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: ms(50),
   },
+  personalBestText: {
+    color: 'white',
+    fontFamily: 'Pixellari',
+    fontSize: ms(16),
+
+  },
+  scoreItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: width * 0.75,
+    paddingHorizontal: ms(12),
+  }
 });
 
 export default styles;

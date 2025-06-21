@@ -6,6 +6,7 @@ import {images} from '@/constants';
 import {useRouter} from 'expo-router';
 import {retrieveData, storeData} from '@/utils/asyncData';
 import * as Crypto from 'expo-crypto';
+import { StatusBar } from 'expo-status-bar';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -42,6 +43,9 @@ export default function App() {
   }
 
   return (
-    <Image source={images.space} style={{height: '100%', width: '100%'}} />
+    <>
+      <StatusBar style="dark" />
+      <Image source={images.space} style={{height: '100%', width: '100%'}} />
+    </>
   );
 }

@@ -1,6 +1,6 @@
 import {View, Animated} from 'react-native';
 import React, {SetStateAction, useEffect, useRef, useState} from 'react';
-import {images, moderateScale as ms, width} from '@/constants';
+import {images} from '@/constants';
 import styles from './style';
 import {randInt} from '@/utils';
 import {BRANCH_HW} from '../Branch/styles';
@@ -15,9 +15,6 @@ interface IPlayer {
   gameOver: boolean;
   step: boolean;
 }
-
-const PLAYER_RIGHT_X = BRANCH_HW - width * 0.1;
-const PLAYER_LEFT_X = -(width * 0.16);
 
 const Player = ({currentSide, setCurrentSide, setDisablePress, gameOver, step}: IPlayer) => {
   // current player model TODO: Set up animated sprite
@@ -45,9 +42,9 @@ const Player = ({currentSide, setCurrentSide, setDisablePress, gameOver, step}: 
     let toValue = 0;
 
     if (currentSide === 'left') {
-      toValue = PLAYER_LEFT_X;
+      toValue = -BRANCH_HW / 1.6;
     } else if (currentSide === 'right') {
-      toValue = PLAYER_RIGHT_X;
+      toValue = BRANCH_HW / 1.6;
     }
 
     Animated.timing(astroSwapSideVal, {
@@ -87,7 +84,7 @@ const Player = ({currentSide, setCurrentSide, setDisablePress, gameOver, step}: 
 
     Animated.parallel([
       Animated.timing(astroSwapSideVal, {
-        toValue: PLAYER_LEFT_X,
+        toValue: -BRANCH_HW / 1.6,
         duration: 750,
         useNativeDriver: true,
       }),

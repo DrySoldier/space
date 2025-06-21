@@ -242,7 +242,6 @@ const Game = () => {
           </Pressable>
         )}
       </View>
-
       <OxygenMeter o2={o2} />
 
       <View style={styles.ground} pointerEvents="none">

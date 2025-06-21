@@ -1,5 +1,6 @@
-import { Platform, StyleSheet } from 'react-native';
-import { height, moderateScale as ms } from '../../../constants/scaling';
+import { StyleSheet } from 'react-native';
+import { moderateScale as ms, width } from '../../../constants/scaling';
+import { BRANCH_HW } from '../../../components/Branch/styles';
 
 const styles = StyleSheet.create({
   container: {
@@ -49,12 +50,13 @@ const styles = StyleSheet.create({
     position: 'absolute',
     width: '100%',
     height: '100%',
-    bottom: Platform.OS === 'ios' ? height * .06 : height * .03
+    bottom: BRANCH_HW * .67,
+    marginRight: BRANCH_HW
   },
   branchContentContainer: {
     alignItems: 'center',
-    width: '75%',
     height: '100%',
+    width,
     overflow: 'visible',
   },
   ground: {

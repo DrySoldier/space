@@ -1,5 +1,6 @@
 import { Dimensions, StyleSheet } from 'react-native';
-import { moderateScale as ms } from '../../constants/scaling';
+import { moderateScale as ms, width } from '../../constants/scaling';
+import { BRANCH_HW } from '../Branch/styles';
 
 const {height} = Dimensions.get('screen');
 
@@ -7,12 +8,13 @@ const styles = StyleSheet.create({
   player: {
     height: height * .15,
     width: ms(75),
-    marginTop: height * .33,
   },
   playerContainer: {
-    width: '100%',
+    flex: 1,
     position: 'absolute',
-    alignItems: 'center',
+    bottom: BRANCH_HW * 2.1,
+    height: '100%',
+    justifyContent: 'flex-end',
   },
 });
 

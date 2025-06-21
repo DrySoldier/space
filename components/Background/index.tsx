@@ -90,12 +90,7 @@ const Background = ({level, setLevel, score, step}: IBackground) => {
         style={[
           styles.imageContainer,
           {
-            transform: [
-              {translateY: offsetY},
-              {
-                skewY: '2deg',
-              },
-            ],
+            transform: [{translateY: offsetY}],
           },
         ]}>
         <Image

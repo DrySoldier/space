@@ -9,10 +9,10 @@ import {
 } from 'react-native';
 import {ImageBackground} from 'expo-image';
 import {Link} from 'expo-router';
+import {useScoreboard} from '@/hooks/useScoreboard';
 import styles from './styles';
 import {images} from '../../constants/images';
 import {retrieveData, storeData} from '../../utils/asyncData';
-import {useScoreboard} from '@/hooks/useScoreboard';
 import {moderateScale as ms, width} from '../../constants';
 
 interface IGameOverModal {
@@ -136,12 +136,7 @@ const GameOverModal = ({visible, score, resetGame}: IGameOverModal) => {
           </Text>
           {hiScoreBeat && (
             <Animated.Text
-              style={{
-                color: 'white',
-                fontFamily: 'Pixellari',
-                fontSize: ms(16),
-                opacity: fadeAnim,
-              }}>
+              style={[styles.personalBestText, {opacity: fadeAnim}]}>
               New Personal Best!
             </Animated.Text>
           )}
@@ -157,13 +152,7 @@ const GameOverModal = ({visible, score, resetGame}: IGameOverModal) => {
             onRefresh={loadAbove}
             refreshing={false}
             renderItem={({item}) => (
-              <View
-                style={{
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                  width: width * 0.75,
-                  paddingHorizontal: 12,
-                }}>
+              <View style={styles.scoreItem}>
                 <Text
                   style={{
                     color: item.player ? 'yellow' : 'white',

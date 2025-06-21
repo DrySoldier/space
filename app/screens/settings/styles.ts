@@ -45,6 +45,20 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
+    changeNameInput: {
+        backgroundColor: 'gray',
+        width: '35%',
+        height: ms(32),
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+        marginTop: ms(24),
+        borderRadius: 6,
+        color: 'white',
+        fontFamily: 'Pixellari',
+        fontSize: 18,
+    },
+    activityIndicator: { paddingTop: ms(36), paddingBottom: ms(8) },
+    container: {flex: 1}
 })
 
 export default styles;

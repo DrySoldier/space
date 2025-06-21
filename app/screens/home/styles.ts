@@ -41,6 +41,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: ms(120),
   },
+  flex: {flex: 1}
 });
 
 export default styles;

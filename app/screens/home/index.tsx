@@ -69,7 +69,7 @@ const Home = () => {
   }, []);
 
   return (
-    <ImageBackground source={images.space} style={{flex: 1}}>
+    <ImageBackground source={images.space} style={styles.flex}>
       <View style={styles.titleContainer}>
         <Text style={styles.title}>SPACE CLIMB</Text>
         <Text style={styles.subtitle}>(title pending)</Text>
@@ -109,7 +109,7 @@ const Home = () => {
           </Link>
         </Animated.View>
       </View>
-      <View style={{flex: 1}} />
+      <View style={styles.flex} />
     </ImageBackground>
   );
 };

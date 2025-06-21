@@ -11,12 +11,12 @@ import {
   KeyboardAvoidingView,
   ActivityIndicator,
 } from 'react-native';
-import {images, moderateScale} from '../../../constants';
+import * as Crypto from 'expo-crypto';
+import {images} from '../../../constants';
 import {removeData, storeData} from '../../../utils/asyncData';
 import {Link, useRouter} from 'expo-router';
 import {randInt} from '../../../utils';
 import styles from './styles';
-import * as Crypto from 'expo-crypto';
 import {useScoreboard} from '../../../hooks/useScoreboard';
 
 const Settings = () => {
@@ -106,7 +106,7 @@ const Settings = () => {
   }, [userScore]);
 
   return (
-    <ImageBackground source={images.space} style={{flex: 1}}>
+    <ImageBackground source={images.space} style={styles.container}>
       <Animated.View
         style={{
           ...styles.astro,
@@ -170,31 +170,24 @@ const Settings = () => {
             </TouchableOpacity>
           </Animated.View>
         </View>
-        <KeyboardAvoidingView behavior='position'>
+        <KeyboardAvoidingView behavior="position">
           <ImageBackground
             style={styles.nameChange}
             resizeMode="stretch"
             source={images.spaceScreen}>
             <Text style={styles.changeNameText}>Change Name</Text>
-            {userScore?.name ? <TextInput
-              style={{
-                backgroundColor: 'gray',
-                width: '35%',
-                height: moderateScale(32),
-                paddingHorizontal: 12,
-                paddingVertical: 6,
-                marginTop: moderateScale(24),
-                borderRadius: 6,
-                color: 'white',
-                fontFamily: 'Pixellari',
-                fontSize: 18,
-              }}
-              defaultValue={userScore?.name || ''}
-              onChangeText={setName}
-              onEndEditing={() => updateName(name)}
-              maxLength={12}
-              value={name}
-            /> : <ActivityIndicator style={{ paddingTop: moderateScale(36), paddingBottom: moderateScale(8) }} />}
+            {userScore?.name ? (
+              <TextInput
+                style={styles.changeNameInput}
+                defaultValue={userScore?.name || ''}
+                onChangeText={setName}
+                onEndEditing={() => updateName(name)}
+                maxLength={16}
+                value={name}
+              />
+            ) : (
+              <ActivityIndicator style={styles.activityIndicator} />
+            )}
           </ImageBackground>
         </KeyboardAvoidingView>
         <ImageBackground
