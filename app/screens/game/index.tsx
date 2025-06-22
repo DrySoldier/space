@@ -80,7 +80,7 @@ const Game = () => {
     refill(31);
     setThrownAwayArr([]);
     setBranches(defaultBranches);
-    setScore(59000);
+    setScore(0);
   };
 
   const endGame = () => {

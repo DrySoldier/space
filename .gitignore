@@ -35,6 +35,8 @@ local.properties
 *.iml
 *.hprof
 .cxx/
+.aab
+.apk
 
 # node.js
 #
