@@ -10,10 +10,16 @@ const styles = StyleSheet.create({
         height: BRANCH_HW,
         position: 'absolute',
     },
-    obstacle: {
+    obstacleLeft: {
         width: BRANCH_HW * 2,
         height: BRANCH_HW,
-        position: 'absolute'
+        position: 'absolute',
+        marginLeft: -BRANCH_HW / 2
+    },
+    obstacleRight: {
+        width: BRANCH_HW * 2,
+        height: BRANCH_HW,
+        position: 'absolute',
     },
     oxygen: {
         marginTop: 12,

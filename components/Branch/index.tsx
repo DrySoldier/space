@@ -45,16 +45,11 @@ const Branch = ({side, index}: IBranch, ref: ForwardedRef<TBranchRef>) => {
 
     case 1:
       return (
-        <Animated.View style={[styles.branch, {transform: [{translateY}]}]}>
-          <Image
-            style={[styles.obstacle, {marginLeft: -OBSTACLE_MARGIN * 3.1}]}
-            resizeMode="contain"
-            source={images.obstacleTile}
-          />
+        <Animated.View style={[styles.obstacleLeft, {transform: [{translateY}]}]}>
           <Image
             resizeMode="stretch"
-            source={images.elevatorTile}
-            style={[styles.branch]}
+            source={images.obstacleTileLeft}
+            style={[styles.obstacleLeft]}
           />
         </Animated.View>
       );
@@ -64,19 +59,10 @@ const Branch = ({side, index}: IBranch, ref: ForwardedRef<TBranchRef>) => {
         <Animated.View style={[styles.branch, {transform: [{translateY}]}]}>
           <Image
             style={[
-              styles.obstacle,
-              {
-                marginLeft: OBSTACLE_MARGIN,
-                transform: [{rotate: '180deg'}],
-              },
+              styles.obstacleRight,
             ]}
-            resizeMode="contain"
-            source={images.obstacleTile}
-          />
-          <Image
             resizeMode="stretch"
-            source={images.elevatorTile}
-            style={[styles.branch]}
+            source={images.obstacleTileRight}
           />
         </Animated.View>
       );
