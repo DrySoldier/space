@@ -123,14 +123,6 @@ const Background = ({level, setLevel, score, step}: IBackground) => {
           source={images.space}
           style={[styles.image]}
         />
-        <Animated.View
-          style={[
-            styles.backgroundColorShift,
-            {
-              opacity: levelOpacityInterpolate,
-            },
-          ]}
-        />
       </Animated.View>
 
       {level === 2 && (
@@ -149,6 +141,14 @@ const Background = ({level, setLevel, score, step}: IBackground) => {
           </ImageBackground>
         </Animated.View>
       )}
+      <Animated.View
+        style={[
+          styles.backgroundColorShift,
+          {
+            opacity: levelOpacityInterpolate,
+          },
+        ]}
+      />
     </>
   );
 };
