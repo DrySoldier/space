@@ -20,11 +20,11 @@ const levelNames = {
 const Background = ({score, step}: IBackground) => {
   const levelOpacity = useRef(new Animated.Value(0)).current;
   const levelOpacity2Interpolate = levelOpacity.interpolate({
-    inputRange: [0, 30000, 55000],
-    outputRange: [0, 0.12, 0],
+    inputRange: [0, 30000, 57500, 60000],
+    outputRange: [0, 0.12, 0.12, 0],
   });
   const levelOpacity3Interpolate = levelOpacity.interpolate({
-    inputRange: [45000, 60000],
+    inputRange: [57500, 60000],
     outputRange: [0, 0.15],
   });
 
@@ -88,13 +88,24 @@ const Background = ({score, step}: IBackground) => {
   }, [step]);
 
   useEffect(() => {
+    if (level === 1) {
+      Animated.timing(levelOpacity, {
+        toValue: 0,
+        duration: 5000,
+        easing: Easing.bezier(0, 0.55, 0.45, 1),
+        useNativeDriver: true,
+      }).start();
+    }
+
     if (level === 2) {
       startButtonRotateAnimation();
       levelNameY.setValue(-200);
     }
 
     if (level === 3) {
-      levelNameY.setValue(-200);
+      levelNameY.stopAnimation(() => {
+        levelNameY.setValue(-200);
+      });
     }
   }, [level]);
 
