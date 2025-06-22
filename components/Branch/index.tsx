@@ -2,7 +2,7 @@ import {ForwardedRef, forwardRef, useImperativeHandle, useRef} from 'react';
 import {Animated, Easing} from 'react-native';
 import {Image} from 'expo-image';
 import {images} from '@/constants';
-import styles, {BRANCH_HW, OBSTACLE_MARGIN} from './styles';
+import styles, {BRANCH_HW} from './styles';
 
 export type TBranchRef = {
   animateDown: (callback: () => void) => void;

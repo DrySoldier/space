@@ -1,12 +1,11 @@
 import {Animated, Easing, Text} from 'react-native';
-import React, {SetStateAction, useEffect, useRef} from 'react';
+import React, {useEffect, useRef} from 'react';
 import {Image, ImageBackground} from 'expo-image';
 import {images} from '@/constants';
 import styles from './styles';
+import {getLevel} from '../../utils/level';
 
 interface IBackground {
-  level: number;
-  setLevel: React.Dispatch<SetStateAction<number>>;
   score: number;
   step: boolean;
 }
@@ -18,7 +17,7 @@ const levelNames = {
   3: 'The Unheard',
 };
 
-const Background = ({level, setLevel, score, step}: IBackground) => {
+const Background = ({score, step}: IBackground) => {
   const levelOpacity = useRef(new Animated.Value(0)).current;
   const levelOpacity2Interpolate = levelOpacity.interpolate({
     inputRange: [0, 30000, 55000],
@@ -37,6 +36,8 @@ const Background = ({level, setLevel, score, step}: IBackground) => {
     inputRange: [0, 1],
     outputRange: ['-10deg', '10deg'],
   });
+
+  const level = getLevel(score);
 
   const startButtonRotateAnimation = () => {
     const randomDegree = Math.random();
@@ -57,19 +58,6 @@ const Background = ({level, setLevel, score, step}: IBackground) => {
       useNativeDriver: true,
     }).start();
 
-    if (level !== 2 && score >= 35000 && score < 60000) {
-      startButtonRotateAnimation();
-      levelNameY.setValue(-200);
-      setLevel(2);
-    }
-
-    if (level !== 3 && score >= 60000) {
-      levelNameY.setValue(-200);
-      setLevel(3);
-    }
-  }, [score]);
-
-  useEffect(() => {
     // Handle background shift
     offsetY.stopAnimation(current => {
       const target = current + 20;
@@ -98,6 +86,18 @@ const Background = ({level, setLevel, score, step}: IBackground) => {
       }
     });
   }, [step]);
+
+  useEffect(() => {
+    if (level === 2) {
+      startButtonRotateAnimation();
+      levelNameY.setValue(-200);
+    }
+
+    if (level === 3) {
+      levelNameY.setValue(-200);
+    }
+  }, [level]);
+
   return (
     <>
       <Animated.View

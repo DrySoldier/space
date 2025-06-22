@@ -13,7 +13,7 @@ import {useScoreboard} from '@/hooks/useScoreboard';
 import styles from './styles';
 import {images} from '../../constants/images';
 import {retrieveData, storeData} from '../../utils/asyncData';
-import {moderateScale as ms, width} from '../../constants';
+import {moderateScale as ms} from '../../constants';
 
 interface IGameOverModal {
   visible: boolean;
@@ -72,11 +72,6 @@ const GameOverModal = ({visible, score, resetGame}: IGameOverModal) => {
   useEffect(() => {
     if (visible) {
       saveScore();
-    }
-  }, [visible]);
-
-  useEffect(() => {
-    if (visible) {
       Animated.loop(
         Animated.sequence([
           Animated.timing(fadeAnim, {

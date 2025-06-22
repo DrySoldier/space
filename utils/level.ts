@@ -1,0 +1,1 @@
+export const getLevel = (score: number) => score >= 60_000 ? 3 : score >= 35_000 ? 2 : 1;

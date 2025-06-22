@@ -102,8 +102,6 @@ const Settings = () => {
 
   useEffect(() => {
     if (userScore?.name) {
-      setName(userScore.name);
-
       Animated.timing(changeNameScale, {
         toValue: 1,
         duration: 1000,

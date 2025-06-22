@@ -1,4 +1,4 @@
-import React, {useState, useEffect, createRef, useRef} from 'react';
+import React, {useState, createRef, useRef} from 'react';
 import {
   Text,
   View,
@@ -21,6 +21,7 @@ import {randInt} from '@/utils';
 import styles from './styles';
 import Player from '@/components/Player';
 import {useOxygen} from '@/hooks/useOxygen';
+import {getLevel} from '../../../utils/level';
 
 type TSide = 'left' | 'right';
 type TBranch = {type: number; id: number; ref: React.RefObject<any>};
@@ -39,9 +40,9 @@ const defaultBranches = [
 let timerInterval: any;
 let oxygenChance = 0;
 
-// Bump up the chance by 1 for every 5000, defaulting to 6 at 0
+// Bump up the chance by 1 for every 7500, defaulting to 6 at 0
 const getOxygenChance = (score: number) =>
-  Math.min(6 + Math.floor(score / 7500), 14);
+  Math.min(6 + Math.floor(score / 7500), 20);
 
 const Game = () => {
   // Current side player is on
@@ -56,15 +57,39 @@ const Game = () => {
 
   const [animatingIn, setAnimatingIn] = useState(false);
 
-  const [score, setScore] = useState(-1);
-  const [level, setLevel] = useState(1);
+  const [score, setScore] = useState(0);
   const [gameOver, setGameOver] = useState(false);
   // animation for the astronaut
   const [step, setStep] = useState(false);
 
   let isMoving = useRef(false).current;
 
-  const {refill, o2} = useOxygen(isMoving, paused, gameOver);
+  const level = getLevel(score);
+
+  const resetGame = () => {
+    timerInterval = setInterval(() => {
+      setScore(prevState => {
+        if (prevState > 0) {
+          return prevState - 20;
+        }
+        return 0;
+      });
+    }, 1000);
+
+    setGameOver(false);
+    refill(31);
+    setThrownAwayArr([]);
+    setBranches(defaultBranches);
+    setScore(59000);
+  };
+
+  const endGame = () => {
+    setGameOver(true);
+    clearInterval(timerInterval);
+    timerInterval = undefined;
+  };
+
+  const {refill, o2} = useOxygen(isMoving, paused, gameOver, endGame);
 
   const generateNewBranch = (lastBranch: TBranch) => {
     let nextBranch = randInt(0, 2);
@@ -96,13 +121,25 @@ const Game = () => {
         nextBranch--;
       }
     } else if (level === 3) {
-      if (oxygenChance > getOxygenChance(score)) {
+      if (oxygenChance > getOxygenChance(score) * 3) {
         const side = randInt(0, 1);
         nextBranch = 3 + side;
         oxygenChance = 0;
       } else {
         const pseudoOxygen = randInt(0, 3);
         if (pseudoOxygen) oxygenChance++;
+
+        if (lastBranch.type === nextBranch) {
+          const backAndForthChance = randInt(0, 1);
+
+          if (backAndForthChance) {
+            if (nextBranch === 1) {
+              nextBranch++;
+            } else if (nextBranch === 2) {
+              nextBranch--;
+            }
+          }
+        }
       }
     } else if (lastBranch.type !== 0) {
       oxygenChance++;
@@ -153,7 +190,7 @@ const Game = () => {
       (side === 'left' && nextBranch.type === 1) ||
       (side === 'right' && nextBranch.type === 2)
     ) {
-      setGameOver(true);
+      endGame();
       return;
     } else {
       if (side === 'left' && nextBranch.type === 3) {
@@ -166,52 +203,25 @@ const Game = () => {
     }
   };
 
-  useEffect(() => {
-    if (gameOver) {
-      clearInterval(timerInterval);
-      timerInterval = undefined;
-    } else if (!gameOver) {
-      timerInterval = setInterval(() => {
-        setScore(prevState => {
-          if (prevState > 0) {
-            return prevState - 20;
-          }
-          return 0;
-        });
-      }, 1000);
-
-      setLevel(1);
-      refill(31);
-      setThrownAwayArr([]);
-      setBranches(defaultBranches);
-      setScore(0);
-    }
-
-    return () => clearInterval(timerInterval);
-  }, [gameOver]);
-
-  useEffect(() => {
-    if (paused) {
-      clearInterval(timerInterval);
-      timerInterval = undefined;
-    } else {
-      if (!timerInterval) {
-        timerInterval = setInterval(() => {
-          setScore(prevState => prevState - 20);
-        }, 1000);
+  const togglePaused = () => {
+    setPaused(prev => {
+      if (prev) {
+        clearInterval(timerInterval);
+        timerInterval = undefined;
+      } else {
+        if (!timerInterval) {
+          timerInterval = setInterval(() => {
+            setScore(prevState => prevState - 20);
+          }, 1000);
+        }
       }
-    }
-  }, [paused]);
-
-  useEffect(() => {
-    if (o2 <= 0) {
-      setGameOver(true);
-    }
-  }, [o2]);
+      return !prev;
+    });
+  };
 
   return (
     <View style={styles.container}>
-      <Background setLevel={setLevel} level={level} score={score} step={step} />
+      <Background score={score} step={step} />
       <FlatList
         pointerEvents="none"
         style={styles.branchContainer}
@@ -250,7 +260,7 @@ const Game = () => {
         <Text style={styles.score}>{score}</Text>
 
         {!paused && !gameOver && (
-          <Pressable onPress={() => setPaused(true)} style={styles.pauseButton}>
+          <Pressable onPress={togglePaused} style={styles.pauseButton}>
             <Image source={images.pause} style={styles.pauseImage} />
           </Pressable>
         )}
@@ -263,20 +273,14 @@ const Game = () => {
 
       {paused && (
         <View style={styles.pauseContainer}>
-          <Pressable
-            style={styles.continueButton}
-            onPress={() => setPaused(false)}>
+          <Pressable style={styles.continueButton} onPress={togglePaused}>
             <Image source={images.play} style={styles.pauseImage} />
           </Pressable>
           <Text style={styles.pauseText}>PAUSED</Text>
         </View>
       )}
 
-      <GameOverModal
-        visible={gameOver}
-        score={score}
-        resetGame={() => setGameOver(false)}
-      />
+      <GameOverModal visible={gameOver} score={score} resetGame={resetGame} />
     </View>
   );
 };

@@ -1,36 +1,36 @@
 import { useEffect, useRef, useState } from 'react';
 
-export function useOxygen(isMoving: boolean, paused: boolean, gameOver: boolean) {
-  const [o2, setO2] = useState<number>(30);
+const MAX_O2 = 30;
+const IDLE_DRAIN = 1;
+const MOVING_DRAIN = 2.2;
 
-  const movingRef = useRef(isMoving);
-  movingRef.current = isMoving;
+export function useOxygen(
+  isMoving: boolean,
+  paused: boolean,
+  gameOver: boolean,
+  endGame: () => void,
+) {
+  const [o2, setO2] = useState<number>(MAX_O2);
+  const drainRef = useRef(IDLE_DRAIN);
+  drainRef.current = isMoving ? MOVING_DRAIN : IDLE_DRAIN;
 
   useEffect(() => {
-    let rafId: number;
-    let last = performance.now();
+    if (paused || gameOver) return;
 
-    const step = (now: number) => {
-      if (!paused && !gameOver) {
-        const dt = (now - last) / 1000;
-        last = now;
+    const id = setInterval(() => {
+      setO2(prev => {
+        if (prev <= 0) {
+          endGame();
+        }
+        return Math.max(prev - drainRef.current, 0)
+      });
+    }, 1000);
 
-        const rate = movingRef.current ? 2.2 : 1;
-        setO2(prev => Math.max(prev - dt * rate, 0));
-
-        rafId = requestAnimationFrame(step);
-      }
-    };
-
-    rafId = requestAnimationFrame(step);
-    return () => cancelAnimationFrame(rafId);
+    return () => clearInterval(id);
   }, [paused, gameOver]);
 
   const refill = (seconds: number) =>
-    setO2(prev => Math.min(prev + seconds, 30));
+    setO2(prev => Math.min(prev + seconds, MAX_O2));
 
-  return {
-    o2,
-    refill
-  };
+  return { o2, refill };
 }
