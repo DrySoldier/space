@@ -24,8 +24,8 @@ const Background = ({score, step}: IBackground) => {
     outputRange: [0, 0.12, 0.12, 0],
   });
   const levelOpacity3Interpolate = levelOpacity.interpolate({
-    inputRange: [57500, 60000],
-    outputRange: [0, 0.15],
+    inputRange: [57500, 60000, 999999999],
+    outputRange: [0, 0.15, .15],
   });
 
   const buttonDegree = useRef(new Animated.Value(0)).current;
@@ -53,7 +53,7 @@ const Background = ({score, step}: IBackground) => {
     levelOpacity.stopAnimation();
     Animated.timing(levelOpacity, {
       toValue: score,
-      duration: 100,
+      duration: 250,
       easing: Easing.linear,
       useNativeDriver: true,
     }).start();

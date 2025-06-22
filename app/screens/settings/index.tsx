@@ -175,8 +175,8 @@ const Settings = () => {
             </TouchableOpacity>
           </Animated.View>
         </View>
-        {!!userScore?.name && (
-          <Animated.View style={{transform: [{scale: changeNameScale}]}}>
+        <Animated.View style={{transform: [{scale: changeNameScale}]}}>
+          {!!userScore?.name && (
             <KeyboardAvoidingView behavior="position">
               <ImageBackground
                 style={styles.nameChange}
@@ -193,8 +193,8 @@ const Settings = () => {
                 />
               </ImageBackground>
             </KeyboardAvoidingView>
-          </Animated.View>
-        )}
+          )}
+        </Animated.View>
         <ImageBackground
           style={styles.creditDisplay}
           resizeMode="stretch"
