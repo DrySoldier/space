@@ -184,7 +184,7 @@ const Game = () => {
       refill(31);
       setThrownAwayArr([]);
       setBranches(defaultBranches);
-      setScore(60000);
+      setScore(0);
     }
 
     return () => clearInterval(timerInterval);
