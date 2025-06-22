@@ -6,7 +6,8 @@ import {images} from '@/constants';
 import {useRouter} from 'expo-router';
 import {retrieveData, storeData} from '@/utils/asyncData';
 import * as Crypto from 'expo-crypto';
-import { StatusBar } from 'expo-status-bar';
+import {StatusBar} from 'expo-status-bar';
+import * as NavigationBar from 'expo-navigation-bar';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -36,6 +37,8 @@ export default function App() {
       }
       setUUIDLoaded(true);
     })();
+
+    NavigationBar.setPositionAsync('absolute');
   }, []);
 
   if (!loaded && !error) {

@@ -15,7 +15,7 @@ const ThrownAway = ({side}: {side: number}) => {
 
   const marginTop = opacity.interpolate({
     inputRange: [0, 0.5, 1],
-    outputRange: [25, 500, 1000],
+    outputRange: [-5, 500, 1000],
   });
 
   const marginLeft = opacity.interpolate({

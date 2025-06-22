@@ -14,6 +14,8 @@ const images = {
   pause: require('../assets/newAssets/pause.png'),
   play: require('../assets/newAssets/play.png'),
   spaceScreen: require('../assets/newAssets/space-screen.png'),
+  obstacleTileLeft: require('../assets/newAssets/elevator-tile-obstacle-left.png'),
+  obstacleTileRight: require('../assets/newAssets/elevator-tile-obstacle-right.png'),
 };
 
 let imageValues = Object.values(images);
