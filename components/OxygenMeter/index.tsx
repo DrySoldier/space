@@ -2,9 +2,9 @@ import {View, Image} from 'react-native';
 import React from 'react';
 import {LinearGradient} from 'expo-linear-gradient';
 import {images, moderateScale as ms} from '@/constants';
-import styles, {OXYGEN_HEIGHT} from './styles';
+import styles from './styles';
 
-const TICK = ms(4.3);
+const TICK = ms(3.14);
 
 const OxygenMeter = ({o2}: {o2: number}) => {
   const colors =
@@ -13,7 +13,7 @@ const OxygenMeter = ({o2}: {o2: number}) => {
       : (['#ffae42', '#d21e2b'] as const);
 
   return (
-    <View style={styles.oxygenContainer}>
+    <View style={styles.oxygenContainer} pointerEvents='none'>
       <LinearGradient
         colors={colors}
         start={{x: 0, y: 0}}
@@ -29,7 +29,7 @@ const OxygenMeter = ({o2}: {o2: number}) => {
       <Image
         source={images.oxygenMeter}
         resizeMode="stretch"
-        style={{height: OXYGEN_HEIGHT, width: ms(180)}}
+        style={{height: ms(45), width: ms(135)}}
       />
     </View>
   );

@@ -27,8 +27,8 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     color: 'white',
-    fontSize: 12,
-    fontFamily: 'GillSans-Bold',
+    fontSize: 18,
+    fontFamily: 'Pixellari',
   },
   titleContainer: {
     flex: 3,

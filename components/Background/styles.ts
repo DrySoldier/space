@@ -24,12 +24,21 @@ const styles = StyleSheet.create({
       levelNameText: {
         color: 'white',
         fontWeight: 'bold',
-        fontSize: ms(16),
+        fontSize: ms(15),
+        paddingHorizontal: 24,
+        fontFamily: 'Pixellari',
+        textAlign: 'center'
       },
-      backgroundColorShift: {
+      backgroundColorShift2: {
         width: '100%',
         height: '100%',
         backgroundColor: '#ff9900',
+        position: 'absolute',
+      },
+      backgroundColorShift3: {
+        width: '100%',
+        height: '100%',
+        backgroundColor: 'blue',
         position: 'absolute',
       },
       levelNameContainer: {

@@ -13,11 +13,20 @@ interface IBackground {
 
 const backgroundSize = 1600;
 
+const levelNames = {
+  2: 'Solaris',
+  3: 'The Unheard',
+};
+
 const Background = ({level, setLevel, score, step}: IBackground) => {
   const levelOpacity = useRef(new Animated.Value(0)).current;
-  const levelOpacityInterpolate = levelOpacity.interpolate({
-    inputRange: [0, 35000],
-    outputRange: [0, 0.12],
+  const levelOpacity2Interpolate = levelOpacity.interpolate({
+    inputRange: [0, 30000, 55000],
+    outputRange: [0, 0.12, 0],
+  });
+  const levelOpacity3Interpolate = levelOpacity.interpolate({
+    inputRange: [45000, 60000],
+    outputRange: [0, 0.15],
   });
 
   const buttonDegree = useRef(new Animated.Value(0)).current;
@@ -43,15 +52,20 @@ const Background = ({level, setLevel, score, step}: IBackground) => {
     levelOpacity.stopAnimation();
     Animated.timing(levelOpacity, {
       toValue: score,
-      duration: 750,
+      duration: 100,
       easing: Easing.linear,
       useNativeDriver: true,
     }).start();
 
-    if (level !== 2 && score >= 35000) {
+    if (level !== 2 && score >= 35000 && score < 60000) {
       startButtonRotateAnimation();
       levelNameY.setValue(-200);
       setLevel(2);
+    }
+
+    if (level !== 3 && score >= 60000) {
+      levelNameY.setValue(-200);
+      setLevel(3);
     }
   }, [score]);
 
@@ -74,7 +88,7 @@ const Background = ({level, setLevel, score, step}: IBackground) => {
     });
 
     levelNameY.stopAnimation(current => {
-      if (level === 2) {
+      if (level === 2 || level === 3) {
         Animated.timing(levelNameY, {
           toValue: current + 100,
           duration: 5000,
@@ -125,7 +139,7 @@ const Background = ({level, setLevel, score, step}: IBackground) => {
         />
       </Animated.View>
 
-      {level === 2 && (
+      {(level === 2 || level === 3) && (
         <Animated.View
           style={[
             styles.levelNameContainer,
@@ -134,18 +148,26 @@ const Background = ({level, setLevel, score, step}: IBackground) => {
             },
           ]}>
           <ImageBackground
-            source={images.spaceProbe}
+            source={images.spaceScreen}
             resizeMode="stretch"
             style={styles.levelNameBackground}>
-            <Text style={styles.levelNameText}>{`Solaris`}</Text>
+            <Text style={styles.levelNameText}>{levelNames[level]}</Text>
           </ImageBackground>
         </Animated.View>
       )}
       <Animated.View
         style={[
-          styles.backgroundColorShift,
+          styles.backgroundColorShift2,
           {
-            opacity: levelOpacityInterpolate,
+            opacity: levelOpacity2Interpolate,
+          },
+        ]}
+      />
+      <Animated.View
+        style={[
+          styles.backgroundColorShift3,
+          {
+            opacity: levelOpacity3Interpolate,
           },
         ]}
       />

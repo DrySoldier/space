@@ -13,7 +13,6 @@
       "bundleIdentifier": "com.imisshtml.spaceclimb"
     },
     "android": {
-      "edgeToEdge": true,
       "adaptiveIcon": {
         "foregroundImage": "./assets/bootsplash_logo.png",
         "backgroundColor": "#ffffff"

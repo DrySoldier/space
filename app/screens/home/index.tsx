@@ -72,7 +72,7 @@ const Home = () => {
     <ImageBackground source={images.space} style={styles.flex}>
       <View style={styles.titleContainer}>
         <Text style={styles.title}>SPACE CLIMB</Text>
-        <Text style={styles.subtitle}>(title pending)</Text>
+        <Text style={styles.subtitle}>The Ascent</Text>
       </View>
       <Animated.View
         style={{

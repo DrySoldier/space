@@ -41,7 +41,7 @@ let oxygenChance = 0;
 
 // Bump up the chance by 1 for every 5000, defaulting to 6 at 0
 const getOxygenChance = (score: number) =>
-  Math.min(6 + Math.floor(score / 5000), 12);
+  Math.min(6 + Math.floor(score / 7500), 14);
 
 const Game = () => {
   // Current side player is on
@@ -74,6 +74,10 @@ const Game = () => {
       nextBranch = randInt(0, 2);
     }
 
+    if (nextBranch === 0 && level === 3) {
+      nextBranch = randInt(0, 2);
+    }
+
     if (nextBranch === 0) {
       const hasOxygenTank = oxygenChance >= getOxygenChance(score);
 
@@ -90,6 +94,15 @@ const Game = () => {
         nextBranch++;
       } else if (nextBranch === 2) {
         nextBranch--;
+      }
+    } else if (level === 3) {
+      if (oxygenChance > getOxygenChance(score)) {
+        const side = randInt(0, 1);
+        nextBranch = 3 + side;
+        oxygenChance = 0;
+      } else {
+        const pseudoOxygen = randInt(0, 3);
+        if (pseudoOxygen) oxygenChance++;
       }
     } else if (lastBranch.type !== 0) {
       oxygenChance++;
@@ -171,7 +184,7 @@ const Game = () => {
       refill(31);
       setThrownAwayArr([]);
       setBranches(defaultBranches);
-      setScore(0);
+      setScore(60000);
     }
 
     return () => clearInterval(timerInterval);

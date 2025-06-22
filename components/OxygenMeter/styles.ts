@@ -1,20 +1,20 @@
-import { moderateScale as ms, width } from "@/constants";
+import { moderateScale as ms } from "@/constants";
 import { StyleSheet } from "react-native";
-
-export const OXYGEN_HEIGHT = ms(70);
 
 const styles = StyleSheet.create({
     oxygenContainer: {
         position: 'absolute',
-        top: ms(100),
+        left: ms(-24),
         flex: 1,
-        justifyContent: 'center',
         alignItems: 'flex-start',
+        transform: [{ rotateZ: '-90deg' }],
+        top: ms(100)
     },
     oxygenGradient: {
         position: 'absolute',
-        height: OXYGEN_HEIGHT,
-        marginLeft: ms(18.7),
+        height: ms(24),
+        marginLeft: ms(15.8),
+        marginTop: ms(10)
     }
 });
 

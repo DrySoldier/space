@@ -39,6 +39,8 @@ export default function App() {
     })();
 
     NavigationBar.setPositionAsync('absolute');
+    NavigationBar.setBehaviorAsync('overlay-swipe');
+    NavigationBar.setBackgroundColorAsync('black');
   }, []);
 
   if (!loaded && !error) {

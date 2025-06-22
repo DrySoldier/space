@@ -9,7 +9,6 @@ import {
   ImageBackground,
   TextInput,
   KeyboardAvoidingView,
-  ActivityIndicator,
 } from 'react-native';
 import * as Crypto from 'expo-crypto';
 import {images} from '../../../constants';
@@ -28,6 +27,8 @@ const Settings = () => {
   const buttonDegree = useRef(new Animated.Value(0)).current;
   const astroPosition = useRef(new Animated.Value(0)).current;
   const astroRotate = useRef(new Animated.Value(0)).current;
+
+  const changeNameScale = useRef(new Animated.Value(0)).current;
 
   const [musicMuted, setMusicMuted] = useState(false);
 
@@ -102,6 +103,12 @@ const Settings = () => {
   useEffect(() => {
     if (userScore?.name) {
       setName(userScore.name);
+
+      Animated.timing(changeNameScale, {
+        toValue: 1,
+        duration: 1000,
+        useNativeDriver: true,
+      }).start();
     }
   }, [userScore]);
 
@@ -170,26 +177,26 @@ const Settings = () => {
             </TouchableOpacity>
           </Animated.View>
         </View>
-        <KeyboardAvoidingView behavior="position">
-          <ImageBackground
-            style={styles.nameChange}
-            resizeMode="stretch"
-            source={images.spaceScreen}>
-            <Text style={styles.changeNameText}>Change Name</Text>
-            {userScore?.name ? (
-              <TextInput
-                style={styles.changeNameInput}
-                defaultValue={userScore?.name || ''}
-                onChangeText={setName}
-                onEndEditing={() => updateName(name)}
-                maxLength={16}
-                value={name}
-              />
-            ) : (
-              <ActivityIndicator style={styles.activityIndicator} />
-            )}
-          </ImageBackground>
-        </KeyboardAvoidingView>
+        {!!userScore?.name && (
+          <Animated.View style={{transform: [{scale: changeNameScale}]}}>
+            <KeyboardAvoidingView behavior="position">
+              <ImageBackground
+                style={styles.nameChange}
+                resizeMode="stretch"
+                source={images.spaceScreen}>
+                <Text style={styles.changeNameText}>Change Name</Text>
+                <TextInput
+                  style={styles.changeNameInput}
+                  defaultValue={userScore?.name || ''}
+                  onChangeText={setName}
+                  onEndEditing={() => updateName(name)}
+                  maxLength={16}
+                  value={name}
+                />
+              </ImageBackground>
+            </KeyboardAvoidingView>
+          </Animated.View>
+        )}
         <ImageBackground
           style={styles.creditDisplay}
           resizeMode="stretch"
