@@ -14,7 +14,7 @@ const backgroundSize = 1600;
 
 const levelNames = {
   2: 'Solaris',
-  3: 'The Unheard',
+  3: 'Elysia',
 };
 
 const Background = ({score, step}: IBackground) => {
@@ -99,7 +99,9 @@ const Background = ({score, step}: IBackground) => {
 
     if (level === 2) {
       startButtonRotateAnimation();
-      levelNameY.setValue(-200);
+      levelNameY.stopAnimation(() => {
+        levelNameY.setValue(-200);
+      });
     }
 
     if (level === 3) {

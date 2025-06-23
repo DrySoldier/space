@@ -42,7 +42,7 @@ let oxygenChance = 0;
 
 // Bump up the chance by 1 for every 7500, defaulting to 6 at 0
 const getOxygenChance = (score: number) =>
-  Math.min(6 + Math.floor(score / 7500), 20);
+  Math.min(6 + Math.floor(score / 7500), 16);
 
 const Game = () => {
   // Current side player is on
