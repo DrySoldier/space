@@ -76,7 +76,7 @@ const Game = () => {
   }, []);
 
   useEffect(() => {
-    if (backgrounded.match(/active/) && !gameOver) {
+    if (backgrounded.match(/active/) && !gameOver && !!score) {
       setPaused(() => {
         clearInterval(timerInterval);
         timerInterval = undefined;
