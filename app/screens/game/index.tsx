@@ -1,13 +1,13 @@
-import React, {useState, createRef, useRef} from 'react';
+import React, {useState, createRef} from 'react';
 import {
   Text,
   View,
-  TouchableOpacity,
   FlatList,
   Pressable,
   Platform,
 } from 'react-native';
 import {Image} from 'expo-image';
+import * as Crypto from 'expo-crypto';
 import {
   ThrownAway,
   Branch,
@@ -62,7 +62,7 @@ const Game = () => {
   // animation for the astronaut
   const [step, setStep] = useState(false);
 
-  let isMoving = useRef(false).current;
+  const [isMoving, setIsMoving] = useState(false);
 
   const level = getLevel(score);
 
@@ -146,6 +146,14 @@ const Game = () => {
       nextBranch = 0;
     }
 
+    if (score >= 35000 && score <= 36000) {
+      nextBranch = 0;
+    }
+
+    if (score >= 60000 && score <= 61000) {
+      nextBranch = 0;
+    }
+
     return nextBranch;
   };
 
@@ -160,7 +168,7 @@ const Game = () => {
     const nextBranch = branches[6];
     const lastGeneratedBranch = branches[0];
 
-    isMoving = true;
+    setIsMoving(true);
 
     branches.forEach(b => {
       b.ref?.current?.animateDown(() => {
@@ -175,14 +183,14 @@ const Game = () => {
             });
             return copy;
           });
-          isMoving = false;
+          setIsMoving(true);
         }
       });
     });
 
     setThrownAwayArr([
       ...thrownAwayArr,
-      <ThrownAway side={lastBranch.type} key={randInt(0, 999999)} />,
+      <ThrownAway side={lastBranch.type} key={Crypto.randomUUID()} />,
     ]);
 
     // Check to see if player is chopping tree below branch

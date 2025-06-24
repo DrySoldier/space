@@ -41,7 +41,6 @@ const Background = ({score, step}: IBackground) => {
       useNativeDriver: true,
     }).start();
 
-    // Handle background shift
     offsetY.stopAnimation(current => {
       const target = current + 20;
 
@@ -53,7 +52,7 @@ const Background = ({score, step}: IBackground) => {
       }).start();
 
       const wrapped = target % backgroundSize;
-      if (wrapped > backgroundSize - 10) {
+      if (wrapped > backgroundSize - 30) {
         offsetY.setValue(0);
       }
     });
