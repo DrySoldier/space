@@ -1,8 +1,7 @@
 import { StyleSheet } from 'react-native';
-import { height, moderateScale as ms } from '../../constants/scaling';
+import { height, moderateScale as ms, width } from '../../constants/scaling';
 
-export const BRANCH_HW = height * 0.1312;
-export const OBSTACLE_MARGIN = height * 0.06;
+export const BRANCH_HW = height * .12;
 
 const styles = StyleSheet.create({
     branch: {

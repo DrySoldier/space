@@ -16,8 +16,8 @@ const styles = StyleSheet.create({
         marginTop: -1,
     },
     levelNameBackground: {
-        height: 75,
-        width: 125,
+        height: ms(35),
+        width: ms(125),
         justifyContent: 'center',
         alignItems: 'center',
       },

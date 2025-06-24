@@ -12,9 +12,8 @@ const styles = StyleSheet.create({
   playerContainer: {
     flex: 1,
     position: 'absolute',
-    bottom: BRANCH_HW * 2.2,
+    top: BRANCH_HW * 5.2,
     height: '100%',
-    justifyContent: 'flex-end',
   },
 });
 

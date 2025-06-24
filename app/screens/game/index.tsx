@@ -163,7 +163,7 @@ const Game = () => {
     isMoving = true;
 
     branches.forEach(b => {
-      b.ref?.current.animateDown(() => {
+      b.ref?.current?.animateDown(() => {
         if (b.id === lastBranch.id) {
           setBranches(prevState => {
             const copy = [...prevState];
@@ -234,19 +234,19 @@ const Game = () => {
         keyExtractor={item => item.id.toString()}
       />
 
-      <TouchableOpacity
-        style={styles.leftSide}
-        onPress={() => handlePress('left')}>
+      {thrownAwayArr}
+
+      <Pressable style={styles.leftSide} onPressIn={() => handlePress('left')}>
         <View style={styles.side} />
-      </TouchableOpacity>
+      </Pressable>
 
       <View style={styles.middle} />
 
-      <TouchableOpacity
+      <Pressable
         style={styles.rightSide}
-        onPress={() => handlePress('right')}>
+        onPressIn={() => handlePress('right')}>
         <View style={styles.side} />
-      </TouchableOpacity>
+      </Pressable>
 
       <Player
         gameOver={gameOver}
@@ -266,10 +266,6 @@ const Game = () => {
         )}
       </View>
       <OxygenMeter o2={o2} />
-
-      <View style={styles.ground} pointerEvents="none">
-        {thrownAwayArr}
-      </View>
 
       {paused && (
         <View style={styles.pauseContainer}>

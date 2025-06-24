@@ -25,29 +25,12 @@ const Background = ({score, step}: IBackground) => {
   });
   const levelOpacity3Interpolate = levelOpacity.interpolate({
     inputRange: [57500, 60000, 999999999],
-    outputRange: [0, 0.15, .15],
+    outputRange: [0, 0.15, 0.15],
   });
 
-  const buttonDegree = useRef(new Animated.Value(0)).current;
   const offsetY = useRef(new Animated.Value(0)).current;
   const levelNameY = useRef(new Animated.Value(-200)).current;
-
-  const spin = buttonDegree.interpolate({
-    inputRange: [0, 1],
-    outputRange: ['-10deg', '10deg'],
-  });
-
   const level = getLevel(score);
-
-  const startButtonRotateAnimation = () => {
-    const randomDegree = Math.random();
-
-    Animated.timing(buttonDegree, {
-      toValue: randomDegree,
-      duration: 5000,
-      useNativeDriver: true,
-    }).start(() => startButtonRotateAnimation());
-  };
 
   useEffect(() => {
     levelOpacity.stopAnimation();
@@ -98,7 +81,6 @@ const Background = ({score, step}: IBackground) => {
     }
 
     if (level === 2) {
-      startButtonRotateAnimation();
       levelNameY.stopAnimation(() => {
         levelNameY.setValue(-200);
       });
@@ -157,7 +139,7 @@ const Background = ({score, step}: IBackground) => {
           style={[
             styles.levelNameContainer,
             {
-              transform: [{rotate: spin}, {translateY: levelNameY}],
+              transform: [{rotate: '-5deg'}, {translateY: levelNameY}],
             },
           ]}>
           <ImageBackground

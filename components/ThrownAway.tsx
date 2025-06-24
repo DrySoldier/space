@@ -1,9 +1,8 @@
 import React, {useEffect, useRef} from 'react';
 import {StyleSheet, View, Animated} from 'react-native';
-import {moderateScale as ms} from '../constants';
 import {randInt} from '../utils';
 import Branch from './Branch';
-import { BRANCH_HW } from './Branch/styles';
+import {BRANCH_HW} from './Branch/styles';
 
 const ThrownAway = ({side}: {side: number}) => {
   const opacity = useRef(new Animated.Value(0)).current;
@@ -15,7 +14,7 @@ const ThrownAway = ({side}: {side: number}) => {
 
   const marginTop = opacity.interpolate({
     inputRange: [0, 0.5, 1],
-    outputRange: [-5, 500, 1000],
+    outputRange: [0, 500, 1000],
   });
 
   const marginLeft = opacity.interpolate({
@@ -42,7 +41,7 @@ const ThrownAway = ({side}: {side: number}) => {
   }, []);
 
   return (
-    <View style={styles.thrownAwayContainer}>
+    <View style={styles.thrownAwayContainer} pointerEvents="none">
       <Animated.View
         style={[
           {
@@ -76,11 +75,11 @@ const styles = StyleSheet.create({
   thrownAwayBranch: {
     height: BRANCH_HW,
     width: BRANCH_HW,
-    alignSelf: 'center',
   },
   thrownAwayContainer: {
     position: 'absolute',
     width: '100%',
     height: '100%',
+    marginTop: BRANCH_HW * 12.8,
   },
 });

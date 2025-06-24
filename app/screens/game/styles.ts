@@ -50,7 +50,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     width: '100%',
     height: '100%',
-    bottom: BRANCH_HW * .67,
+    marginTop: BRANCH_HW * .7,
     marginRight: BRANCH_HW
   },
   branchContentContainer: {
@@ -58,12 +58,6 @@ const styles = StyleSheet.create({
     height: '100%',
     width,
     overflow: 'visible',
-  },
-  ground: {
-    width: '100%',
-    height: '28.5%',
-    alignSelf: 'flex-end',
-    position: 'absolute',
   },
   modal: {
     height: ms(200),
