@@ -2,17 +2,13 @@ import { useEffect, useRef, useState } from 'react';
 
 const MAX_O2 = 30;
 const IDLE_DRAIN = 1;
-const MOVING_DRAIN = 2.2;
 
 export function useOxygen(
-  isMoving: boolean,
   paused: boolean,
   gameOver: boolean,
   endGame: () => void,
 ) {
   const [o2, setO2] = useState<number>(MAX_O2);
-  const drainRef = useRef(IDLE_DRAIN);
-  drainRef.current = isMoving ? MOVING_DRAIN : IDLE_DRAIN;
 
   useEffect(() => {
     if (paused || gameOver) return;
@@ -22,7 +18,7 @@ export function useOxygen(
         if (prev <= 0) {
           endGame();
         }
-        return Math.max(prev - drainRef.current, 0)
+        return Math.max(prev - IDLE_DRAIN, 0)
       });
     }, 1000);
 

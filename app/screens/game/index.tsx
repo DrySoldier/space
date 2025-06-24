@@ -6,6 +6,7 @@ import {
   Pressable,
   Platform,
   AppState,
+  AppStateStatus,
 } from 'react-native';
 import {Image} from 'expo-image';
 import * as Crypto from 'expo-crypto';
@@ -62,24 +63,27 @@ const Game = () => {
   const [gameOver, setGameOver] = useState(false);
   // animation for the astronaut
   const [step, setStep] = useState(false);
-
-  const [isMoving, setIsMoving] = useState(false);
+  const [backgrounded, setAppBackgrounded] = useState<AppStateStatus>('active');
 
   const level = getLevel(score);
 
   useEffect(() => {
-    const listener = AppState.addEventListener('change', state => {
-      if (state.match(/active/)) {
-        setPaused(() => {
-          clearInterval(timerInterval);
-          timerInterval = undefined;
-          return true;
-        });
-      }
-    });
+    const listener = AppState.addEventListener('change', state =>
+      setAppBackgrounded(state),
+    );
 
     return () => listener.remove();
   }, []);
+
+  useEffect(() => {
+    if (backgrounded.match(/active/) && !gameOver) {
+      setPaused(() => {
+        clearInterval(timerInterval);
+        timerInterval = undefined;
+        return true;
+      });
+    }
+  }, [backgrounded]);
 
   const resetGame = () => {
     timerInterval = setInterval(() => {
@@ -104,7 +108,7 @@ const Game = () => {
     timerInterval = undefined;
   };
 
-  const {refill, o2} = useOxygen(isMoving, paused, gameOver, endGame);
+  const {refill, o2} = useOxygen(paused, gameOver, endGame);
 
   const generateNewBranch = (lastBranch: TBranch) => {
     let nextBranch = randInt(0, 2);
@@ -183,8 +187,6 @@ const Game = () => {
     const nextBranch = branches[6];
     const lastGeneratedBranch = branches[0];
 
-    setIsMoving(true);
-
     branches.forEach(b => {
       b.ref?.current?.animateDown(() => {
         if (b.id === lastBranch.id) {
@@ -198,7 +200,6 @@ const Game = () => {
             });
             return copy;
           });
-          setIsMoving(true);
         }
       });
     });
