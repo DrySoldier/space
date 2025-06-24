@@ -17,10 +17,12 @@ import {Link, useRouter} from 'expo-router';
 import {randInt} from '../../../utils';
 import styles from './styles';
 import {useScoreboard} from '../../../hooks/useScoreboard';
+import { useMusic } from '../../../context/MusicProvider';
 
 const Settings = () => {
   const router = useRouter();
   const {getScoreByUUID, updateName, userScore} = useScoreboard();
+  const music = useMusic();
 
   const [name, setName] = useState(userScore?.name || '');
 
@@ -29,8 +31,6 @@ const Settings = () => {
   const astroRotate = useRef(new Animated.Value(0)).current;
 
   const changeNameScale = useRef(new Animated.Value(0)).current;
-
-  const [musicMuted, setMusicMuted] = useState(false);
 
   const spin = buttonDegree.interpolate({
     inputRange: [0, 1],
@@ -86,6 +86,7 @@ const Settings = () => {
   const clearAllData = async () => {
     await removeData('HISCORE');
     await removeData('UUID');
+    await removeData('MUTED');
 
     const uuid = Crypto.randomUUID();
 
@@ -138,13 +139,13 @@ const Settings = () => {
         </Animated.View>
         <View style={{flexDirection: 'row'}}>
           <Animated.View style={{transform: [{rotate: spin}]}}>
-            <TouchableOpacity onPress={() => setMusicMuted(!musicMuted)}>
+            <TouchableOpacity onPress={() => music.toggle()}>
               <ImageBackground
                 style={styles.button}
                 resizeMode="stretch"
                 source={images.spaceProbe}>
                 <Text style={styles.buttonText}>
-                  {musicMuted ? 'UNMUTE' : 'MUTE'}
+                  {music.isPlaying ? 'MUTE' : 'UNMUTE'}
                 </Text>
               </ImageBackground>
             </TouchableOpacity>

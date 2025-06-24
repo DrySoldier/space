@@ -1,10 +1,11 @@
-import React, {useState, createRef} from 'react';
+import React, {useState, createRef, useEffect} from 'react';
 import {
   Text,
   View,
   FlatList,
   Pressable,
   Platform,
+  AppState,
 } from 'react-native';
 import {Image} from 'expo-image';
 import * as Crypto from 'expo-crypto';
@@ -65,6 +66,20 @@ const Game = () => {
   const [isMoving, setIsMoving] = useState(false);
 
   const level = getLevel(score);
+
+  useEffect(() => {
+    const listener = AppState.addEventListener('change', state => {
+      if (state.match(/active/)) {
+        setPaused(() => {
+          clearInterval(timerInterval);
+          timerInterval = undefined;
+          return true;
+        });
+      }
+    });
+
+    return () => listener.remove();
+  }, []);
 
   const resetGame = () => {
     timerInterval = setInterval(() => {
@@ -214,14 +229,14 @@ const Game = () => {
   const togglePaused = () => {
     setPaused(prev => {
       if (prev) {
-        clearInterval(timerInterval);
-        timerInterval = undefined;
-      } else {
         if (!timerInterval) {
           timerInterval = setInterval(() => {
             setScore(prevState => prevState - 20);
           }, 1000);
         }
+      } else {
+        clearInterval(timerInterval);
+        timerInterval = undefined;
       }
       return !prev;
     });

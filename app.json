@@ -38,9 +38,12 @@
       [
         "expo-font",
         {
-          "fonts": ["./assets/fonts/Pixellari.ttf"]
+          "fonts": [
+            "./assets/fonts/Pixellari.ttf"
+          ]
         }
-      ]
+      ],
+      "expo-audio"
     ],
     "experiments": {
       "typedRoutes": true
