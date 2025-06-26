@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 const MAX_O2 = 30;
 const IDLE_DRAIN = 1;

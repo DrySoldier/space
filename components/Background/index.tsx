@@ -81,13 +81,13 @@ const Background = ({score, step}: IBackground) => {
 
     if (level === 2) {
       levelNameY.stopAnimation(() => {
-        levelNameY.setValue(-200);
+        levelNameY.setValue(-50);
       });
     }
 
     if (level === 3) {
       levelNameY.stopAnimation(() => {
-        levelNameY.setValue(-200);
+        levelNameY.setValue(-50);
       });
     }
   }, [level]);

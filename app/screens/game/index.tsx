@@ -29,6 +29,7 @@ type TSide = 'left' | 'right';
 type TBranch = {type: number; id: number; ref: React.RefObject<any>};
 
 const defaultBranches = [
+  {type: 0, id: 8, ref: createRef()},
   {type: 0, id: 7, ref: createRef()},
   {type: 0, id: 6, ref: createRef()},
   {type: 0, id: 5, ref: createRef()},
@@ -110,66 +111,40 @@ const Game = () => {
 
   const {refill, o2} = useOxygen(paused, gameOver, endGame);
 
-  const generateNewBranch = (lastBranch: TBranch) => {
-    let nextBranch = randInt(0, 2);
-
-    // Make empty branches a little more rare
-    if (nextBranch === 0) {
-      nextBranch = randInt(0, 2);
+  const generateNewBranch = (lastBranch: TBranch): number => {
+    if (
+      (score >= 35_000 && score < 36_000) ||
+      (score >= 60_000 && score < 61_000)
+    ) {
+      return 0;
     }
 
-    if (nextBranch === 0 && level === 3) {
-      nextBranch = randInt(0, 2);
-    }
+    const biasedRand012 = (): 0 | 1 | 2 => {
+      const r = randInt(0, 8);
+      return r === 0 ? 0 : r < 5 ? 1 : 2;
+    };
 
-    if (nextBranch === 0) {
-      const hasOxygenTank = oxygenChance >= getOxygenChance(score);
+    let nextBranch: number = biasedRand012();
+    if (level === 3 && nextBranch === 0) nextBranch = randInt(0, 2);
 
-      const side = randInt(0, 1);
-      if (hasOxygenTank) {
-        nextBranch = 3 + side;
-        oxygenChance = 0;
-        return nextBranch;
-      }
+    if (nextBranch === 0 && oxygenChance >= getOxygenChance(score)) {
+      oxygenChance = 0;
+      return 3 + randInt(0, 1);
     }
 
     if (level === 2 && lastBranch.type === nextBranch) {
-      if (nextBranch === 1) {
-        nextBranch++;
-      } else if (nextBranch === 2) {
-        nextBranch--;
-      }
+      nextBranch = nextBranch === 1 ? 2 : 1;
     } else if (level === 3) {
       if (oxygenChance > getOxygenChance(score) * 3) {
-        const side = randInt(0, 1);
-        nextBranch = 3 + side;
         oxygenChance = 0;
-      } else {
-        const pseudoOxygen = randInt(0, 3);
-        if (pseudoOxygen) oxygenChance++;
-
-        if (lastBranch.type === nextBranch) {
-          const backAndForthChance = randInt(0, 1);
-
-          if (backAndForthChance) {
-            if (nextBranch === 1) {
-              nextBranch++;
-            } else if (nextBranch === 2) {
-              nextBranch--;
-            }
-          }
-        }
+        return 3 + randInt(0, 1);
+      }
+      if (randInt(0, 3)) oxygenChance++;
+      if (lastBranch.type === nextBranch && randInt(0, 1)) {
+        nextBranch = nextBranch === 1 ? 2 : 1;
       }
     } else if (lastBranch.type !== 0) {
       oxygenChance++;
-      nextBranch = 0;
-    }
-
-    if (score >= 35000 && score <= 36000) {
-      nextBranch = 0;
-    }
-
-    if (score >= 60000 && score <= 61000) {
       nextBranch = 0;
     }
 
@@ -183,23 +158,25 @@ const Game = () => {
     setStep(prevState => !prevState);
 
     // Handle branch animations
-    const lastBranch = branches[7];
-    const nextBranch = branches[6];
+    const lastBranch = branches[branches.length - 1];
+    const nextBranch = branches[branches.length - 2];
     const lastGeneratedBranch = branches[0];
 
     branches.forEach(b => {
       b.ref?.current?.animateDown(() => {
         if (b.id === lastBranch.id) {
-          setBranches(prevState => {
-            const copy = [...prevState];
-            copy.pop();
-            copy.unshift({
-              type: generateNewBranch(lastGeneratedBranch),
-              id: prevState[0].id + 1,
-              ref: createRef(),
-            });
-            return copy;
-          });
+          requestAnimationFrame(() =>
+            setBranches(prevState => {
+              const copy = [...prevState];
+              copy.pop();
+              copy.unshift({
+                type: generateNewBranch(lastGeneratedBranch),
+                id: prevState[0].id + 1,
+                ref: createRef(),
+              });
+              return copy;
+            }),
+          );
         }
       });
     });

@@ -50,7 +50,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     width: '100%',
     height: '100%',
-    marginTop: BRANCH_HW * .7,
+    marginTop: -BRANCH_HW * 1.2,
     marginRight: BRANCH_HW
   },
   branchContentContainer: {

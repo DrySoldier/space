@@ -21,7 +21,7 @@ const Branch = ({side, index}: IBranch, ref: ForwardedRef<TBranchRef>) => {
   const animateDown = (callback: () => void) => {
     Animated.timing(translateY, {
       toValue: (index - 1) * BRANCH_HW,
-      duration: 50,
+      duration: 25,
       easing: Easing.linear,
       useNativeDriver: true,
     }).start(() => {
@@ -45,7 +45,8 @@ const Branch = ({side, index}: IBranch, ref: ForwardedRef<TBranchRef>) => {
 
     case 1:
       return (
-        <Animated.View style={[styles.obstacleLeft, {transform: [{translateY}]}]}>
+        <Animated.View
+          style={[styles.obstacleLeft, {transform: [{translateY}]}]}>
           <Image
             resizeMode="stretch"
             source={images.obstacleTileLeft}
@@ -58,9 +59,7 @@ const Branch = ({side, index}: IBranch, ref: ForwardedRef<TBranchRef>) => {
       return (
         <Animated.View style={[styles.branch, {transform: [{translateY}]}]}>
           <Image
-            style={[
-              styles.obstacleRight,
-            ]}
+            style={[styles.obstacleRight]}
             resizeMode="stretch"
             source={images.obstacleTileRight}
           />
