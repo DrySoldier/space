@@ -52,7 +52,7 @@ export function useScoreboard() {
     const loadAbove = async () => {
         if (!scores.length) return;
         const beforeRank = scores[0].rk;
-        const newRows = await api.getAbove(beforeRank) as IScore[];
+        const newRows = await api.getAbove(beforeRank);
         if (newRows && newRows.length > 0) {
             setScores(prev => [...newRows.reverse(), ...prev]);
         }
@@ -61,7 +61,7 @@ export function useScoreboard() {
     const loadBelow = async () => {
         if (!scores.length) return;
         const afterRank = scores[scores.length - 1].rk;
-        const newRows = await api.getBelow(afterRank) as IScore[];
+        const newRows = await api.getBelow(afterRank);
         if (newRows && newRows.length > 0) {
             setScores(prev => [...prev, ...newRows]);
         }

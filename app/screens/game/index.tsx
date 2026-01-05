@@ -1,4 +1,4 @@
-import React, {useState, createRef, useEffect} from 'react';
+import React, {useState, createRef, useEffect, useRef} from 'react';
 import {
   Text,
   View,
@@ -14,6 +14,7 @@ import {
   ThrownAway,
   Branch,
   GameOverModal,
+  ContinueModal,
   OxygenMeter,
   Background,
 } from '@/components';
@@ -39,8 +40,6 @@ const defaultBranches = [
   {type: 0, id: 1, ref: createRef()},
   {type: 0, id: 0, ref: createRef()},
 ];
-
-let timerInterval: any;
 let oxygenChance = 0;
 
 // Bump up the chance by 1 for every 7500, defaulting to 6 at 0
@@ -62,11 +61,17 @@ const Game = () => {
 
   const [score, setScore] = useState(0);
   const [gameOver, setGameOver] = useState(false);
+  const [pendingDeath, setPendingDeath] = useState(false);
+  const [runContinuesUsed, setRunContinuesUsed] = useState(0);
+
   // animation for the astronaut
   const [step, setStep] = useState(false);
   const [backgrounded, setAppBackgrounded] = useState<AppStateStatus>('active');
+  const suppressNextAutoPauseRef = useRef(false);
 
   const level = getLevel(score);
+
+  let timerInterval = useRef<undefined | number>(undefined);
 
   useEffect(() => {
     const listener = AppState.addEventListener('change', state =>
@@ -78,16 +83,21 @@ const Game = () => {
 
   useEffect(() => {
     if (backgrounded.match(/active/) && !gameOver && !!score) {
-      setPaused(() => {
-        clearInterval(timerInterval);
-        timerInterval = undefined;
-        return true;
-      });
+      if (suppressNextAutoPauseRef.current) {
+        // Skip the auto-pause once after an ad continue
+        suppressNextAutoPauseRef.current = false;
+      } else {
+        setPaused(() => {
+          clearInterval(timerInterval.current);
+          timerInterval.current = undefined;
+          return true;
+        });
+      }
     }
   }, [backgrounded]);
 
   const resetGame = () => {
-    timerInterval = setInterval(() => {
+    timerInterval.current = setInterval(() => {
       setScore(prevState => {
         if (prevState > 0) {
           return prevState - 20;
@@ -101,15 +111,25 @@ const Game = () => {
     setThrownAwayArr([]);
     setBranches(defaultBranches);
     setScore(0);
+    setRunContinuesUsed(0);
   };
 
   const endGame = () => {
     setGameOver(true);
-    clearInterval(timerInterval);
-    timerInterval = undefined;
+
+    clearInterval(timerInterval.current);
+    timerInterval.current = undefined;
   };
 
-  const {refill, o2} = useOxygen(paused, gameOver, endGame);
+  const onOxygenDeplete = () => {
+    if (runContinuesUsed > 0) {
+      endGame();
+    } else {
+      setPaused(true);
+      setPendingDeath(true);
+    }
+  };
+  const {refill, o2} = useOxygen(paused, gameOver, onOxygenDeplete);
 
   const generateNewBranch = (lastBranch: TBranch): number => {
     if (
@@ -187,11 +207,17 @@ const Game = () => {
     ]);
 
     // Check to see if player is chopping tree below branch
-    if (
+    const wouldCollide =
       (side === 'left' && nextBranch.type === 1) ||
-      (side === 'right' && nextBranch.type === 2)
-    ) {
-      endGame();
+      (side === 'right' && nextBranch.type === 2);
+
+    if (wouldCollide) {
+      if (runContinuesUsed === 0) {
+        togglePaused();
+        setPendingDeath(true);
+      } else {
+        endGame();
+      }
       return;
     } else {
       if (side === 'left' && nextBranch.type === 3) {
@@ -204,17 +230,36 @@ const Game = () => {
     }
   };
 
+  const continueRun = () => {
+    // Restart the per-second score decay if needed
+    if (!timerInterval.current) {
+      timerInterval.current = setInterval(() => {
+        setScore(prevState => (prevState > 0 ? prevState - 20 : 0));
+      }, 1000);
+    }
+    setRunContinuesUsed(prev => prev + 1);
+    refill(31);
+    setPaused(false);
+    setAnimatingIn(false);
+    // Clear the tree: remove all branches currently on screen
+    setBranches(prev => prev.map(b => ({...b, type: 0})));
+    // Prevent auto-pause triggered by returning from ad
+    suppressNextAutoPauseRef.current = true;
+    setGameOver(false);
+    setPendingDeath(false);
+  };
+
   const togglePaused = () => {
     setPaused(prev => {
       if (prev) {
-        if (!timerInterval) {
-          timerInterval = setInterval(() => {
+        if (!timerInterval.current) {
+          timerInterval.current = setInterval(() => {
             setScore(prevState => prevState - 20);
           }, 1000);
         }
       } else {
-        clearInterval(timerInterval);
-        timerInterval = undefined;
+        clearInterval(timerInterval.current);
+        timerInterval.current = undefined;
       }
       return !prev;
     });
@@ -268,7 +313,7 @@ const Game = () => {
       </View>
       <OxygenMeter o2={o2} />
 
-      {paused && (
+      {paused && !pendingDeath && (
         <View style={styles.pauseContainer}>
           <Pressable style={styles.continueButton} onPress={togglePaused}>
             <Image source={images.play} style={styles.pauseImage} />
@@ -277,6 +322,13 @@ const Game = () => {
         </View>
       )}
 
+      <ContinueModal
+        visible={pendingDeath && runContinuesUsed < 1}
+        onContinue={continueRun}
+        onEndRun={() => {
+          endGame();
+        }}
+      />
       <GameOverModal visible={gameOver} score={score} resetGame={resetGame} />
     </View>
   );

@@ -1,3 +1,5 @@
+import { IScore } from "../hooks/useScoreboard";
+
 type ApiPayload = Record<string, unknown>;
 export type ApiResponse<T = any> = Promise<T | null>;
 
@@ -53,6 +55,6 @@ export const postScore = async (score: number, uuid: string) =>
 export const putName = async (uuid: string, name: string) =>
     fetchData(`scoreboard/uuid/${uuid}/name/${name}`, 'PUT');
 
-export const getAbove = async (rank: number) => fetchData(`scoreboard/above?rank=${rank}`, 'GET');
+export const getAbove = async (rank: number): Promise<IScore[]> => fetchData(`scoreboard/above?rank=${rank}`, 'GET');
 
-export const getBelow = async (rank: number) => fetchData(`scoreboard/below?rank=${rank}`, 'GET');
+export const getBelow = async (rank: number): Promise<IScore[]> => fetchData(`scoreboard/below?rank=${rank}`, 'GET');

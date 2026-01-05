@@ -14,9 +14,11 @@ interface IPlayer {
   setDisablePress: React.Dispatch<SetStateAction<boolean>>;
   gameOver: boolean;
   step: boolean;
+  pendingDeath?: boolean;
+  resumeSeq?: number;
 }
 
-const Player = ({currentSide, setCurrentSide, setDisablePress, gameOver, step}: IPlayer) => {
+const Player = ({currentSide, setCurrentSide, setDisablePress, gameOver, step, pendingDeath = false, resumeSeq = 0}: IPlayer) => {
   // current player model TODO: Set up animated sprite
   const [playerModel, setPlayerModel] = useState(defaultPosition);
 

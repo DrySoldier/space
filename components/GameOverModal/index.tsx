@@ -10,6 +10,7 @@ import {
 import {ImageBackground} from 'expo-image';
 import {Link} from 'expo-router';
 import {useScoreboard} from '@/hooks/useScoreboard';
+import { useRewardedAd } from '@/hooks/useRewardedAd';
 import styles from './styles';
 import {images} from '../../constants/images';
 import {retrieveData, storeData} from '../../utils/asyncData';
@@ -19,11 +20,14 @@ interface IGameOverModal {
   visible: boolean;
   score: number;
   resetGame: () => void;
+  canContinue?: boolean;
+  onContinue?: () => void;
 }
 
-const GameOverModal = ({visible, score, resetGame}: IGameOverModal) => {
+const GameOverModal = ({visible, score, resetGame, canContinue = false, onContinue}: IGameOverModal) => {
   const [hiScore, setHiScore] = useState(0);
   const {scores, addNewScore, loadAbove, loadBelow} = useScoreboard();
+  const { isLoaded, isLoading, load, show } = useRewardedAd();
 
   const scoreboardRef = useRef<FlatList>(null);
 
@@ -50,6 +54,24 @@ const GameOverModal = ({visible, score, resetGame}: IGameOverModal) => {
       duration: 5000,
       useNativeDriver: true,
     }).start(() => startButtonRotateAnimation());
+  };
+
+  useEffect(() => {
+    if (visible && canContinue && !isLoaded && !isLoading) {
+      load();
+    }
+  }, [visible, canContinue, isLoaded, isLoading, load]);
+
+  const onPressContinue = async () => {
+    if (!onContinue) return;
+    if (!isLoaded) {
+      load();
+      return;
+    }
+    const rewarded = await show();
+    if (rewarded) {
+      onContinue();
+    }
   };
 
   const saveScore = async () => {
@@ -193,6 +215,20 @@ const GameOverModal = ({visible, score, resetGame}: IGameOverModal) => {
               </ImageBackground>
             </Link>
           </Animated.View>
+          {canContinue && (
+            <Animated.View style={{transform: [{rotate: oppositeSpin}]}}>
+              <TouchableOpacity onPress={onPressContinue} disabled={!isLoaded && isLoading}>
+                <ImageBackground
+                  resizeMode={'stretch'}
+                  source={images.spaceProbe}
+                  style={styles.spaceProbe}>
+                  <Text style={styles.text}>
+                    {isLoaded ? 'Watch Ad to Continue' : isLoading ? 'Loading Ad…' : 'Load Ad'}
+                  </Text>
+                </ImageBackground>
+              </TouchableOpacity>
+            </Animated.View>
+          )}
           <Animated.View style={{transform: [{rotate: oppositeSpin}]}}>
             <TouchableOpacity onPress={resetGame}>
               <ImageBackground
