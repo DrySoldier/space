@@ -10,24 +10,46 @@ export interface IScore {
     player?: boolean;
 }
 
+interface IUserScore {
+    id?: number;
+    name?: string;
+    score?: number;
+}
+
+interface IScoreByUUIDPayload {
+    userScore: IUserScore | null;
+    scores: IScore[];
+}
+
 export function useScoreboard() {
     const [scores, setScores] = useState<IScore[]>([]);
-    const [userScore, setUserScore] = useState<IScore | undefined>();
+    const [userScore, setUserScore] = useState<IUserScore | undefined>();
+    const [isFetchingScores, setIsFetchingScores] = useState(false);
 
     const getScoreByUUID = async () => {
         const deviceId = await retrieveData('UUID');
-        if (deviceId) {
-            const fetchedScore = await api.getScoreByUUID(deviceId);
 
-            setUserScore(fetchedScore);
+        if (!deviceId) {
+            setUserScore(undefined);
+            setScores([]);
+            return;
+        }
+
+        setIsFetchingScores(true);
+        try {
+            const fetchedScore = await api.getScoreByUUID(deviceId) as IScoreByUUIDPayload | null;
+
+            if (fetchedScore) {
+                setUserScore(fetchedScore.userScore || undefined);
+                setScores(Array.isArray(fetchedScore.scores) ? fetchedScore.scores : []);
+            } else {
+                setUserScore(undefined);
+                setScores([]);
+            }
+        } finally {
+            setIsFetchingScores(false);
         }
     };
-
-    /*const getScoresFromTo = async (from: number, to: number) => {
-        const fetchedScores = await getScoreRange(from, to);
-
-        setScores(fetchedScores);
-    };*/
 
     const addNewScore = async (score: number) => {
         const deviceId = await retrieveData('UUID');
@@ -52,7 +74,7 @@ export function useScoreboard() {
     const loadAbove = async () => {
         if (!scores.length) return;
         const beforeRank = scores[0].rk;
-        const newRows = await api.getAbove(beforeRank) as IScore[];
+        const newRows = await api.getAbove(beforeRank);
         if (newRows && newRows.length > 0) {
             setScores(prev => [...newRows.reverse(), ...prev]);
         }
@@ -61,7 +83,7 @@ export function useScoreboard() {
     const loadBelow = async () => {
         if (!scores.length) return;
         const afterRank = scores[scores.length - 1].rk;
-        const newRows = await api.getBelow(afterRank) as IScore[];
+        const newRows = await api.getBelow(afterRank);
         if (newRows && newRows.length > 0) {
             setScores(prev => [...prev, ...newRows]);
         }
@@ -70,6 +92,7 @@ export function useScoreboard() {
     return {
         scores,
         userScore,
+        isFetchingScores,
         addNewScore,
         updateName,
         loadAbove,

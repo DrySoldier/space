@@ -2,83 +2,161 @@ import { StyleSheet } from 'react-native';
 import { height, moderateScale as ms, width } from '../../constants/scaling';
 
 const styles = StyleSheet.create({
-  mainSpaceProbe: {
-    height: ms(120),
-    width: ms(220),
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: ms(12)
-  },
-  spaceProbe: {
-    height: ms(100),
-    width: ms(150),
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: ms(40),
-  },
-  hiScoreSpaceProbe: {
-    height: height * .4,
-    width: width * 1.4,
-    justifyContent: 'flex-start',
-    alignItems: 'center',
-    paddingTop: ms(26),
-    paddingBottom: height * .065
-  },
   modalContainer: {
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     alignItems: 'center',
-    height: '80%',
+    height: '100%',
     width: '100%',
-    marginTop: ms(80)
   },
-  text: {
-    color: 'white',
-    fontFamily: 'Pixellari',
-    fontSize: ms(16),
-    textAlign: 'center',
+  headerPanel: {
+    width: width,
+    height: 124,
+    paddingTop: 28,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   headerText: {
     color: 'white',
     fontFamily: 'Pixellari',
     textAlign: 'center',
-    fontSize: ms(42),
+    fontSize: ms(28),
   },
-  hiscoreText: {
+  subheaderText: {
     color: 'white',
     fontFamily: 'Pixellari',
     textAlign: 'center',
-    fontSize: ms(42),
+    fontSize: ms(16),
+    opacity: 0.9,
   },
-  scoreText: {
+  scoreCard: {
+    width: width,
+    height: height * .25,
+    marginTop: -4,
+    paddingVertical: ms(24),
+    paddingHorizontal: ms(24),
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: ms(8),
+  },
+  scoreValue: {
     color: 'white',
     fontFamily: 'Pixellari',
     textAlign: 'center',
-    fontSize: ms(64),
+    fontSize: ms(44),
   },
-  buttonContainer: {
+  bestValue: {
+    color: 'white',
+    fontFamily: 'Pixellari',
+    textAlign: 'center',
+    fontSize: ms(20),
+    opacity: 0.85,
+  },
+  ctaContainer: {
     width: '100%',
-    flexDirection: 'row',
-    justifyContent: 'space-evenly',
+    alignItems: 'center',
+    gap: ms(14),
+    paddingBottom: ms(10),
+    marginTop: ms(64),
   },
-  hiScoreContainer: {
-    flex: 1,
-    height: height * .3,
+  ctaButton: {
+    width: width * 0.42,
+    height: ms(54),
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: ms(50),
+    paddingHorizontal: ms(12),
+  },
+  primaryCta: {
+    width: width * 0.7,
+    height: ms(60),
+  },
+  secondaryRow: {
+    flexDirection: 'row',
+    width: width * 0.85,
+    justifyContent: 'space-between',
+    gap: ms(12)
+  },
+  placeholderButton: {
+    opacity: 0.4,
+  },
+  placeholderText: {
+    color: 'white',
+    fontFamily: 'Pixellari',
+    fontSize: ms(16),
+    textAlign: 'center',
+    opacity: 0.6,
+  },
+  ctaText: {
+    color: 'white',
+    fontFamily: 'Pixellari',
+    fontSize: ms(18),
+    textAlign: 'center',
   },
   personalBestText: {
     color: 'white',
     fontFamily: 'Pixellari',
-    fontSize: ms(16),
-
+    fontSize: ms(14),
   },
-  scoreItem: {
+  scoreboardSection: {
+    width: '100%',
+    alignItems: 'center',
+    gap: ms(8),
+    marginTop: ms(6),
+  },
+  rankHintText: {
+    color: '#FFE15A',
+    fontFamily: 'Pixellari',
+    fontSize: ms(11),
+    textAlign: 'center',
+    textTransform: 'uppercase',
+    letterSpacing: 0.4,
+    paddingHorizontal: ms(8),
+  },
+  scoreboardSnippetCard: {
+    width: '92%',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.25)',
+    borderRadius: ms(8),
+    paddingVertical: ms(8),
+    paddingHorizontal: ms(10),
+    backgroundColor: 'rgba(0,0,0,0.18)',
+  },
+  scoreboardLoadingContainer: {
+    minHeight: ms(56),
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  scoreboardPlaceholderText: {
+    color: 'white',
+    fontFamily: 'Pixellari',
+    fontSize: ms(12),
+    textAlign: 'center',
+    opacity: 0.75,
+    paddingVertical: ms(8),
+  },
+  scoreRow: {
     flexDirection: 'row',
+    alignItems: 'center',
     justifyContent: 'space-between',
-    width: width * 0.75,
-    paddingHorizontal: ms(12),
-  }
+    paddingVertical: ms(4),
+    gap: ms(8),
+  },
+  scoreMetaText: {
+    color: 'white',
+    fontFamily: 'Pixellari',
+    fontSize: ms(12),
+    minWidth: ms(34),
+    textAlign: 'center',
+  },
+  scoreNameText: {
+    color: 'white',
+    fontFamily: 'Pixellari',
+    fontSize: ms(12),
+    flex: 1,
+    textAlign: 'center',
+  },
+  playerScoreText: {
+    color: '#FFE15A',
+  },
 });
 
 export default styles;

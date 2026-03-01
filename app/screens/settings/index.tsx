@@ -6,61 +6,54 @@ import {
   Animated,
   Easing,
   Alert,
+  ActivityIndicator,
+  FlatList,
+  Image,
   ImageBackground,
   TextInput,
   KeyboardAvoidingView,
+  SafeAreaView,
 } from 'react-native';
 import * as Crypto from 'expo-crypto';
 import {images} from '../../../constants';
 import {removeData, storeData} from '../../../utils/asyncData';
-import {Link, useRouter} from 'expo-router';
+import {useRouter} from 'expo-router';
 import {randInt} from '../../../utils';
 import styles from './styles';
 import {useScoreboard} from '../../../hooks/useScoreboard';
-import { useMusic } from '../../../context/MusicProvider';
+import {useMusic} from '../../../context/MusicProvider';
 
 const Settings = () => {
   const router = useRouter();
-  const {getScoreByUUID, updateName, userScore} = useScoreboard();
+  const {
+    getScoreByUUID,
+    updateName,
+    userScore,
+    scores,
+    isFetchingScores,
+    loadAbove,
+    loadBelow,
+  } = useScoreboard();
   const music = useMusic();
 
   const [name, setName] = useState(userScore?.name || '');
 
-  const buttonDegree = useRef(new Animated.Value(0)).current;
   const astroPosition = useRef(new Animated.Value(0)).current;
   const astroRotate = useRef(new Animated.Value(0)).current;
-
   const changeNameScale = useRef(new Animated.Value(0)).current;
 
-  const spin = buttonDegree.interpolate({
-    inputRange: [0, 1],
-    outputRange: ['-10deg', '10deg'],
-  });
-
-  const oppositeSpin = buttonDegree.interpolate({
-    inputRange: [0, 1],
-    outputRange: ['10deg', '-10deg'],
-  });
+  const [isPagingAbove, setIsPagingAbove] = useState(false);
+  const [isPagingBelow, setIsPagingBelow] = useState(false);
 
   const astro360 = astroRotate.interpolate({
     inputRange: [0, 1],
-    outputRange: [`0deg`, `360deg`],
+    outputRange: ['0deg', '360deg'],
   });
 
   const xPosition = astroPosition.interpolate({
     inputRange: [0, 1],
     outputRange: [-100, 650],
   });
-
-  const startButtonRotateAnimation = () => {
-    const randomDegree = Math.random();
-
-    Animated.timing(buttonDegree, {
-      toValue: randomDegree,
-      duration: 5000,
-      useNativeDriver: true,
-    }).start(() => startButtonRotateAnimation());
-  };
 
   const startAstroAnimation = () => {
     const newDuration = randInt(6000, 18000);
@@ -83,6 +76,26 @@ const Settings = () => {
     ]).start(() => startAstroAnimation());
   };
 
+  const pageAbove = async () => {
+    if (isPagingAbove || !scores.length) return;
+    setIsPagingAbove(true);
+    try {
+      await loadAbove();
+    } finally {
+      setIsPagingAbove(false);
+    }
+  };
+
+  const pageBelow = async () => {
+    if (isPagingBelow || !scores.length) return;
+    setIsPagingBelow(true);
+    try {
+      await loadBelow();
+    } finally {
+      setIsPagingBelow(false);
+    }
+  };
+
   const clearAllData = async () => {
     await removeData('HISCORE');
     await removeData('UUID');
@@ -96,9 +109,13 @@ const Settings = () => {
   };
 
   useEffect(() => {
-    startButtonRotateAnimation();
     startAstroAnimation();
     getScoreByUUID();
+
+    return () => {
+      astroPosition.stopAnimation();
+      astroRotate.stopAnimation();
+    };
   }, []);
 
   useEffect(() => {
@@ -108,8 +125,26 @@ const Settings = () => {
         duration: 1000,
         useNativeDriver: true,
       }).start();
+      setName(userScore.name);
     }
   }, [userScore]);
+
+  const renderScoreRow = (item: any) => (
+    <View style={styles.scoreRow}>
+      <Text
+        style={[styles.scoreMetaText, item.player && styles.playerScoreText]}>
+        {item.rk}
+      </Text>
+      <Text
+        style={[styles.scoreNameText, item.player && styles.playerScoreText]}>
+        {item.name}
+      </Text>
+      <Text
+        style={[styles.scoreMetaText, item.player && styles.playerScoreText]}>
+        {item.score}
+      </Text>
+    </View>
+  );
 
   return (
     <ImageBackground source={images.space} style={styles.container}>
@@ -126,84 +161,124 @@ const Settings = () => {
           source={images['astro-right-2']}
         />
       </Animated.View>
-      <View style={styles.buttonContainer}>
-        <Animated.View style={{transform: [{rotate: spin}], paddingLeft: 125}}>
-          <Link href="..">
+
+      <SafeAreaView style={styles.content}>
+        <View style={styles.topLeftBar}>
+          <TouchableOpacity onPress={() => router.back()}>
             <ImageBackground
-              style={styles.button}
+              style={styles.backButton}
               resizeMode="stretch"
-              source={images.spaceProbe}>
-              <Text style={styles.buttonText}>BACK</Text>
+              source={images.normalButton}>
+              <Text style={styles.buttonText}>Back</Text>
             </ImageBackground>
-          </Link>
-        </Animated.View>
-        <View style={{flexDirection: 'row'}}>
-          <Animated.View style={{transform: [{rotate: spin}]}}>
-            <TouchableOpacity onPress={() => music.toggle()}>
-              <ImageBackground
-                style={styles.button}
-                resizeMode="stretch"
-                source={images.spaceProbe}>
-                <Text style={styles.buttonText}>
-                  {music.isPlaying ? 'MUTE' : 'UNMUTE'}
-                </Text>
-              </ImageBackground>
-            </TouchableOpacity>
-          </Animated.View>
-          <Animated.View style={{transform: [{rotate: oppositeSpin}]}}>
-            <TouchableOpacity
-              onPress={() =>
-                Alert.alert(
-                  'Clear data?',
-                  'This will reset your hi-score',
-                  [
-                    {
-                      text: 'Cancel',
-                      onPress: () => console.log('Cancel Pressed'),
-                      style: 'cancel',
-                    },
-                    {text: 'OK', onPress: clearAllData},
-                  ],
-                  {cancelable: false},
-                )
-              }>
-              <ImageBackground
-                style={styles.button}
-                resizeMode="stretch"
-                source={images.spaceProbe}>
-                <Text style={styles.buttonText}>CLEAR DATA</Text>
-              </ImageBackground>
-            </TouchableOpacity>
-          </Animated.View>
+          </TouchableOpacity>
         </View>
+
+        <View style={styles.nameStack}>
+          <ImageBackground
+            resizeMode="stretch"
+            source={images.panelHeader}
+            style={styles.headerPanel}>
+            <Text style={styles.headerText}>Settings</Text>
+          </ImageBackground>
+        </View>
+
         <Animated.View style={{transform: [{scale: changeNameScale}]}}>
-          {!!userScore?.name && (
-            <KeyboardAvoidingView behavior="position">
-              <ImageBackground
-                style={styles.nameChange}
-                resizeMode="stretch"
-                source={images.spaceScreen}>
-                <Text style={styles.changeNameText}>Change Name</Text>
-                <TextInput
-                  style={styles.changeNameInput}
-                  defaultValue={userScore?.name || ''}
-                  onChangeText={setName}
-                  onEndEditing={() => updateName(name)}
-                  maxLength={16}
-                  value={name}
-                />
-              </ImageBackground>
-            </KeyboardAvoidingView>
-          )}
+          <KeyboardAvoidingView behavior="position">
+            <ImageBackground
+              style={styles.namePanel}
+              resizeMode="stretch"
+              source={images.panel}>
+              <Text style={styles.panelTitle}>Pilot Name</Text>
+
+              <TextInput
+                style={styles.changeNameInput}
+                defaultValue={userScore?.name || ''}
+                onChangeText={setName}
+                onEndEditing={() => updateName(name)}
+                maxLength={16}
+                value={name}
+                placeholder="Enter name"
+                placeholderTextColor="rgba(255,255,255,0.55)"
+              />
+
+              <View style={styles.nameActionsRow}>
+                <TouchableOpacity onPress={() => music.toggle()}>
+                  <ImageBackground
+                    style={styles.muteButton}
+                    resizeMode="stretch"
+                    source={images.normalButton}>
+                    <Image
+                      source={music.isPlaying ? images.pause : images.play}
+                      style={styles.muteIcon}
+                    />
+                  </ImageBackground>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  onPress={() =>
+                    Alert.alert(
+                      'Clear data?',
+                      'This will reset your hi-score',
+                      [
+                        {text: 'Cancel', style: 'cancel'},
+                        {text: 'OK', onPress: clearAllData},
+                      ],
+                    )
+                  }>
+                  <ImageBackground
+                    style={styles.clearButton}
+                    resizeMode="stretch"
+                    source={images.normalButton}>
+                    <Text style={styles.buttonText}>Clear Data</Text>
+                  </ImageBackground>
+                </TouchableOpacity>
+              </View>
+            </ImageBackground>
+          </KeyboardAvoidingView>
         </Animated.View>
+
         <ImageBackground
-          style={styles.creditDisplay}
+          style={styles.scoreboardPanel}
           resizeMode="stretch"
-          source={images.spaceProbe}>
-          <Text style={styles.buttonText}>Programming:</Text>
-          <Text style={styles.buttonText}>Christian Cotham</Text>
+          source={images.panel}>
+          <Text style={styles.panelTitle}>Leaderboard</Text>
+
+          <View style={styles.scoreboardBody}>
+            <View style={styles.scoreHeaderRow}>
+              <Text style={styles.scoreHeaderMetaText}>RK</Text>
+              <Text style={styles.scoreHeaderNameText}>NAME</Text>
+              <Text style={styles.scoreHeaderMetaText}>SCORE</Text>
+            </View>
+
+            {isFetchingScores && !scores.length ? (
+              <View style={styles.scoreboardLoadingContainer}>
+                <ActivityIndicator color="#FFFFFF" />
+              </View>
+            ) : (
+              <FlatList
+                data={scores}
+                keyExtractor={item => `${item.rk}-${item.score}-${item.name}`}
+                renderItem={({item}) => renderScoreRow(item)}
+                style={styles.scoreboardList}
+                contentContainerStyle={styles.scoreboardListContent}
+                nestedScrollEnabled
+                showsVerticalScrollIndicator={false}
+                onEndReached={pageBelow}
+                onEndReachedThreshold={0.35}
+                onRefresh={pageAbove}
+                refreshing={isPagingAbove}
+                scrollEventThrottle={16}
+                ListEmptyComponent={
+                  <Text style={styles.scoreboardPlaceholderText}>
+                    No leaderboard entries yet
+                  </Text>
+                }
+              />
+            )}
+          </View>
         </ImageBackground>
-      </View>
+      </SafeAreaView>
     </ImageBackground>
   );
 };

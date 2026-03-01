@@ -1,5 +1,5 @@
 import React, {createContext, useContext, useEffect, useState} from 'react';
-import Audio, {useAudioPlayer} from 'expo-audio';
+import {useAudioPlayer} from 'expo-audio';
 import {retrieveData, storeData} from '../utils/asyncData';
 
 type MusicCtx = {isPlaying: boolean; toggle: () => void};

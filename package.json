@@ -20,6 +20,7 @@
     "@react-navigation/native": "^7.0.14",
     "@react-navigation/stack": "^7.1.2",
     "expo": "^53.0.11",
+    "expo-audio": "~0.4.6",
     "expo-blur": "~14.1.5",
     "expo-constants": "~17.1.6",
     "expo-crypto": "~14.1.5",
@@ -28,6 +29,7 @@
     "expo-image": "~2.3.0",
     "expo-linear-gradient": "^14.1.5",
     "expo-linking": "~7.1.5",
+    "expo-navigation-bar": "~4.2.6",
     "expo-router": "~5.1.0",
     "expo-splash-screen": "~0.30.9",
     "expo-status-bar": "~2.2.3",
@@ -39,13 +41,12 @@
     "react-native": "0.79.3",
     "react-native-bootsplash": "^6.3.3",
     "react-native-gesture-handler": "~2.24.0",
+    "react-native-google-mobile-ads": "^15.8.1",
     "react-native-reanimated": "~3.17.4",
     "react-native-safe-area-context": "5.4.0",
     "react-native-screens": "~4.11.1",
     "react-native-web": "^0.20.0",
-    "react-native-webview": "13.13.5",
-    "expo-navigation-bar": "~4.2.6",
-    "expo-audio": "~0.4.6"
+    "react-native-webview": "13.13.5"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
@@ -57,5 +58,6 @@
     "react-test-renderer": "~19.0.0",
     "typescript": "^5.3.3"
   },
-  "private": true
+  "private": true,
+  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
 }

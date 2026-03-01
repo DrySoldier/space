@@ -28,14 +28,15 @@ const ThrownAway = ({side}: {side: number}) => {
   });
 
   const opacityInterpolate = opacity.interpolate({
-    inputRange: [0.8, 1],
-    outputRange: [0.99, 1],
+    inputRange: [0, .0001, 1],
+    outputRange: [0, 1, 1],
   });
 
   useEffect(() => {
     Animated.timing(opacity, {
       toValue: 1,
       duration: 750,
+      delay: 25,
       useNativeDriver: true,
     }).start();
   }, []);

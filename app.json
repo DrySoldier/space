@@ -27,6 +27,13 @@
     "plugins": [
       "expo-router",
       [
+        "react-native-google-mobile-ads",
+        {
+          "iosAppId": "ca-app-pub-7460988456290280~3647376245",
+          "androidAppId": "ca-app-pub-7460988456290280~4963106157"
+        }
+      ],
+      [
         "expo-splash-screen",
         {
           "image": "./assets/bootsplash_logo.png",
@@ -56,5 +63,9 @@
         "projectId": "c13eed24-e36e-45a6-a491-c44549c34266"
       }
     }
+  },
+  "react-native-google-mobile-ads": {
+    "ios_app_id": "ca-app-pub-7460988456290280~3647376245",
+    "android_app_id": "ca-app-pub-7460988456290280~4963106157"
   }
 }
