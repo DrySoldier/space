@@ -228,7 +228,12 @@ const GameOverModal = ({
           )}
           <Text style={styles.scoreValue}>{score}</Text>
 
-          <GameOverModalScoreboard scores={scores} isLoading={isSavingScore} />
+          <GameOverModalScoreboard
+            scores={scores}
+            isLoading={isSavingScore}
+            score={score}
+            personalBest={hiScore}
+          />
         </ImageBackground>
         <View style={styles.ctaContainer}>
           <View>

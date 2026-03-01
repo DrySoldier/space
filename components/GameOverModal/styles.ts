@@ -102,6 +102,15 @@ const styles = StyleSheet.create({
     gap: ms(8),
     marginTop: ms(6),
   },
+  rankHintText: {
+    color: '#FFE15A',
+    fontFamily: 'Pixellari',
+    fontSize: ms(11),
+    textAlign: 'center',
+    textTransform: 'uppercase',
+    letterSpacing: 0.4,
+    paddingHorizontal: ms(8),
+  },
   scoreboardSnippetCard: {
     width: '92%',
     borderWidth: 1,
