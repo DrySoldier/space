@@ -14,6 +14,13 @@ const images = {
   pause: require('../assets/newAssets/pause.png'),
   play: require('../assets/newAssets/play.png'),
   spaceScreen: require('../assets/newAssets/space-screen.png'),
+  buttonNormal: require('../assets/newAssets/button_normal.png'),
+  buttonHover: require('../assets/newAssets/button_hover.png'),
+  buttonClicked: require('../assets/newAssets/button_clicked.png'),
+  panel: require('../assets/newAssets/panel.png'),
+  titlePanel: require('../assets/newAssets/title_panel.png'),
+  dividerHorizontal: require('../assets/newAssets/divider_horizontal.png'),
+  scrollbarHorizontal: require('../assets/newAssets/scrollbar_horizontal.png'),
   obstacleTileLeft: require('../assets/newAssets/elevator-tile-obstacle-left.png'),
   obstacleTileRight: require('../assets/newAssets/elevator-tile-obstacle-right.png'),
 };

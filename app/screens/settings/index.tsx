@@ -16,15 +16,15 @@ import {removeData, storeData} from '../../../utils/asyncData';
 import {Link, useRouter} from 'expo-router';
 import {randInt} from '../../../utils';
 import styles from './styles';
-import { useRewardedAd } from '../../../hooks/useRewardedAd';
+import {useRewardedAd} from '../../../hooks/useRewardedAd';
 import {useScoreboard} from '../../../hooks/useScoreboard';
-import { useMusic } from '../../../context/MusicProvider';
+import {useMusic} from '../../../context/MusicProvider';
 
 const Settings = () => {
   const router = useRouter();
   const {getScoreByUUID, updateName, userScore} = useScoreboard();
   const music = useMusic();
-  const { isLoaded, isLoading, load, show } = useRewardedAd();
+  const {isLoaded, isLoading, load, show} = useRewardedAd();
 
   const [name, setName] = useState(userScore?.name || '');
 
@@ -178,34 +178,6 @@ const Settings = () => {
             </TouchableOpacity>
           </Animated.View>
         </View>
-        {/* Rewarded Ad test button (dev/testing aid) */}
-        <Animated.View style={{transform: [{rotate: spin}]}}>
-          <TouchableOpacity
-            onPress={async () => {
-              if (!isLoaded) {
-                load();
-                return;
-              }
-              const rewarded = await show();
-              Alert.alert(
-                'Ad Reward',
-                rewarded
-                  ? 'Reward earned (continue allowed).'
-                  : 'Ad canceled/failed.'
-              );
-            }}
-            disabled={!isLoaded && isLoading}
-          >
-            <ImageBackground
-              style={styles.button}
-              resizeMode="stretch"
-              source={images.spaceProbe}>
-              <Text style={styles.buttonText}>
-                {isLoaded ? 'SHOW REWARDED AD' : isLoading ? 'LOADING…' : 'LOAD AD'}
-              </Text>
-            </ImageBackground>
-          </TouchableOpacity>
-        </Animated.View>
         <Animated.View style={{transform: [{scale: changeNameScale}]}}>
           {!!userScore?.name && (
             <KeyboardAvoidingView behavior="position">

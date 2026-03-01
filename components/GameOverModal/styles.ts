@@ -2,83 +2,97 @@ import { StyleSheet } from 'react-native';
 import { height, moderateScale as ms, width } from '../../constants/scaling';
 
 const styles = StyleSheet.create({
-  mainSpaceProbe: {
-    height: ms(120),
-    width: ms(220),
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: ms(12)
-  },
-  spaceProbe: {
-    height: ms(100),
-    width: ms(150),
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: ms(40),
-  },
-  hiScoreSpaceProbe: {
-    height: height * .4,
-    width: width * 1.4,
-    justifyContent: 'flex-start',
-    alignItems: 'center',
-    paddingTop: ms(26),
-    paddingBottom: height * .065
-  },
   modalContainer: {
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     alignItems: 'center',
-    height: '80%',
+    height: '100%',
     width: '100%',
-    marginTop: ms(80)
+    gap: ms(20),
   },
-  text: {
-    color: 'white',
-    fontFamily: 'Pixellari',
-    fontSize: ms(16),
-    textAlign: 'center',
+  headerPanel: {
+    width: width * 1.2,
+    padding: ms(20),
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: ms(6),
   },
   headerText: {
     color: 'white',
     fontFamily: 'Pixellari',
     textAlign: 'center',
-    fontSize: ms(42),
+    fontSize: ms(36),
   },
-  hiscoreText: {
+  subheaderText: {
     color: 'white',
     fontFamily: 'Pixellari',
     textAlign: 'center',
-    fontSize: ms(42),
+    fontSize: ms(16),
+    opacity: 0.9,
   },
-  scoreText: {
+  scoreCard: {
+    width: width * 1.1,
+    paddingVertical: ms(18),
+    paddingHorizontal: ms(24),
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: ms(8),
+  },
+  scoreValue: {
     color: 'white',
     fontFamily: 'Pixellari',
     textAlign: 'center',
-    fontSize: ms(64),
+    fontSize: ms(52),
   },
-  buttonContainer: {
+  bestValue: {
+    color: 'white',
+    fontFamily: 'Pixellari',
+    textAlign: 'center',
+    fontSize: ms(20),
+    opacity: 0.85,
+  },
+  ctaContainer: {
     width: '100%',
-    flexDirection: 'row',
-    justifyContent: 'space-evenly',
+    alignItems: 'center',
+    gap: ms(14),
+    paddingBottom: ms(10),
   },
-  hiScoreContainer: {
-    flex: 1,
-    height: height * .3,
+  ctaButton: {
+    width: width * 0.42,
+    height: ms(54),
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: ms(50),
+    paddingHorizontal: ms(12),
+  },
+  primaryCta: {
+    width: width * 0.7,
+    height: ms(60),
+  },
+  secondaryRow: {
+    flexDirection: 'row',
+    width: width * 0.85,
+    justifyContent: 'space-between',
+  },
+  placeholderButton: {
+    opacity: 0.4,
+  },
+  placeholderText: {
+    color: 'white',
+    fontFamily: 'Pixellari',
+    fontSize: ms(16),
+    textAlign: 'center',
+    opacity: 0.6,
+  },
+  ctaText: {
+    color: 'white',
+    fontFamily: 'Pixellari',
+    fontSize: ms(18),
+    textAlign: 'center',
   },
   personalBestText: {
     color: 'white',
     fontFamily: 'Pixellari',
-    fontSize: ms(16),
-
+    fontSize: ms(14),
   },
-  scoreItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: width * 0.75,
-    paddingHorizontal: ms(12),
-  }
 });
 
 export default styles;

@@ -67,7 +67,7 @@ const Player = ({currentSide, setCurrentSide, setDisablePress, gameOver, step, p
   }, [step]);
 
   useEffect(() => {
-    if (gameOver) {
+    if (gameOver || pendingDeath) {
       Animated.timing(astroSpin, {
         toValue: 1,
         duration: 1000,
@@ -77,7 +77,7 @@ const Player = ({currentSide, setCurrentSide, setDisablePress, gameOver, step, p
       setPlayerModel(defaultPosition);
       animateAstronautIn();
     }
-  }, [gameOver]);
+  }, [gameOver, pendingDeath, resumeSeq]);
 
   const animateAstronautIn = () => {
     setDisablePress(true);

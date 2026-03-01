@@ -14,7 +14,6 @@ import {
   ThrownAway,
   Branch,
   GameOverModal,
-  ContinueModal,
   OxygenMeter,
   Background,
 } from '@/components';
@@ -63,6 +62,7 @@ const Game = () => {
   const [gameOver, setGameOver] = useState(false);
   const [pendingDeath, setPendingDeath] = useState(false);
   const [runContinuesUsed, setRunContinuesUsed] = useState(0);
+  const [resumeSeq, setResumeSeq] = useState(0);
 
   // animation for the astronaut
   const [step, setStep] = useState(false);
@@ -107,6 +107,8 @@ const Game = () => {
     }, 1000);
 
     setGameOver(false);
+    setPaused(false);
+    setPendingDeath(false);
     refill(31);
     setThrownAwayArr([]);
     setBranches(defaultBranches);
@@ -116,6 +118,8 @@ const Game = () => {
 
   const endGame = () => {
     setGameOver(true);
+    setPaused(false);
+    setPendingDeath(false);
 
     clearInterval(timerInterval.current);
     timerInterval.current = undefined;
@@ -247,6 +251,7 @@ const Game = () => {
     suppressNextAutoPauseRef.current = true;
     setGameOver(false);
     setPendingDeath(false);
+    setResumeSeq(prev => prev + 1);
   };
 
   const togglePaused = () => {
@@ -300,6 +305,8 @@ const Game = () => {
         currentSide={currentSide}
         setDisablePress={setAnimatingIn}
         step={step}
+        pendingDeath={pendingDeath}
+        resumeSeq={resumeSeq}
       />
 
       <View style={styles.headerContainer}>
@@ -322,14 +329,13 @@ const Game = () => {
         </View>
       )}
 
-      <ContinueModal
-        visible={pendingDeath && runContinuesUsed < 1}
+      <GameOverModal
+        canContinue={pendingDeath && runContinuesUsed < 1}
         onContinue={continueRun}
-        onEndRun={() => {
-          endGame();
-        }}
+        visible={pendingDeath || gameOver}
+        score={score}
+        resetGame={resetGame}
       />
-      <GameOverModal visible={gameOver} score={score} resetGame={resetGame} />
     </View>
   );
 };
