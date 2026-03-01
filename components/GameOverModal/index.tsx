@@ -6,12 +6,12 @@ import {
   Modal,
   Animated,
   SafeAreaView,
-  Image,
 } from 'react-native';
 import {ImageBackground} from 'expo-image';
-import {Link} from 'expo-router';
+import {useRouter} from 'expo-router';
 import {useScoreboard} from '@/hooks/useScoreboard';
 import {useRewardedAd} from '@/hooks/useRewardedAd';
+import GameOverModalScoreboard from './Scoreboard';
 import styles from './styles';
 import {images} from '../../constants/images';
 import {retrieveData, storeData} from '../../utils/asyncData';
@@ -21,8 +21,8 @@ interface IGameOverModal {
   score: number;
   resetGame: () => void;
   /**
-   * If true, show the Watch Ad CTA and do not persist the score yet.
-   * When false, behave like a final game-over screen.
+   * If true, show the Watch Ad CTA.
+   * Score persistence is handled on death/modal open.
    */
   canContinue?: boolean;
   onContinue?: () => void;
@@ -35,42 +35,48 @@ const GameOverModal = ({
   canContinue = false,
   onContinue,
 }: IGameOverModal) => {
+  const router = useRouter();
   const [hiScore, setHiScore] = useState(0);
-  const {addNewScore} = useScoreboard();
+  const {scores, addNewScore} = useScoreboard();
   const {isLoaded, isLoading, load, show} = useRewardedAd();
+  const [isActionLocked, setIsActionLocked] = useState(false);
+  const [isSavingScore, setIsSavingScore] = useState(false);
 
   const hasPersistedScoreRef = useRef(false);
-
-  const buttonDegree = useRef(new Animated.Value(0)).current;
+  const saveScorePromiseRef = useRef<Promise<boolean> | null>(null);
+  const actionLockRef = useRef(false);
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
-  const spin = buttonDegree.interpolate({
-    inputRange: [0, 1],
-    outputRange: ['-10deg', '10deg'],
-  });
-
-  const oppositeSpin = buttonDegree.interpolate({
-    inputRange: [0, 1],
-    outputRange: ['10deg', '-10deg'],
-  });
-
-  const hiScoreBeat = !canContinue && score >= hiScore;
-
-  const startButtonRotateAnimation = () => {
-    const randomDegree = Math.random();
-
-    Animated.timing(buttonDegree, {
-      toValue: randomDegree,
-      duration: 5000,
-      useNativeDriver: true,
-    }).start(() => startButtonRotateAnimation());
-  };
+  const hiScoreBeat = score >= hiScore;
 
   const loadHiScore = async () => {
     const stored = await retrieveData('HISCORE');
     const parsedHiScore = Number(stored) || 0;
     setHiScore(parsedHiScore);
     return parsedHiScore;
+  };
+
+  const unlockActions = () => {
+    actionLockRef.current = false;
+    setIsActionLocked(false);
+  };
+
+  const runLockedAction = async (
+    action: () => Promise<boolean | void> | boolean | void,
+  ) => {
+    if (actionLockRef.current) return;
+
+    actionLockRef.current = true;
+    setIsActionLocked(true);
+
+    try {
+      const shouldStayLocked = await action();
+      if (!shouldStayLocked) {
+        unlockActions();
+      }
+    } catch (error) {
+      unlockActions();
+    }
   };
 
   useEffect(() => {
@@ -82,48 +88,94 @@ const GameOverModal = ({
   useEffect(() => {
     if (visible) {
       hasPersistedScoreRef.current = false;
+      saveScorePromiseRef.current = null;
+      setIsSavingScore(false);
+      unlockActions();
     }
   }, [visible]);
 
   const onPressContinue = async () => {
-    if (!onContinue) return;
-    if (!isLoaded) {
-      load();
-      return;
-    }
-    const rewarded = await show();
-    if (rewarded) {
-      onContinue();
-    }
+    await runLockedAction(async () => {
+      // Ensure this death is posted even when player chooses to continue.
+      const didSave = await saveScore();
+      if (!didSave) return false;
+
+      if (!onContinue) return false;
+
+      if (!isLoaded) {
+        load();
+        return false;
+      }
+
+      const rewarded = await show();
+      if (rewarded) {
+        onContinue();
+        return true;
+      }
+
+      return false;
+    });
   };
 
-  const saveScore = async () => {
-    const parsedHiScore = await loadHiScore();
+  const saveScore = async (): Promise<boolean> => {
+    if (saveScorePromiseRef.current) return saveScorePromiseRef.current;
+    if (hasPersistedScoreRef.current) return true;
 
-    if (score > parsedHiScore) {
-      storeData('HISCORE', score);
-      setHiScore(score);
-    }
-    addNewScore(score);
-    hasPersistedScoreRef.current = true;
+    const savePromise = (async () => {
+      // Flip immediately to prevent duplicate concurrent submissions.
+      hasPersistedScoreRef.current = true;
+      setIsSavingScore(true);
+
+      try {
+        const parsedHiScore = await loadHiScore();
+
+        if (score > parsedHiScore) {
+          storeData('HISCORE', score);
+          setHiScore(score);
+        }
+        await addNewScore(score);
+        return true;
+      } catch (error) {
+        // Allow a retry from another path (restart/main menu/continue) if save fails.
+        hasPersistedScoreRef.current = false;
+        return false;
+      } finally {
+        setIsSavingScore(false);
+      }
+    })();
+
+    saveScorePromiseRef.current = savePromise;
+    const didSave = await savePromise;
+    saveScorePromiseRef.current = null;
+
+    return didSave;
   };
 
   const handleRestart = async () => {
-    // If this is the pre-continue state, persist the score before resetting
-    if (canContinue) {
-      await saveScore();
-    }
-    resetGame();
+    await runLockedAction(async () => {
+      // Always persist current death before starting a new run.
+      const didSave = await saveScore();
+      if (!didSave) return false;
+
+      resetGame();
+      return true;
+    });
+  };
+
+  const handleMainMenu = async () => {
+    await runLockedAction(async () => {
+      // Always persist current death before leaving game screen.
+      const didSave = await saveScore();
+      if (!didSave) return false;
+
+      router.push('..');
+      return true;
+    });
   };
 
   useEffect(() => {
-    startButtonRotateAnimation();
-  }, []);
-
-  useEffect(() => {
     if (visible) {
-      loadHiScore();
-      if (!canContinue && !hasPersistedScoreRef.current) {
+      if (!hasPersistedScoreRef.current) {
         saveScore();
       }
       if (hiScoreBeat) {
@@ -149,68 +201,71 @@ const GameOverModal = ({
     } else {
       fadeAnim.stopAnimation();
     }
-  }, [visible, canContinue, hiScoreBeat]);
+  }, [visible, hiScoreBeat]);
 
   return (
     <Modal
-      animationType="slide"
+      animationType="fade"
       transparent={true}
       visible={visible}
       onRequestClose={resetGame}>
       <SafeAreaView style={styles.modalContainer}>
         <ImageBackground
           resizeMode={'stretch'}
-          source={images.panel}
+          source={images.panelHeader}
           style={styles.headerPanel}>
-          <Text style={styles.headerText}>Gravity Won</Text>
-          <Image
-            source={images.dividerHorizontal}
-            resizeMode="stretch"
-            style={{width: '70%'}}
-          />
+          <Text style={styles.headerText}>Game Over</Text>
+        </ImageBackground>
+        <ImageBackground
+          resizeMode={'stretch'}
+          source={images.panel}
+          style={styles.scoreCard}>
           {hiScoreBeat && (
             <Animated.Text
               style={[styles.personalBestText, {opacity: fadeAnim}]}>
-              New Personal Best!
+              New Personal Best!!!
             </Animated.Text>
           )}
           <Text style={styles.scoreValue}>{score}</Text>
-          <Text style={styles.bestValue}>Best: {hiScore}</Text>
+
+          <GameOverModalScoreboard scores={scores} isLoading={isSavingScore} />
         </ImageBackground>
         <View style={styles.ctaContainer}>
-          <Animated.View style={{transform: []}}>
-            <TouchableOpacity onPress={handleRestart}>
+          <View>
+            <TouchableOpacity onPress={handleRestart} disabled={isActionLocked}>
               <ImageBackground
                 resizeMode={'stretch'}
-                source={images.buttonNormal}
+                source={images.normalButton}
                 style={[styles.ctaButton, styles.primaryCta]}>
                 <Text style={styles.ctaText}>Restart</Text>
               </ImageBackground>
             </TouchableOpacity>
-          </Animated.View>
+          </View>
           <View style={styles.secondaryRow}>
-            <Animated.View style={{transform: []}}>
-              <Link href="..">
+            <View>
+              <TouchableOpacity
+                onPress={handleMainMenu}
+                disabled={isActionLocked}>
                 <ImageBackground
                   resizeMode={'stretch'}
-                  source={images.buttonNormal}
+                  source={images.normalButton}
                   style={styles.ctaButton}>
                   <Text style={styles.ctaText}>Main Menu</Text>
                 </ImageBackground>
-              </Link>
-            </Animated.View>
-            <Animated.View style={{transform: []}}>
+              </TouchableOpacity>
+            </View>
+            <View>
               {canContinue ? (
                 <TouchableOpacity
                   onPress={onPressContinue}
-                  disabled={!isLoaded && isLoading}>
+                  disabled={isActionLocked || (!isLoaded && isLoading)}>
                   <ImageBackground
                     resizeMode={'stretch'}
-                    source={images.buttonNormal}
+                    source={images.adButton}
                     style={styles.ctaButton}>
                     <Text style={styles.ctaText}>
                       {isLoaded
-                        ? 'Watch Ad'
+                        ? 'Continue'
                         : isLoading
                           ? 'Loading…'
                           : 'Load Ad'}
@@ -220,12 +275,12 @@ const GameOverModal = ({
               ) : (
                 <ImageBackground
                   resizeMode={'stretch'}
-                  source={images.buttonNormal}
+                  source={images.adButton}
                   style={[styles.ctaButton, styles.placeholderButton]}>
-                  <Text style={styles.placeholderText}>No Ad</Text>
+                  <Text style={styles.placeholderText}>Claimed</Text>
                 </ImageBackground>
               )}
-            </Animated.View>
+            </View>
           </View>
         </View>
       </SafeAreaView>

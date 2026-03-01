@@ -16,7 +16,6 @@ import {removeData, storeData} from '../../../utils/asyncData';
 import {Link, useRouter} from 'expo-router';
 import {randInt} from '../../../utils';
 import styles from './styles';
-import {useRewardedAd} from '../../../hooks/useRewardedAd';
 import {useScoreboard} from '../../../hooks/useScoreboard';
 import {useMusic} from '../../../context/MusicProvider';
 
@@ -24,7 +23,6 @@ const Settings = () => {
   const router = useRouter();
   const {getScoreByUUID, updateName, userScore} = useScoreboard();
   const music = useMusic();
-  const {isLoaded, isLoading, load, show} = useRewardedAd();
 
   const [name, setName] = useState(userScore?.name || '');
 
