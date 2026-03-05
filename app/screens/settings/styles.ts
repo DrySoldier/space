@@ -183,14 +183,14 @@ const styles = StyleSheet.create({
   scoreMetaText: {
     color: 'white',
     fontFamily: 'Pixellari',
-    fontSize: ms(12),
+    fontSize: ms(20),
     minWidth: ms(36),
     textAlign: 'center',
   },
   scoreNameText: {
     color: 'white',
     fontFamily: 'Pixellari',
-    fontSize: ms(12),
+    fontSize: ms(20),
     flex: 1,
     textAlign: 'center',
   },

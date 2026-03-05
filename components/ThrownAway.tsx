@@ -1,4 +1,4 @@
-import React, {useEffect, useRef} from 'react';
+import React, {memo, useEffect, useRef} from 'react';
 import {StyleSheet, View, Animated} from 'react-native';
 import {randInt} from '../utils';
 import Branch from './Branch';
@@ -6,10 +6,12 @@ import {BRANCH_HW} from './Branch/styles';
 
 const ThrownAway = ({side}: {side: number}) => {
   const opacity = useRef(new Animated.Value(0)).current;
+  const spinTargetRef = useRef(randInt(-60, 60));
+  const xTargetRef = useRef(randInt(-500, 500));
 
   const spin = opacity.interpolate({
     inputRange: [0, 1],
-    outputRange: ['0deg', `${randInt(-60, 60)}deg`],
+    outputRange: ['0deg', `${spinTargetRef.current}deg`],
   });
 
   const marginTop = opacity.interpolate({
@@ -19,7 +21,7 @@ const ThrownAway = ({side}: {side: number}) => {
 
   const marginLeft = opacity.interpolate({
     inputRange: [0, 1],
-    outputRange: [0, randInt(-500, 500)],
+    outputRange: [0, xTargetRef.current],
   });
 
   const scale = opacity.interpolate({
@@ -28,7 +30,7 @@ const ThrownAway = ({side}: {side: number}) => {
   });
 
   const opacityInterpolate = opacity.interpolate({
-    inputRange: [0, .0001, 1],
+    inputRange: [0, 0.0001, 1],
     outputRange: [0, 1, 1],
   });
 
@@ -70,7 +72,7 @@ const ThrownAway = ({side}: {side: number}) => {
   );
 };
 
-export default ThrownAway;
+export default memo(ThrownAway);
 
 const styles = StyleSheet.create({
   thrownAwayBranch: {

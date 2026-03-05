@@ -1,5 +1,5 @@
 import {View, Animated} from 'react-native';
-import React, {SetStateAction, useEffect, useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {images} from '@/constants';
 import styles from './style';
 import {randInt} from '@/utils';
@@ -10,15 +10,14 @@ type TSide = 'left' | 'right';
 
 interface IPlayer {
   currentSide: TSide;
-  setCurrentSide: React.Dispatch<SetStateAction<TSide>>;
-  setDisablePress: React.Dispatch<SetStateAction<boolean>>;
+  setDisablePress: React.Dispatch<React.SetStateAction<boolean>>;
   gameOver: boolean;
   step: boolean;
   pendingDeath?: boolean;
   resumeSeq?: number;
 }
 
-const Player = ({currentSide, setCurrentSide, setDisablePress, gameOver, step, pendingDeath = false, resumeSeq = 0}: IPlayer) => {
+const Player = ({currentSide, setDisablePress, gameOver, step, pendingDeath = false, resumeSeq = 0}: IPlayer) => {
   // current player model TODO: Set up animated sprite
   const [playerModel, setPlayerModel] = useState(defaultPosition);
 
@@ -97,7 +96,6 @@ const Player = ({currentSide, setCurrentSide, setDisablePress, gameOver, step, p
       }),
     ]).start(() => {
       setDisablePress(false);
-      setCurrentSide('left');
     });
   };
 

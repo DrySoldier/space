@@ -15,13 +15,15 @@ import {
   SafeAreaView,
 } from 'react-native';
 import * as Crypto from 'expo-crypto';
+import {useRouter} from 'expo-router';
 import {images} from '../../../constants';
 import {removeData, storeData} from '../../../utils/asyncData';
-import {useRouter} from 'expo-router';
 import {randInt} from '../../../utils';
-import styles from './styles';
 import {useScoreboard} from '../../../hooks/useScoreboard';
 import {useMusic} from '../../../context/MusicProvider';
+import {IScore} from '../../../hooks/useScoreboard';
+
+import styles from './styles';
 
 const Settings = () => {
   const router = useRouter();
@@ -44,6 +46,8 @@ const Settings = () => {
 
   const [isPagingAbove, setIsPagingAbove] = useState(false);
   const [isPagingBelow, setIsPagingBelow] = useState(false);
+  const scoreboardListRef = useRef<FlatList<IScore> | null>(null);
+  const hasAutoScrolledToPlayerRef = useRef(false);
 
   const astro360 = astroRotate.interpolate({
     inputRange: [0, 1],
@@ -128,6 +132,22 @@ const Settings = () => {
       setName(userScore.name);
     }
   }, [userScore]);
+
+  useEffect(() => {
+    if (!scores.length || hasAutoScrolledToPlayerRef.current) return;
+
+    const playerRowIndex = scores.findIndex(row => !!row.player);
+    if (playerRowIndex < 0) return;
+
+    requestAnimationFrame(() => {
+      scoreboardListRef.current?.scrollToIndex({
+        index: playerRowIndex,
+        animated: true,
+        viewPosition: 0.5,
+      });
+      hasAutoScrolledToPlayerRef.current = true;
+    });
+  }, [scores]);
 
   const renderScoreRow = (item: any) => (
     <View style={styles.scoreRow}>
@@ -257,6 +277,7 @@ const Settings = () => {
               </View>
             ) : (
               <FlatList
+                ref={scoreboardListRef}
                 data={scores}
                 keyExtractor={item => `${item.rk}-${item.score}-${item.name}`}
                 renderItem={({item}) => renderScoreRow(item)}
@@ -266,6 +287,20 @@ const Settings = () => {
                 showsVerticalScrollIndicator={false}
                 onEndReached={pageBelow}
                 onEndReachedThreshold={0.35}
+                onScrollToIndexFailed={info => {
+                  scoreboardListRef.current?.scrollToOffset({
+                    offset: info.averageItemLength * info.index,
+                    animated: false,
+                  });
+
+                  requestAnimationFrame(() => {
+                    scoreboardListRef.current?.scrollToIndex({
+                      index: info.index,
+                      animated: true,
+                      viewPosition: 0.5,
+                    });
+                  });
+                }}
                 onRefresh={pageAbove}
                 refreshing={isPagingAbove}
                 scrollEventThrottle={16}

@@ -4,7 +4,6 @@ import {
   View,
   TouchableOpacity,
   Modal,
-  Animated,
   SafeAreaView,
 } from 'react-native';
 import {ImageBackground} from 'expo-image';
@@ -45,7 +44,6 @@ const GameOverModal = ({
   const hasPersistedScoreRef = useRef(false);
   const saveScorePromiseRef = useRef<Promise<boolean> | null>(null);
   const actionLockRef = useRef(false);
-  const fadeAnim = useRef(new Animated.Value(0)).current;
 
   const hiScoreBeat = score >= hiScore;
 
@@ -174,34 +172,10 @@ const GameOverModal = ({
   };
 
   useEffect(() => {
-    if (visible) {
-      if (!hasPersistedScoreRef.current) {
-        saveScore();
-      }
-      if (hiScoreBeat) {
-        fadeAnim.stopAnimation();
-        fadeAnim.setValue(0);
-        Animated.loop(
-          Animated.sequence([
-            Animated.timing(fadeAnim, {
-              toValue: 1,
-              duration: 1000,
-              useNativeDriver: true,
-            }),
-            Animated.timing(fadeAnim, {
-              toValue: 0,
-              duration: 1000,
-              useNativeDriver: true,
-            }),
-          ]),
-        ).start();
-      } else {
-        fadeAnim.stopAnimation();
-      }
-    } else {
-      fadeAnim.stopAnimation();
+    if (visible && !hasPersistedScoreRef.current) {
+      saveScore();
     }
-  }, [visible, hiScoreBeat]);
+  }, [visible]);
 
   return (
     <Modal
@@ -220,12 +194,6 @@ const GameOverModal = ({
           resizeMode={'stretch'}
           source={images.panel}
           style={styles.scoreCard}>
-          {hiScoreBeat && (
-            <Animated.Text
-              style={[styles.personalBestText, {opacity: fadeAnim}]}>
-              New Personal Best!!!
-            </Animated.Text>
-          )}
           <Text style={styles.scoreValue}>{score}</Text>
 
           <GameOverModalScoreboard
@@ -233,6 +201,7 @@ const GameOverModal = ({
             isLoading={isSavingScore}
             score={score}
             personalBest={hiScore}
+            isPersonalBest={hiScoreBeat}
           />
         </ImageBackground>
         <View style={styles.ctaContainer}>

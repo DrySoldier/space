@@ -91,11 +91,6 @@ const styles = StyleSheet.create({
     fontSize: ms(18),
     textAlign: 'center',
   },
-  personalBestText: {
-    color: 'white',
-    fontFamily: 'Pixellari',
-    fontSize: ms(14),
-  },
   scoreboardSection: {
     width: '100%',
     alignItems: 'center',

@@ -8,6 +8,7 @@ interface IGameOverModalScoreboard {
   isLoading: boolean;
   score: number;
   personalBest: number;
+  isPersonalBest?: boolean;
 }
 
 const GameOverModalScoreboard = ({
@@ -15,6 +16,7 @@ const GameOverModalScoreboard = ({
   isLoading,
   score,
   personalBest,
+  isPersonalBest = false,
 }: IGameOverModalScoreboard) => {
   const rankHintOpacity = useRef(new Animated.Value(1)).current;
 
@@ -30,6 +32,7 @@ const GameOverModalScoreboard = ({
 
   const rankHintText = (() => {
     if (isLoading) return null;
+    if (isPersonalBest) return 'New Personal Best!!!';
     if (!scores.length) return null;
 
     const pointsToPersonalBest = personalBest - score;

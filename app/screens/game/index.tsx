@@ -1,4 +1,4 @@
-import React, {useState, createRef, useEffect, useRef} from 'react';
+import React, {createRef, useEffect, useReducer, useRef, useState} from 'react';
 import {
   Text,
   View,
@@ -6,7 +6,6 @@ import {
   Pressable,
   Platform,
   AppState,
-  AppStateStatus,
 } from 'react-native';
 import {Image} from 'expo-image';
 import * as Crypto from 'expo-crypto';
@@ -18,274 +17,117 @@ import {
   Background,
 } from '@/components';
 import {images} from '@/constants';
-import {randInt} from '@/utils';
+import {createInitialGameState, gameReducer, Side} from '@/state/game';
+import type {TBranchRef} from '@/components/Branch';
 
 import styles from './styles';
 import Player from '@/components/Player';
-import {useOxygen} from '@/hooks/useOxygen';
-import {getLevel} from '../../../utils/level';
-
-type TSide = 'left' | 'right';
-type TBranch = {type: number; id: number; ref: React.RefObject<any>};
-
-const defaultBranches = [
-  {type: 0, id: 8, ref: createRef()},
-  {type: 0, id: 7, ref: createRef()},
-  {type: 0, id: 6, ref: createRef()},
-  {type: 0, id: 5, ref: createRef()},
-  {type: 0, id: 4, ref: createRef()},
-  {type: 0, id: 3, ref: createRef()},
-  {type: 0, id: 2, ref: createRef()},
-  {type: 0, id: 1, ref: createRef()},
-  {type: 0, id: 0, ref: createRef()},
-];
-let oxygenChance = 0;
-
-// Bump up the chance by 1 for every 7500, defaulting to 6 at 0
-const getOxygenChance = (score: number) =>
-  Math.min(6 + Math.floor(score / 7500), 16);
 
 const Game = () => {
-  // Current side player is on
-  const [currentSide, setCurrentSide] = useState<TSide>('left');
-  // All the branch views
-  // 0 - no branch, 1 - left side branch, 2 - right side branch
-  // 3 - left side oxygen tank, 4 - right side oxygen tank
-  const [branches, setBranches] = useState<TBranch[]>(defaultBranches);
-  // Array to store thrown away squares
-  const [thrownAwayArr, setThrownAwayArr] = useState<React.JSX.Element[]>([]);
-  const [paused, setPaused] = useState(false);
-
+  const [state, dispatch] = useReducer(
+    gameReducer,
+    undefined,
+    createInitialGameState,
+  );
   const [animatingIn, setAnimatingIn] = useState(false);
+  const branchRefs = useRef<Record<number, React.RefObject<TBranchRef | null>>>(
+    {},
+  );
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const [score, setScore] = useState(0);
-  const [gameOver, setGameOver] = useState(false);
-  const [pendingDeath, setPendingDeath] = useState(false);
-  const [runContinuesUsed, setRunContinuesUsed] = useState(0);
-  const [resumeSeq, setResumeSeq] = useState(0);
+  const paused = state.status === 'paused';
+  const pendingDeath = state.status === 'pending_death';
+  const gameOver = state.status === 'game_over';
 
-  // animation for the astronaut
-  const [step, setStep] = useState(false);
-  const [backgrounded, setAppBackgrounded] = useState<AppStateStatus>('active');
-  const suppressNextAutoPauseRef = useRef(false);
+  const getBranchRef = (id: number): React.RefObject<TBranchRef | null> => {
+    if (!branchRefs.current[id]) {
+      branchRefs.current[id] = createRef<TBranchRef>();
+    }
 
-  const level = getLevel(score);
-
-  let timerInterval = useRef<undefined | number>(undefined);
+    return branchRefs.current[id];
+  };
 
   useEffect(() => {
-    const listener = AppState.addEventListener('change', state =>
-      setAppBackgrounded(state),
-    );
+    const listener = AppState.addEventListener('change', nextState => {
+      if (nextState.match(/active/)) {
+        dispatch({type: 'AUTO_PAUSE_ON_ACTIVE'});
+      }
+    });
 
     return () => listener.remove();
   }, []);
 
   useEffect(() => {
-    if (backgrounded.match(/active/) && !gameOver && !!score) {
-      if (suppressNextAutoPauseRef.current) {
-        // Skip the auto-pause once after an ad continue
-        suppressNextAutoPauseRef.current = false;
-      } else {
-        setPaused(() => {
-          clearInterval(timerInterval.current);
-          timerInterval.current = undefined;
-          return true;
-        });
-      }
+    if (state.status !== 'running') {
+      return;
     }
-  }, [backgrounded]);
 
-  const resetGame = () => {
-    timerInterval.current = setInterval(() => {
-      setScore(prevState => {
-        if (prevState > 0) {
-          return prevState - 20;
-        }
-        return 0;
-      });
+    intervalRef.current = setInterval(() => {
+      dispatch({type: 'TICK_1S'});
     }, 1000);
 
-    setGameOver(false);
-    setPaused(false);
-    setPendingDeath(false);
-    refill(31);
-    setThrownAwayArr([]);
-    setBranches(defaultBranches);
-    setScore(0);
-    setRunContinuesUsed(0);
-  };
-
-  const endGame = () => {
-    setGameOver(true);
-    setPaused(false);
-    setPendingDeath(false);
-
-    clearInterval(timerInterval.current);
-    timerInterval.current = undefined;
-  };
-
-  const onOxygenDeplete = () => {
-    if (runContinuesUsed > 0) {
-      endGame();
-    } else {
-      setPaused(true);
-      setPendingDeath(true);
-    }
-  };
-  const {refill, o2} = useOxygen(paused, gameOver, onOxygenDeplete);
-
-  const generateNewBranch = (lastBranch: TBranch): number => {
-    if (
-      (score >= 35_000 && score < 36_000) ||
-      (score >= 60_000 && score < 61_000)
-    ) {
-      return 0;
-    }
-
-    const biasedRand012 = (): 0 | 1 | 2 => {
-      const r = randInt(0, 8);
-      return r === 0 ? 0 : r < 5 ? 1 : 2;
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
     };
+  }, [state.status]);
 
-    let nextBranch: number = biasedRand012();
-    if (level === 3 && nextBranch === 0) nextBranch = randInt(0, 2);
-
-    if (nextBranch === 0 && oxygenChance >= getOxygenChance(score)) {
-      oxygenChance = 0;
-      return 3 + randInt(0, 1);
-    }
-
-    if (level === 2 && lastBranch.type === nextBranch) {
-      nextBranch = nextBranch === 1 ? 2 : 1;
-    } else if (level === 3) {
-      if (oxygenChance > getOxygenChance(score) * 3) {
-        oxygenChance = 0;
-        return 3 + randInt(0, 1);
-      }
-      if (randInt(0, 3)) oxygenChance++;
-      if (lastBranch.type === nextBranch && randInt(0, 1)) {
-        nextBranch = nextBranch === 1 ? 2 : 1;
-      }
-    } else if (lastBranch.type !== 0) {
-      oxygenChance++;
-      nextBranch = 0;
-    }
-
-    return nextBranch;
+  const resetGame = () => {
+    dispatch({type: 'RESET_RUN'});
+    setAnimatingIn(false);
   };
 
-  const handlePress = (side: TSide) => {
-    if (animatingIn || paused || gameOver) return;
+  const handlePress = (side: Side) => {
+    if (animatingIn || state.status !== 'running') {
+      return;
+    }
 
-    setCurrentSide(side);
-    setStep(prevState => !prevState);
-
-    // Handle branch animations
-    const lastBranch = branches[branches.length - 1];
-    const nextBranch = branches[branches.length - 2];
-    const lastGeneratedBranch = branches[0];
-
-    branches.forEach(b => {
-      b.ref?.current?.animateDown(() => {
-        if (b.id === lastBranch.id) {
-          requestAnimationFrame(() =>
-            setBranches(prevState => {
-              const copy = [...prevState];
-              copy.pop();
-              copy.unshift({
-                type: generateNewBranch(lastGeneratedBranch),
-                id: prevState[0].id + 1,
-                ref: createRef(),
-              });
-              return copy;
-            }),
-          );
-        }
-      });
+    dispatch({
+      type: 'CHOP_RESOLVE',
+      side,
+      thrownAwayId: Crypto.randomUUID(),
     });
 
-    setThrownAwayArr([
-      ...thrownAwayArr,
-      <ThrownAway side={lastBranch.type} key={Crypto.randomUUID()} />,
-    ]);
+    // Keep visual branch animation, but decouple state progression from animation callbacks.
+    // Callback-driven commits can be dropped under very rapid tapping.
+    state.branches.forEach(branch => {
+      getBranchRef(branch.id).current?.animateDown(() => {});
+    });
 
-    // Check to see if player is chopping tree below branch
-    const wouldCollide =
-      (side === 'left' && nextBranch.type === 1) ||
-      (side === 'right' && nextBranch.type === 2);
-
-    if (wouldCollide) {
-      if (runContinuesUsed === 0) {
-        togglePaused();
-        setPendingDeath(true);
-      } else {
-        endGame();
-      }
-      return;
-    } else {
-      if (side === 'left' && nextBranch.type === 3) {
-        refill(8);
-      } else if (side === 'right' && nextBranch.type === 4) {
-        refill(8);
-      }
-
-      setScore(prevState => prevState + 100);
-    }
+    setTimeout(() => {
+      dispatch({type: 'COMMIT_BRANCH_SHIFT'});
+    }, 25);
   };
 
   const continueRun = () => {
-    // Restart the per-second score decay if needed
-    if (!timerInterval.current) {
-      timerInterval.current = setInterval(() => {
-        setScore(prevState => (prevState > 0 ? prevState - 20 : 0));
-      }, 1000);
-    }
-    setRunContinuesUsed(prev => prev + 1);
-    refill(31);
-    setPaused(false);
+    dispatch({type: 'CONTINUE_AFTER_AD'});
     setAnimatingIn(false);
-    // Clear the tree: remove all branches currently on screen
-    setBranches(prev => prev.map(b => ({...b, type: 0})));
-    // Prevent auto-pause triggered by returning from ad
-    suppressNextAutoPauseRef.current = true;
-    setGameOver(false);
-    setPendingDeath(false);
-    setResumeSeq(prev => prev + 1);
   };
 
   const togglePaused = () => {
-    setPaused(prev => {
-      if (prev) {
-        if (!timerInterval.current) {
-          timerInterval.current = setInterval(() => {
-            setScore(prevState => prevState - 20);
-          }, 1000);
-        }
-      } else {
-        clearInterval(timerInterval.current);
-        timerInterval.current = undefined;
-      }
-      return !prev;
-    });
+    dispatch({type: 'TOGGLE_PAUSE'});
   };
 
   return (
     <View style={styles.container}>
-      <Background score={score} step={step} />
+      <Background score={state.score} step={state.step} />
       <FlatList
         pointerEvents="none"
         style={styles.branchContainer}
         contentContainerStyle={styles.branchContentContainer}
-        data={branches}
+        data={state.branches}
         renderItem={({item, index}) => (
-          <Branch side={item.type} index={index} ref={item.ref} />
+          <Branch side={item.type} index={index} ref={getBranchRef(item.id)} />
         )}
         removeClippedSubviews={Platform.OS === 'android'}
         keyExtractor={item => item.id.toString()}
       />
 
-      {thrownAwayArr}
+      {state.thrownAwayEvents.map(event => (
+        <ThrownAway side={event.side} key={event.id} />
+      ))}
 
       <Pressable style={styles.leftSide} onPressIn={() => handlePress('left')}>
         <View style={styles.side} />
@@ -301,16 +143,15 @@ const Game = () => {
 
       <Player
         gameOver={gameOver}
-        setCurrentSide={setCurrentSide}
-        currentSide={currentSide}
+        currentSide={state.side}
         setDisablePress={setAnimatingIn}
-        step={step}
+        step={state.step}
         pendingDeath={pendingDeath}
-        resumeSeq={resumeSeq}
+        resumeSeq={state.resumeSeq}
       />
 
       <View style={styles.headerContainer}>
-        <Text style={styles.score}>{score}</Text>
+        <Text style={styles.score}>{state.score}</Text>
 
         {!paused && !gameOver && (
           <Pressable onPress={togglePaused} style={styles.pauseButton}>
@@ -318,7 +159,7 @@ const Game = () => {
           </Pressable>
         )}
       </View>
-      <OxygenMeter o2={o2} />
+      <OxygenMeter o2={state.o2} />
 
       {paused && !pendingDeath && (
         <View style={styles.pauseContainer}>
@@ -330,10 +171,10 @@ const Game = () => {
       )}
 
       <GameOverModal
-        canContinue={pendingDeath && runContinuesUsed < 1}
+        canContinue={pendingDeath && state.runContinuesUsed < 1}
         onContinue={continueRun}
         visible={pendingDeath || gameOver}
-        score={score}
+        score={state.score}
         resetGame={resetGame}
       />
     </View>
