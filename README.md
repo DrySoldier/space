@@ -25,15 +25,48 @@ In the output, you'll find options to open the app in a
 
 You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
 
-## Get a fresh project
+## About this project
 
-When you're ready, run:
+__Space Climb__ is a fast-paced arcade ascent game where you race upward through a dangerous space tower, dodge side hazards, and manage your oxygen to survive. Every run tests your timing and decision-making, with leaderboard progression and an evolving meta-loop that unlocks new narrative beats and upgrades as you climb higher.
 
-```bash
-npm run reset-project
-```
+## Technical analysis
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+- Built with __React Native (Expo)__ + __TypeScript__.
+
+- The project is organized into clear layers:
+
+  - `app/screens` = full screens (Game, Home, Settings, Shop)
+  - `components` = reusable UI pieces (player, branches, modals, meters)
+  - `hooks` = side-effect logic (ads, scoreboard, music, etc.)
+  - `state/game` = core game state and reducer logic
+  - `state/meta` (planned/extended) = progression, currency, and upgrades
+  - `docs/shop` = epics/specs that define the system design
+
+- Main patterns used:
+
+  - __Reducer pattern__ for game state transitions (pause, run, death, continue, score/oxygen updates)
+  - __Single game tick loop__ for timer-based updates
+  - __Pure helper functions__ for gameplay rules (spawn/collision/score math)
+  - __Presentational components__ separated from game logic
+
+- Main parts of the game:
+
+  - Real-time climb gameplay (left/right inputs, obstacle avoidance)
+  - Oxygen management and score progression
+  - Run-end flow with continue/restart and leaderboard update
+  - Narrative unlock flow (Space Man encounter)
+  - Shop + upgrade loop (using oxygen tanks as currency)
+  - Settings/profile + leaderboard browsing
+
+- Data model direction:
+
+  - __Offline-first__ local save for progression and upgrades
+  - Optional __server sync__ for leaderboard/shop validation when online
+
+- Overall goal:
+
+  - Keep gameplay fast and responsive while making the codebase easy to extend for narrative, new hazards, and shop systems.
+
 
 ## Learn more
 
