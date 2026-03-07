@@ -25,67 +25,120 @@ export function useScoreboard() {
     const [scores, setScores] = useState<IScore[]>([]);
     const [userScore, setUserScore] = useState<IUserScore | undefined>();
     const [isFetchingScores, setIsFetchingScores] = useState(false);
+    const [hasMoreAbove, setHasMoreAbove] = useState(true);
+    const [hasMoreBelow, setHasMoreBelow] = useState(true);
 
     const getScoreByUUID = async () => {
-        const deviceId = await retrieveData('UUID');
-
-        if (!deviceId) {
-            setUserScore(undefined);
-            setScores([]);
-            return;
-        }
-
-        setIsFetchingScores(true);
         try {
+            const deviceId = await retrieveData('UUID');
+
+            if (!deviceId) {
+                setUserScore(undefined);
+                setScores([]);
+                setHasMoreAbove(false);
+                setHasMoreBelow(false);
+                return;
+            }
+
+            setIsFetchingScores(true);
             const fetchedScore = await api.getScoreByUUID(deviceId) as IScoreByUUIDPayload | null;
 
             if (fetchedScore) {
                 setUserScore(fetchedScore.userScore || undefined);
                 setScores(Array.isArray(fetchedScore.scores) ? fetchedScore.scores : []);
+                setHasMoreAbove(true);
+                setHasMoreBelow(true);
             } else {
                 setUserScore(undefined);
                 setScores([]);
+                setHasMoreAbove(false);
+                setHasMoreBelow(false);
             }
+        } catch (error) {
+            console.log(' ::: useScoreboard.getScoreByUUID failed :::', error);
+            setUserScore(undefined);
+            setScores([]);
+            setHasMoreAbove(false);
+            setHasMoreBelow(false);
         } finally {
             setIsFetchingScores(false);
         }
     };
 
     const addNewScore = async (score: number) => {
-        const deviceId = await retrieveData('UUID');
+        try {
+            const deviceId = await retrieveData('UUID');
 
-        if (deviceId) {
-            const data = await api.postScore(score, deviceId);
+            if (!deviceId) {
+                return null;
+            }
 
-            setScores(data);
+            const data = await api.postScore(score, deviceId) as IScore[] | null;
+
+            if (Array.isArray(data)) {
+                setScores(data);
+                setHasMoreAbove(true);
+                setHasMoreBelow(true);
+                return data;
+            }
+
+            return null;
+        } catch (error) {
+            console.log(' ::: useScoreboard.addNewScore failed :::', error);
+            return null;
         }
     };
 
     const updateName = async (name: string) => {
-        const deviceId = await retrieveData('UUID');
+        try {
+            const deviceId = await retrieveData('UUID');
 
-        if (deviceId) {
+            if (!deviceId) {
+                return null;
+            }
+
             const result = await api.putName(deviceId, name);
 
             return result;
+        } catch (error) {
+            console.log(' ::: useScoreboard.updateName failed :::', error);
+            return null;
         }
-    }
+    };
 
     const loadAbove = async () => {
-        if (!scores.length) return;
-        const beforeRank = scores[0].rk;
-        const newRows = await api.getAbove(beforeRank);
-        if (newRows && newRows.length > 0) {
-            setScores(prev => [...newRows.reverse(), ...prev]);
+        try {
+            if (!scores.length || !hasMoreAbove) return;
+
+            const beforeRank = scores[0].rk;
+            const newRows = await api.getAbove(beforeRank);
+            if (newRows && newRows.length > 0) {
+                setScores(prev => [...newRows.reverse(), ...prev]);
+                return;
+            }
+
+            setHasMoreAbove(false);
+        } catch (error) {
+            console.log(' ::: useScoreboard.loadAbove failed :::', error);
+            setHasMoreAbove(false);
         }
     };
 
     const loadBelow = async () => {
-        if (!scores.length) return;
-        const afterRank = scores[scores.length - 1].rk;
-        const newRows = await api.getBelow(afterRank);
-        if (newRows && newRows.length > 0) {
-            setScores(prev => [...prev, ...newRows]);
+        try {
+            if (!scores.length || !hasMoreBelow) return;
+
+            const afterRank = scores[scores.length - 1].rk;
+            const newRows = await api.getBelow(afterRank);
+            if (newRows && newRows.length > 0) {
+                setScores(prev => [...prev, ...newRows]);
+                return;
+            }
+
+            setHasMoreBelow(false);
+        } catch (error) {
+            console.log(' ::: useScoreboard.loadBelow failed :::', error);
+            setHasMoreBelow(false);
         }
     };
 
@@ -93,6 +146,8 @@ export function useScoreboard() {
         scores,
         userScore,
         isFetchingScores,
+        hasMoreAbove,
+        hasMoreBelow,
         addNewScore,
         updateName,
         loadAbove,

@@ -1,11 +1,5 @@
 import React, {useRef, useEffect, useState} from 'react';
-import {
-  Text,
-  View,
-  TouchableOpacity,
-  Modal,
-  SafeAreaView,
-} from 'react-native';
+import {Text, View, TouchableOpacity, Modal, SafeAreaView} from 'react-native';
 import {ImageBackground} from 'expo-image';
 import {useRouter} from 'expo-router';
 import {useScoreboard} from '@/hooks/useScoreboard';
@@ -14,10 +8,13 @@ import GameOverModalScoreboard from './Scoreboard';
 import styles from './styles';
 import {images} from '../../constants/images';
 import {retrieveData, storeData} from '../../utils/asyncData';
+import {calculateRunCurrencyPayout} from '@/utils';
+import {loadShopState, saveShopState} from '@/state/meta/shop';
 
 interface IGameOverModal {
   visible: boolean;
   score: number;
+  tanksCollected: number;
   resetGame: () => void;
   /**
    * If true, show the Watch Ad CTA.
@@ -30,6 +27,7 @@ interface IGameOverModal {
 const GameOverModal = ({
   visible,
   score,
+  tanksCollected,
   resetGame,
   canContinue = false,
   onContinue,
@@ -126,11 +124,27 @@ const GameOverModal = ({
 
       try {
         const parsedHiScore = await loadHiScore();
+        const shopState = await loadShopState();
+        const payoutCredits = calculateRunCurrencyPayout(
+          score,
+          tanksCollected,
+          shopState.levels.tank_value_boost,
+        );
+
+        const nextShopState = {
+          ...shopState,
+          wallet: {
+            oxygenCredits: shopState.wallet.oxygenCredits + payoutCredits,
+          },
+        };
 
         if (score > parsedHiScore) {
-          storeData('HISCORE', score);
+          await storeData('HISCORE', score);
           setHiScore(score);
         }
+
+        await saveShopState(nextShopState);
+        await storeData('CREDITS', nextShopState.wallet.oxygenCredits);
         await addNewScore(score);
         return true;
       } catch (error) {

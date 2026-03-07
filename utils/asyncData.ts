@@ -1,6 +1,11 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-type TStorageKeys = 'HISCORE' | 'UUID' | 'MUTED';
+type TStorageKeys =
+  | 'HISCORE'
+  | 'UUID'
+  | 'MUTED'
+  | 'CREDITS'
+  | 'SHOP_STATE';
 
 export const storeData = async (type: TStorageKeys, val: unknown) => {
   try {

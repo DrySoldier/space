@@ -22,6 +22,7 @@ export interface GameState {
   step: boolean;
   score: number;
   o2: number;
+  tanksCollected: number;
   runContinuesUsed: number;
   resumeSeq: number;
   oxygenChanceCounter: number;

@@ -5,7 +5,7 @@ import {images} from '@/constants';
 import styles, {BRANCH_HW} from './styles';
 
 export type TBranchRef = {
-  animateDown: (callback: () => void) => void;
+  animateDown: () => void;
 };
 
 interface IBranch {
@@ -18,15 +18,13 @@ const Branch = ({side, index}: IBranch, ref: ForwardedRef<TBranchRef>) => {
     new Animated.Value((index - 2) * BRANCH_HW),
   ).current;
 
-  const animateDown = (callback: () => void) => {
+  const animateDown = () => {
     Animated.timing(translateY, {
       toValue: (index - 1) * BRANCH_HW,
       duration: 25,
       easing: Easing.linear,
       useNativeDriver: true,
-    }).start(() => {
-      callback();
-    });
+    }).start();
   };
 
   useImperativeHandle(ref, () => ({

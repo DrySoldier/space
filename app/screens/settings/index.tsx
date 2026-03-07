@@ -33,6 +33,8 @@ const Settings = () => {
     userScore,
     scores,
     isFetchingScores,
+    hasMoreAbove,
+    hasMoreBelow,
     loadAbove,
     loadBelow,
   } = useScoreboard();
@@ -81,27 +83,22 @@ const Settings = () => {
   };
 
   const pageAbove = async () => {
-    if (isPagingAbove || !scores.length) return;
+    if (isPagingAbove || !scores.length || !hasMoreAbove) return;
     setIsPagingAbove(true);
-    try {
-      await loadAbove();
-    } finally {
-      setIsPagingAbove(false);
-    }
+    await loadAbove();
+    setIsPagingAbove(false);
   };
 
   const pageBelow = async () => {
-    if (isPagingBelow || !scores.length) return;
+    if (isPagingBelow || !scores.length || !hasMoreBelow) return;
     setIsPagingBelow(true);
-    try {
-      await loadBelow();
-    } finally {
-      setIsPagingBelow(false);
-    }
+    await loadBelow();
+    setIsPagingBelow(false);
   };
 
   const clearAllData = async () => {
     await removeData('HISCORE');
+    await removeData('CREDITS');
     await removeData('UUID');
     await removeData('MUTED');
 
@@ -266,7 +263,7 @@ const Settings = () => {
 
           <View style={styles.scoreboardBody}>
             <View style={styles.scoreHeaderRow}>
-              <Text style={styles.scoreHeaderMetaText}>RK</Text>
+              <Text style={styles.scoreHeaderMetaText}>RANK</Text>
               <Text style={styles.scoreHeaderNameText}>NAME</Text>
               <Text style={styles.scoreHeaderMetaText}>SCORE</Text>
             </View>

@@ -15,6 +15,7 @@ export const createInitialGameState = (): GameState => ({
   step: false,
   score: 0,
   o2: MAX_O2,
+  tanksCollected: 0,
   runContinuesUsed: 0,
   resumeSeq: 0,
   oxygenChanceCounter: 0,

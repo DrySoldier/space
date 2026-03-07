@@ -34,6 +34,7 @@ const Game = () => {
     {},
   );
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const commitRafRef = useRef<number | null>(null);
 
   const paused = state.status === 'paused';
   const pendingDeath = state.status === 'pending_death';
@@ -74,6 +75,36 @@ const Game = () => {
     };
   }, [state.status]);
 
+  useEffect(() => {
+    if (!state.pendingBranchQueue.length || commitRafRef.current !== null) {
+      return;
+    }
+
+    commitRafRef.current = requestAnimationFrame(() => {
+      commitRafRef.current = null;
+      dispatch({type: 'COMMIT_BRANCH_SHIFT'});
+    });
+
+    return () => {
+      if (commitRafRef.current !== null) {
+        cancelAnimationFrame(commitRafRef.current);
+        commitRafRef.current = null;
+      }
+    };
+  }, [state.pendingBranchQueue.length]);
+
+  useEffect(() => {
+    const activeBranchIds = new Set(state.branches.map(branch => branch.id));
+
+    Object.keys(branchRefs.current).forEach(branchIdKey => {
+      const branchId = Number(branchIdKey);
+
+      if (!activeBranchIds.has(branchId)) {
+        delete branchRefs.current[branchId];
+      }
+    });
+  }, [state.branches]);
+
   const resetGame = () => {
     dispatch({type: 'RESET_RUN'});
     setAnimatingIn(false);
@@ -93,12 +124,8 @@ const Game = () => {
     // Keep visual branch animation, but decouple state progression from animation callbacks.
     // Callback-driven commits can be dropped under very rapid tapping.
     state.branches.forEach(branch => {
-      getBranchRef(branch.id).current?.animateDown(() => {});
+      getBranchRef(branch.id).current?.animateDown();
     });
-
-    setTimeout(() => {
-      dispatch({type: 'COMMIT_BRANCH_SHIFT'});
-    }, 25);
   };
 
   const continueRun = () => {
@@ -175,6 +202,7 @@ const Game = () => {
         onContinue={continueRun}
         visible={pendingDeath || gameOver}
         score={state.score}
+        tanksCollected={state.tanksCollected}
         resetGame={resetGame}
       />
     </View>

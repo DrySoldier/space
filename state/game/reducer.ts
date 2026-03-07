@@ -189,6 +189,7 @@ export const gameReducer = (state: GameState, action: GameAction): GameState => 
         pendingBranchQueue: [...state.pendingBranchQueue, branchType],
         score: state.score + SCORE_GAIN_PER_CHOP,
         o2: collectedTank ? Math.min(MAX_O2, state.o2 + O2_PICKUP_AMOUNT) : state.o2,
+        tanksCollected: collectedTank ? state.tanksCollected + 1 : state.tanksCollected,
       };
     }
 
@@ -219,6 +220,7 @@ export const gameReducer = (state: GameState, action: GameAction): GameState => 
         status: 'running',
         runContinuesUsed: state.runContinuesUsed + 1,
         o2: MAX_O2,
+        tanksCollected: 0,
         branches: state.branches.map(branch => ({ ...branch, type: 0 })),
         suppressNextAutoPause: true,
         resumeSeq: state.resumeSeq + 1,

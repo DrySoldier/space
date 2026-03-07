@@ -1,16 +1,23 @@
-import React, {useEffect, useRef} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {View, Text, Animated, Easing} from 'react-native';
 import {ImageBackground} from 'expo-image';
-import {Link} from 'expo-router';
+import {Link, useFocusEffect} from 'expo-router';
 import {images} from '../../../constants/images';
 import styles from './styles';
 import {randInt} from '../../../utils';
-import { moderateScale } from '@/constants';
+import {moderateScale} from '@/constants';
+import {loadShopState} from '@/state/meta/shop';
 
 const Home = () => {
+  const [shopUnlocked, setShopUnlocked] = useState(false);
   const buttonDegree = useRef(new Animated.Value(0)).current;
   const astroPosition = useRef(new Animated.Value(0)).current;
   const astroRotate = useRef(new Animated.Value(0)).current;
+
+  const refreshShopUnlocked = async () => {
+    const shopState = await loadShopState();
+    setShopUnlocked(shopState.unlocked);
+  };
 
   const spin = buttonDegree.interpolate({
     inputRange: [0, 1],
@@ -66,7 +73,14 @@ const Home = () => {
   useEffect(() => {
     startButtonRotateAnimation();
     startAstroAnimation();
+    refreshShopUnlocked();
   }, []);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      refreshShopUnlocked();
+    }, []),
+  );
 
   return (
     <ImageBackground source={images.space} style={styles.flex}>
@@ -88,7 +102,8 @@ const Home = () => {
         />
       </Animated.View>
       <View style={styles.buttonContainer}>
-        <Animated.View style={{transform: [{rotate: spin}], paddingLeft: moderateScale(125)}}>
+        <Animated.View
+          style={{transform: [{rotate: spin}], paddingLeft: moderateScale(125)}}>
           <Link href="/screens/game">
             <ImageBackground
               style={styles.button}
@@ -108,6 +123,18 @@ const Home = () => {
             </ImageBackground>
           </Link>
         </Animated.View>
+        {shopUnlocked && (
+          <Animated.View style={{transform: [{rotate: spin}]}}>
+            <Link href="/screens/shop">
+              <ImageBackground
+                style={styles.button}
+                resizeMode="stretch"
+                source={images.spaceProbe}>
+                <Text style={styles.buttonText}>SHOP</Text>
+              </ImageBackground>
+            </Link>
+          </Animated.View>
+        )}
       </View>
       <View style={styles.flex} />
     </ImageBackground>
