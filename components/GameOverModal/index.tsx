@@ -38,12 +38,18 @@ const GameOverModal = ({
   const {isLoaded, isLoading, load, show} = useRewardedAd();
   const [isActionLocked, setIsActionLocked] = useState(false);
   const [isSavingScore, setIsSavingScore] = useState(false);
+  const [shopUnlocked, setShopUnlocked] = useState(false);
 
   const hasPersistedScoreRef = useRef(false);
   const saveScorePromiseRef = useRef<Promise<boolean> | null>(null);
   const actionLockRef = useRef(false);
 
   const hiScoreBeat = score >= hiScore;
+
+  const refreshShopUnlocked = async () => {
+    const shopState = await loadShopState();
+    setShopUnlocked(shopState.unlocked);
+  };
 
   const loadHiScore = async () => {
     const stored = await retrieveData('HISCORE');
@@ -87,6 +93,7 @@ const GameOverModal = ({
       saveScorePromiseRef.current = null;
       setIsSavingScore(false);
       unlockActions();
+      refreshShopUnlocked();
     }
   }, [visible]);
 
@@ -185,11 +192,45 @@ const GameOverModal = ({
     });
   };
 
+  const handleShop = async () => {
+    await runLockedAction(async () => {
+      const didSave = await saveScore();
+      if (!didSave) return false;
+
+      // Dismiss the modal state before leaving the game screen.
+      resetGame();
+      router.replace('/screens/shop');
+      return true;
+    });
+  };
+
   useEffect(() => {
     if (visible && !hasPersistedScoreRef.current) {
       saveScore();
     }
   }, [visible]);
+
+  const continueButton = canContinue ? (
+    <TouchableOpacity
+      onPress={onPressContinue}
+      disabled={isActionLocked || (!isLoaded && isLoading)}>
+      <ImageBackground
+        resizeMode={'stretch'}
+        source={images.adButton}
+        style={styles.ctaButton}>
+        <Text style={styles.ctaText}>
+          {isLoaded ? 'Continue' : isLoading ? 'Loading…' : 'Load Ad'}
+        </Text>
+      </ImageBackground>
+    </TouchableOpacity>
+  ) : (
+    <ImageBackground
+      resizeMode={'stretch'}
+      source={images.adButton}
+      style={[styles.ctaButton, styles.placeholderButton]}>
+      <Text style={styles.placeholderText}>Claimed</Text>
+    </ImageBackground>
+  );
 
   return (
     <Modal
@@ -219,21 +260,27 @@ const GameOverModal = ({
           />
         </ImageBackground>
         <View style={styles.ctaContainer}>
-          <View>
-            <TouchableOpacity onPress={handleRestart} disabled={isActionLocked}>
-              <ImageBackground
-                resizeMode={'stretch'}
-                source={images.normalButton}
-                style={[styles.ctaButton, styles.primaryCta]}>
-                <Text style={styles.ctaText}>Restart</Text>
-              </ImageBackground>
-            </TouchableOpacity>
-          </View>
-          <View style={styles.secondaryRow}>
-            <View>
-              <TouchableOpacity
-                onPress={handleMainMenu}
-                disabled={isActionLocked}>
+          {shopUnlocked ? (
+            <View style={styles.gridContainer}>
+              <TouchableOpacity onPress={handleShop} disabled={isActionLocked}>
+                <ImageBackground
+                  resizeMode={'stretch'}
+                  source={images.normalButton}
+                  style={styles.ctaButton}>
+                  <Text style={styles.ctaText}>Shop</Text>
+                </ImageBackground>
+              </TouchableOpacity>
+
+              <TouchableOpacity onPress={handleRestart} disabled={isActionLocked}>
+                <ImageBackground
+                  resizeMode={'stretch'}
+                  source={images.normalButton}
+                  style={styles.ctaButton}>
+                  <Text style={styles.ctaText}>Restart</Text>
+                </ImageBackground>
+              </TouchableOpacity>
+
+              <TouchableOpacity onPress={handleMainMenu} disabled={isActionLocked}>
                 <ImageBackground
                   resizeMode={'stretch'}
                   source={images.normalButton}
@@ -241,35 +288,39 @@ const GameOverModal = ({
                   <Text style={styles.ctaText}>Main Menu</Text>
                 </ImageBackground>
               </TouchableOpacity>
+
+              {continueButton}
             </View>
-            <View>
-              {canContinue ? (
-                <TouchableOpacity
-                  onPress={onPressContinue}
-                  disabled={isActionLocked || (!isLoaded && isLoading)}>
+          ) : (
+            <>
+              <View style={styles.secondaryRow}>
+                <View>
+                  <TouchableOpacity
+                    onPress={handleMainMenu}
+                    disabled={isActionLocked}>
+                    <ImageBackground
+                      resizeMode={'stretch'}
+                      source={images.normalButton}
+                      style={styles.ctaButton}>
+                      <Text style={styles.ctaText}>Main Menu</Text>
+                    </ImageBackground>
+                  </TouchableOpacity>
+                </View>
+                <View>{continueButton}</View>
+              </View>
+
+              <View>
+                <TouchableOpacity onPress={handleRestart} disabled={isActionLocked}>
                   <ImageBackground
                     resizeMode={'stretch'}
-                    source={images.adButton}
-                    style={styles.ctaButton}>
-                    <Text style={styles.ctaText}>
-                      {isLoaded
-                        ? 'Continue'
-                        : isLoading
-                          ? 'Loading…'
-                          : 'Load Ad'}
-                    </Text>
+                    source={images.normalButton}
+                    style={[styles.ctaButton, styles.primaryCta]}>
+                    <Text style={styles.ctaText}>Restart</Text>
                   </ImageBackground>
                 </TouchableOpacity>
-              ) : (
-                <ImageBackground
-                  resizeMode={'stretch'}
-                  source={images.adButton}
-                  style={[styles.ctaButton, styles.placeholderButton]}>
-                  <Text style={styles.placeholderText}>Claimed</Text>
-                </ImageBackground>
-              )}
-            </View>
-          </View>
+              </View>
+            </>
+          )}
         </View>
       </SafeAreaView>
     </Modal>

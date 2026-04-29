@@ -5,7 +5,8 @@ type TStorageKeys =
   | 'UUID'
   | 'MUTED'
   | 'CREDITS'
-  | 'SHOP_STATE';
+  | 'SHOP_STATE'
+  | 'PROGRESSION_STAGE';
 
 export const storeData = async (type: TStorageKeys, val: unknown) => {
   try {

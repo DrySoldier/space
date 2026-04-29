@@ -33,7 +33,7 @@ const createDefaultUpgradeLevels = (): UpgradeLevels =>
 
 export const createDefaultShopState = (
   oxygenCredits = 0,
-  unlocked = true,
+  unlocked = false,
 ): ShopState => ({
   unlocked,
   wallet: {

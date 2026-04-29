@@ -2,6 +2,7 @@ import { randInt } from '@/utils';
 import { getLevel } from '@/utils/level';
 
 import {
+  FIRST_CONTACT_MILESTONE_SCORE,
   MAX_O2,
   O2_DRAIN_PER_TICK,
   O2_PICKUP_AMOUNT,
@@ -86,11 +87,22 @@ export const gameReducer = (state: GameState, action: GameAction): GameState => 
       const nextO2 = Math.max(0, state.o2 - O2_DRAIN_PER_TICK);
 
       if (nextO2 <= 0) {
+        const nextStatus =
+          state.runContinuesUsed > 0 ? 'game_over' : 'pending_death';
+        const shouldCheckEncounter =
+          (nextStatus === 'pending_death' || nextStatus === 'game_over') &&
+          nextScore >= FIRST_CONTACT_MILESTONE_SCORE;
+
         return {
           ...state,
           score: nextScore,
           o2: 0,
-          status: state.runContinuesUsed > 0 ? 'game_over' : 'pending_death',
+          status: nextStatus,
+          encounterCheckSeq: shouldCheckEncounter
+            ? state.encounterCheckSeq + 1
+            : state.encounterCheckSeq,
+          narrativeEncounterPending:
+            shouldCheckEncounter || state.narrativeEncounterPending,
         };
       }
 
@@ -169,6 +181,12 @@ export const gameReducer = (state: GameState, action: GameAction): GameState => 
       ].slice(-25);
 
       if (wouldCollide) {
+        const nextStatus =
+          state.runContinuesUsed === 0 ? 'pending_death' : 'game_over';
+        const shouldCheckEncounter =
+          (nextStatus === 'pending_death' || nextStatus === 'game_over') &&
+          state.score >= FIRST_CONTACT_MILESTONE_SCORE;
+
         return {
           ...state,
           side: action.side,
@@ -176,7 +194,12 @@ export const gameReducer = (state: GameState, action: GameAction): GameState => 
           thrownAwayEvents: nextThrownAwayEvents,
           oxygenChanceCounter,
           pendingBranchQueue: [...state.pendingBranchQueue, branchType],
-          status: state.runContinuesUsed === 0 ? 'pending_death' : 'game_over',
+          status: nextStatus,
+          encounterCheckSeq: shouldCheckEncounter
+            ? state.encounterCheckSeq + 1
+            : state.encounterCheckSeq,
+          narrativeEncounterPending:
+            shouldCheckEncounter || state.narrativeEncounterPending,
         };
       }
 
@@ -228,10 +251,23 @@ export const gameReducer = (state: GameState, action: GameAction): GameState => 
         side: 'left',
       };
 
+    case 'ENCOUNTER_FLOW_RESOLVED':
+      return {
+        ...state,
+        narrativeEncounterPending: false,
+      };
+
     case 'END_GAME':
       return {
         ...state,
         status: 'game_over',
+        encounterCheckSeq:
+          state.score >= FIRST_CONTACT_MILESTONE_SCORE
+            ? state.encounterCheckSeq + 1
+            : state.encounterCheckSeq,
+        narrativeEncounterPending:
+          state.score >= FIRST_CONTACT_MILESTONE_SCORE ||
+          state.narrativeEncounterPending,
       };
 
     default:

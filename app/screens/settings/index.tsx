@@ -99,6 +99,8 @@ const Settings = () => {
   const clearAllData = async () => {
     await removeData('HISCORE');
     await removeData('CREDITS');
+    await removeData('SHOP_STATE');
+    await removeData('PROGRESSION_STAGE');
     await removeData('UUID');
     await removeData('MUTED');
 
@@ -236,7 +238,7 @@ const Settings = () => {
                   onPress={() =>
                     Alert.alert(
                       'Clear data?',
-                      'This will reset your hi-score',
+                      'This will reset your score and shop progress.',
                       [
                         {text: 'Cancel', style: 'cancel'},
                         {text: 'OK', onPress: clearAllData},

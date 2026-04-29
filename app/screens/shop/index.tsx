@@ -93,7 +93,7 @@ const Shop = () => {
     <ImageBackground source={images.space} style={styles.container}>
       <SafeAreaView style={styles.content}>
         <View style={styles.topLeftBar}>
-          <TouchableOpacity onPress={() => router.back()}>
+          <TouchableOpacity onPress={() => router.replace('/screens/home')}>
             <ImageBackground
               style={styles.backButton}
               resizeMode="stretch"

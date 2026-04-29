@@ -1,20 +1,15 @@
 import React, {createRef, useEffect, useReducer, useRef, useState} from 'react';
-import {
-  Text,
-  View,
-  FlatList,
-  Pressable,
-  Platform,
-  AppState,
-} from 'react-native';
+import {Text, View, FlatList, Pressable, Platform, AppState} from 'react-native';
 import {Image} from 'expo-image';
 import * as Crypto from 'expo-crypto';
+
 import {
   ThrownAway,
   Branch,
   GameOverModal,
   OxygenMeter,
   Background,
+  EncounterFlow,
 } from '@/components';
 import {images} from '@/constants';
 import {createInitialGameState, gameReducer, Side} from '@/state/game';
@@ -30,6 +25,7 @@ const Game = () => {
     createInitialGameState,
   );
   const [animatingIn, setAnimatingIn] = useState(false);
+
   const branchRefs = useRef<Record<number, React.RefObject<TBranchRef | null>>>(
     {},
   );
@@ -39,6 +35,7 @@ const Game = () => {
   const paused = state.status === 'paused';
   const pendingDeath = state.status === 'pending_death';
   const gameOver = state.status === 'game_over';
+  const encounterActive = state.narrativeEncounterPending;
 
   const getBranchRef = (id: number): React.RefObject<TBranchRef | null> => {
     if (!branchRefs.current[id]) {
@@ -121,8 +118,6 @@ const Game = () => {
       thrownAwayId: Crypto.randomUUID(),
     });
 
-    // Keep visual branch animation, but decouple state progression from animation callbacks.
-    // Callback-driven commits can be dropped under very rapid tapping.
     state.branches.forEach(branch => {
       getBranchRef(branch.id).current?.animateDown();
     });
@@ -140,6 +135,7 @@ const Game = () => {
   return (
     <View style={styles.container}>
       <Background score={state.score} step={state.step} />
+
       <FlatList
         pointerEvents="none"
         style={styles.branchContainer}
@@ -180,15 +176,16 @@ const Game = () => {
       <View style={styles.headerContainer}>
         <Text style={styles.score}>{state.score}</Text>
 
-        {!paused && !gameOver && (
+        {!paused && !gameOver && !encounterActive && (
           <Pressable onPress={togglePaused} style={styles.pauseButton}>
             <Image source={images.pause} style={styles.pauseImage} />
           </Pressable>
         )}
       </View>
+
       <OxygenMeter o2={state.o2} />
 
-      {paused && !pendingDeath && (
+      {paused && !pendingDeath && !encounterActive && (
         <View style={styles.pauseContainer}>
           <Pressable style={styles.continueButton} onPress={togglePaused}>
             <Image source={images.play} style={styles.pauseImage} />
@@ -198,12 +195,22 @@ const Game = () => {
       )}
 
       <GameOverModal
-        canContinue={pendingDeath && state.runContinuesUsed < 1}
+        canContinue={pendingDeath && state.runContinuesUsed < 1 && !encounterActive}
         onContinue={continueRun}
-        visible={pendingDeath || gameOver}
+        visible={
+          (pendingDeath || gameOver) &&
+          !encounterActive &&
+          !state.narrativeEncounterPending
+        }
         score={state.score}
         tanksCollected={state.tanksCollected}
         resetGame={resetGame}
+      />
+
+      <EncounterFlow
+        encounterCheckSeq={state.encounterCheckSeq}
+        score={state.score}
+        onFlowResolved={() => dispatch({type: 'ENCOUNTER_FLOW_RESOLVED'})}
       />
     </View>
   );

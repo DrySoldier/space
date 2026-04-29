@@ -14,6 +14,7 @@ const images = {
   pause: require('../assets/newAssets/pause.png'),
   play: require('../assets/newAssets/play.png'),
   spaceScreen: require('../assets/newAssets/space-screen.png'),
+  spaceTablet: require('../assets/newAssets/space-tablet.png'),
   buttonNormal: require('../assets/newAssets/button_normal.png'),
   buttonHover: require('../assets/newAssets/button_hover.png'),
   buttonClicked: require('../assets/newAssets/button_clicked.png'),
@@ -26,6 +27,9 @@ const images = {
   scrollbarHorizontal: require('../assets/newAssets/scrollbar_horizontal.png'),
   obstacleTileLeft: require('../assets/newAssets/elevator-tile-obstacle-left.png'),
   obstacleTileRight: require('../assets/newAssets/elevator-tile-obstacle-right.png'),
+  merchantBright: require('../assets/newAssets/merchant_bright.png'),
+  merchantDark: require('../assets/newAssets/merchant_dark.png'),
+  tabletSpriteSheet: require('../assets/newAssets/tablet_spritesheet.png'),
 };
 
 let imageValues = Object.values(images);

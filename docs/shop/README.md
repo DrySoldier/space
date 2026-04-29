@@ -14,7 +14,8 @@ These docs are the planning source for the next major phase: **Shop + narrative 
 4. **E3 — Fireball Obstacle System**
 5. **E4 — Economy and Balance Pass**
 6. **E5 — Server Sync + Rudimentary Validation**
-7. **E6 — Polish, QA, Release Hardening**
+7. **E5.5 — Run Integrity Guardrails**
+8. **E6 — Polish, QA, Release Hardening**
 
 ## Folder Layout
 

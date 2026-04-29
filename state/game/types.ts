@@ -28,6 +28,8 @@ export interface GameState {
   oxygenChanceCounter: number;
   pendingBranchQueue: BranchType[];
   suppressNextAutoPause: boolean;
+  encounterCheckSeq: number;
+  narrativeEncounterPending: boolean;
 }
 
 export type GameAction =
@@ -38,4 +40,5 @@ export type GameAction =
   | {type: 'CHOP_RESOLVE'; side: Side; thrownAwayId: string}
   | {type: 'COMMIT_BRANCH_SHIFT'}
   | {type: 'CONTINUE_AFTER_AD'}
+  | {type: 'ENCOUNTER_FLOW_RESOLVED'}
   | {type: 'END_GAME'};

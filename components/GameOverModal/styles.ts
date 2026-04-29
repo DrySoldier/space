@@ -69,6 +69,12 @@ const styles = StyleSheet.create({
     width: width * 0.7,
     height: ms(60),
   },
+  gridContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    width: width * 0.85,
+    justifyContent: 'space-between',
+  },
   secondaryRow: {
     flexDirection: 'row',
     width: width * 0.85,

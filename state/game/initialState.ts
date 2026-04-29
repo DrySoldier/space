@@ -21,4 +21,6 @@ export const createInitialGameState = (): GameState => ({
   oxygenChanceCounter: 0,
   pendingBranchQueue: [],
   suppressNextAutoPause: false,
+  encounterCheckSeq: 0,
+  narrativeEncounterPending: false,
 });

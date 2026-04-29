@@ -18,7 +18,8 @@
 4. **E3 — Fireball Obstacle System**
 5. **E4 — Economy and Balance Pass**
 6. **E5 — Server Sync + Rudimentary Validation**
-7. **E6 — Polish, QA, Release Hardening**
+7. **E5.5 — Run Integrity Guardrails**
+8. **E6 — Polish, QA, Release Hardening**
 
 Detailed docs live under `docs/shop/`.
 
